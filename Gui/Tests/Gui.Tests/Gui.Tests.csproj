@@ -1,0 +1,64 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.4"/>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1"/>
+    <PackageReference Include="NUnit" Version="4.3.2"/>
+    <PackageReference Include="NUnit.Analyzers" Version="4.6.0"/>
+    <PackageReference Include="NUnit3TestAdapter" Version="4.6.0"/>
+    <PackageReference Include="OpenTK" Version="4.9.4"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="NUnit.Framework"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="VintagestoryAPI">
+      <HintPath>$(VINTAGE_STORY)/VintagestoryAPI.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="VSSurvivalMod">
+      <HintPath>$(VINTAGE_STORY)/Mods/VSSurvivalMod.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="cairo-sharp">
+      <HintPath>$(VINTAGE_STORY)/Lib/cairo-sharp.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="SkiaSharp">
+      <HintPath>$(VINTAGE_STORY)/Lib/SkiaSharp.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="HarfBuzzSharp">
+      <HintPath>$(VINTAGE_STORY)/Lib/HarfBuzzSharp.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="SkiaSharp.HarfBuzz">
+      <HintPath>$(VINTAGE_STORY)/Lib/SkiaSharp.HarfBuzz.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <ProjectReference Include="..\..\Gui\Gui.csproj"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="$(VINTAGE_STORY)/Lib/libSkiaSharp.dll">
+      <Link>libSkiaSharp.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(NuGetPackageRoot)harfbuzzsharp.nativeassets.win32/7.3.0.3/runtimes/win-x64/native/libHarfBuzzSharp.dll">
+      <Link>libHarfBuzzSharp.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

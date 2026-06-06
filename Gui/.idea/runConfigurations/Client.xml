@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Client" type="RunExecutable" factoryName="Executable">
+    <option name="EXECUTABLE_PATH" value="C:\Games\VintageStory-1.21\Vintagestory.exe" />
+    <option name="PROGRAM_PARAMETERS" value="--tracelog --addModPath &quot;$PROJECT_DIR$/Gui/bin/Debug/Mods&quot;" />
+    <option name="WORKING_DIRECTORY" value="C:\Games\VintageStory-1.21" />
+    <method v="2">
+      <option name="Build" enabled="true" />
+    </method>
+  </configuration>
+</component>

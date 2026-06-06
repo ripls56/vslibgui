@@ -1,0 +1,17 @@
+{
+  "$schema": "https://moddbcdn.vintagestory.at/schema/modinfo.latest.json",
+  "type": "Code",
+  "modid": "gui",
+  "name": "Gui",
+  "authors": [
+    "ripls"
+  ],
+  "side": "Universal",
+  "description": "Client-side GUI library",
+  "version": "2.0.0",
+  "dependencies": {
+    "game": "1.22.0"
+  },
+  "requiredOnClient": true,
+  "requiredOnServer": false
+}
