@@ -47,6 +47,21 @@ public class VtmlSpanBuilderTests
     }
 
     [Test]
+    public void TextRunWithHref_NoHandler_StillHasRecognizer()
+    {
+        var elements = new List<VtmlInlineElement>
+        {
+            new VtmlTextRun { Text = "Click", Style = Base, Href = "handbook://test" }
+        };
+        var span = VtmlSpanBuilder.Build(elements, Base);
+
+        var root = span as TextSpan;
+        var child = root!.Children![0] as TextSpan;
+        Assert.That(child!.Recognizer, Is.InstanceOf<TapGestureRecognizer>());
+        Assert.That(child.Style?.Decoration, Is.EqualTo(TextDecoration.Underline));
+    }
+
+    [Test]
     public void LineBreak_ProducesNewlineTextSpan()
     {
         var elements = new List<VtmlInlineElement>
@@ -63,11 +78,25 @@ public class VtmlSpanBuilderTests
     }
 
     [Test]
-    public void IconRun_ProducesWidgetSpan()
+    public void IconRun_ByName_ProducesVsIconWidgetSpan()
     {
         var elements = new List<VtmlInlineElement>
         {
             new VtmlIconRun { Name = "dice", Size = 24f }
+        };
+        var span = VtmlSpanBuilder.Build(elements, Base);
+        var root = span as TextSpan;
+        var child = root!.Children![0];
+        Assert.That(child, Is.InstanceOf<WidgetSpan>());
+        Assert.That(((WidgetSpan)child).Child, Is.InstanceOf<VsIcon>());
+    }
+
+    [Test]
+    public void IconRun_ByPath_ProducesSvgIconWidgetSpan()
+    {
+        var elements = new List<VtmlInlineElement>
+        {
+            new VtmlIconRun { Path = "game:icons/foo", Size = 24f }
         };
         var span = VtmlSpanBuilder.Build(elements, Base);
         var root = span as TextSpan;

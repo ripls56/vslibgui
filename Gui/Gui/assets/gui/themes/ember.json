@@ -1,0 +1,21 @@
+{
+  "Theme": {
+    "Primary": "#FF6D00",
+    "OnPrimary": "#1A0800",
+    "Secondary": "#FFAB40",
+    "OnSecondary": "#1A0C00",
+    "Surface": "#1F1000",
+    "OnSurface": "#FFE0B2",
+    "OnSurfaceVariant": "#FFAB40",
+    "Background": "#100800",
+    "OnBackground": "#FFE0B2",
+    "Border": "#FF6D0080",
+    "Error": "#FF5252",
+    "OnError": "#1A0000",
+    "SurfaceLow": "#160B00",
+    "SurfaceHigh": "#2A1600",
+    "StateHover": "#FFE0B214",
+    "StateSelected": "#FF6D002E",
+    "OutlineVariant": "#FF6D0040"
+  }
+}

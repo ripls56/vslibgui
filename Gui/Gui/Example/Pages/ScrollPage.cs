@@ -42,43 +42,54 @@ internal class ScrollPage : StatefulWidget
 
         public override Widget Build(BuildContext context)
         {
-            var colors = Theme.Of(context).ColorScheme;
+            var theme = Theme.Of(context);
+            var colors = theme.ColorScheme;
+            var headerStyle = theme.TextTheme.Headline;
+            headerStyle.Color = colors.Primary;
 
-            return new Column(
+            return new Column
+            (
                 crossAxisAlignment: CrossAxisAlignment.Stretch,
                 spacing: 16,
                 children:
                 [
-                    new Text("Scroll",
-                        new TextStyle
-                        {
-                            FontSize = 22, Weight = FontWeight.Bold, Color = colors.Primary
-                        }),
+                    new Text("Scroll", headerStyle),
 
-                    new DemoCard(
+                    new DemoCard
+                    (
                         "ListView — vertical",
                         description:
                         "Virtualizes large lists. Only visible items are built and laid out.",
-                        demo: new SizedBox(
+                        demo: new SizedBox
+                        (
                             height: 200,
-                            child: new ListView(
-                                (ctx, i) => new Padding(
+                            child: new ListView
+                            (
+                                (ctx, i) => new Padding
+                                (
                                     EdgeInsets.Symmetric(3),
-                                    new Container(
+                                    new Container
+                                    (
                                         new BoxStyle
                                         {
                                             Color = i % 2 == 0 ? colors.Surface : Vector4.Zero,
                                             CornerRadius = Vector4.One * 4,
                                             BorderThickness = 1f,
                                             BorderColor = colors.Border,
-                                            Padding = EdgeInsets.Symmetric(horizontal: 12,
-                                                vertical: 8)
+                                            Padding = EdgeInsets.Symmetric
+                                            (
+                                                horizontal: 12,
+                                                vertical: 8
+                                            )
                                         },
-                                        new Text($"Item {i + 1}",
+                                        new Text
+                                        (
+                                            $"Item {i + 1}",
                                             new TextStyle
                                             {
                                                 FontSize = 13, Color = colors.OnSurface
-                                            })
+                                            }
+                                        )
                                     )
                                 ),
                                 200,
@@ -97,15 +108,20 @@ internal class ScrollPage : StatefulWidget
                         capi: Widget.Capi
                     ),
 
-                    new DemoCard(
+                    new DemoCard
+                    (
                         "ListView — horizontal",
                         description: "Pass scrollDirection: Axis.Horizontal for a horizontal list.",
-                        demo: new SizedBox(
+                        demo: new SizedBox
+                        (
                             height: 72,
-                            child: new ListView(
-                                (ctx, i) => new Padding(
+                            child: new ListView
+                            (
+                                (ctx, i) => new Padding
+                                (
                                     EdgeInsets.Symmetric(horizontal: 4),
-                                    new Container(
+                                    new Container
+                                    (
                                         new BoxStyle
                                         {
                                             Color = colors.Surface,
@@ -114,14 +130,18 @@ internal class ScrollPage : StatefulWidget
                                             BorderColor = colors.Primary,
                                             Width = 64
                                         },
-                                        new Center(
-                                            new Text($"{i + 1}",
+                                        new Center
+                                        (
+                                            new Text
+                                            (
+                                                $"{i + 1}",
                                                 new TextStyle
                                                 {
                                                     FontSize = 14,
                                                     Weight = FontWeight.Bold,
                                                     Color = colors.Primary
-                                                })
+                                                }
+                                            )
                                         )
                                     )
                                 ),
@@ -141,54 +161,73 @@ internal class ScrollPage : StatefulWidget
                         capi: Widget.Capi
                     ),
 
-                    new DemoCard(
+                    new DemoCard
+                    (
                         "SingleChildScrollView",
                         description:
                         "Wraps any widget in a scrollable area. Non-virtualized — all children are built.",
-                        demo: new SizedBox(
+                        demo: new SizedBox
+                        (
                             height: 120,
-                            child: new SingleChildScrollView(
-                                new Column(
+                            child: new SingleChildScrollView
+                            (
+                                new Column
+                                (
                                     crossAxisAlignment: CrossAxisAlignment.Stretch,
                                     spacing: 4,
                                     children:
                                     [
-                                        new Container(new BoxStyle
-                                        {
-                                            Color = colors.Surface,
-                                            Height = 32,
-                                            CornerRadius = Vector4.One * 3,
-                                            BorderThickness = 1f,
-                                            BorderColor = colors.Border
-                                        }),
-                                        new Container(new BoxStyle
-                                        {
-                                            Color = colors.Surface,
-                                            Height = 32,
-                                            CornerRadius = Vector4.One * 3,
-                                            BorderThickness = 1f,
-                                            BorderColor = colors.Border
-                                        }),
-                                        new Container(new BoxStyle
-                                        {
-                                            Color = colors.Surface,
-                                            Height = 32,
-                                            CornerRadius = Vector4.One * 3,
-                                            BorderThickness = 1f,
-                                            BorderColor = colors.Border
-                                        }),
-                                        new Container(new BoxStyle
-                                        {
-                                            Color = colors.Primary,
-                                            Height = 32,
-                                            CornerRadius = Vector4.One * 3
-                                        }),
-                                        new Container(new BoxStyle
-                                        {
-                                            Color = colors.Primary,
-                                            Height = 32,
-                                            CornerRadius = Vector4.One * 3
-                                        })
+                                        new Container
+                                        (
+                                            new BoxStyle
+                                            {
+                                                Color = colors.Surface,
+                                                Height = 32,
+                                                CornerRadius = Vector4.One * 3,
+                                                BorderThickness = 1f,
+                                                BorderColor = colors.Border
+                                            }
+                                        ),
+                                        new Container
+                                        (
+                                            new BoxStyle
+                                            {
+                                                Color = colors.Surface,
+                                                Height = 32,
+                                                CornerRadius = Vector4.One * 3,
+                                                BorderThickness = 1f,
+                                                BorderColor = colors.Border
+                                            }
+                                        ),
+                                        new Container
+                                        (
+                                            new BoxStyle
+                                            {
+                                                Color = colors.Surface,
+                                                Height = 32,
+                                                CornerRadius = Vector4.One * 3,
+                                                BorderThickness = 1f,
+                                                BorderColor = colors.Border
+                                            }
+                                        ),
+                                        new Container
+                                        (
+                                            new BoxStyle
+                                            {
+                                                Color = colors.Primary,
+                                                Height = 32,
+                                                CornerRadius = Vector4.One * 3
+                                            }
+                                        ),
+                                        new Container
+                                        (
+                                            new BoxStyle
+                                            {
+                                                Color = colors.Primary,
+                                                Height = 32,
+                                                CornerRadius = Vector4.One * 3
+                                            }
+                                        )
                                     ]
                                 )
                             )
@@ -203,35 +242,46 @@ internal class ScrollPage : StatefulWidget
                         capi: Widget.Capi
                     ),
 
-                    new DemoCard(
+                    new DemoCard
+                    (
                         "GridView",
                         description:
                         "Virtualized scrollable grid. Builder mode renders only the visible cells.",
-                        demo: new SizedBox(
+                        demo: new SizedBox
+                        (
                             height: 220,
-                            child: GridView.Builder(
-                                (ctx, i) => new Container(
+                            child: GridView.Builder
+                            (
+                                (ctx, i) => new Container
+                                (
                                     new BoxStyle
                                     {
-                                        Color = new Vector4(
+                                        Color = new Vector4
+                                        (
                                             colors.Primary.X,
                                             colors.Primary.Y,
                                             colors.Primary.Z,
-                                            0.15f + i % 5 * 0.10f),
+                                            0.15f + i % 5 * 0.10f
+                                        ),
                                         CornerRadius = Vector4.One * 4
                                     },
-                                    new Center(
-                                        new Text($"{i + 1}",
+                                    new Center
+                                    (
+                                        new Text
+                                        (
+                                            $"{i + 1}",
                                             new TextStyle
                                             {
                                                 FontSize = 12,
                                                 Weight = FontWeight.Bold,
                                                 Color = colors.Primary
-                                            })
+                                            }
+                                        )
                                     )
                                 ),
                                 240,
-                                new SliverGridDelegateWithFixedCrossAxisCount(
+                                new SliverGridDelegateWithFixedCrossAxisCount
+                                (
                                     4,
                                     crossAxisSpacing: 6,
                                     mainAxisSpacing: 6,
@@ -253,18 +303,24 @@ internal class ScrollPage : StatefulWidget
                         capi: Widget.Capi
                     ),
 
-                    new DemoCard(
+                    new DemoCard
+                    (
                         "Scrollbar",
                         description:
                         "Wraps any scrollable child with a visible track and draggable thumb. Requires a shared ScrollController.",
-                        demo: new SizedBox(
+                        demo: new SizedBox
+                        (
                             height: 200,
-                            child: new Scrollbar(
+                            child: new Scrollbar
+                            (
                                 _scrollCtrl,
-                                new ListView(
-                                    (ctx, i) => new Padding(
+                                new ListView
+                                (
+                                    (ctx, i) => new Padding
+                                    (
                                         EdgeInsets.Symmetric(3),
-                                        new Container(
+                                        new Container
+                                        (
                                             new BoxStyle
                                             {
                                                 Color =
@@ -272,14 +328,20 @@ internal class ScrollPage : StatefulWidget
                                                 CornerRadius = Vector4.One * 4,
                                                 BorderThickness = 1f,
                                                 BorderColor = colors.Border,
-                                                Padding = EdgeInsets.Symmetric(horizontal: 12,
-                                                    vertical: 8)
+                                                Padding = EdgeInsets.Symmetric
+                                                (
+                                                    horizontal: 12,
+                                                    vertical: 8
+                                                )
                                             },
-                                            new Text($"Row {i + 1}",
+                                            new Text
+                                            (
+                                                $"Row {i + 1}",
                                                 new TextStyle
                                                 {
                                                     FontSize = 13, Color = colors.OnSurface
-                                                })
+                                                }
+                                            )
                                         )
                                     ),
                                     30,

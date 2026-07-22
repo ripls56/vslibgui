@@ -2,6 +2,7 @@ using System;
 using Gui.Rendering;
 using Gui.Widgets.Animations;
 using Gui.Widgets.Basic;
+using Gui.Widgets.Events;
 using Gui.Widgets.Framework;
 using Gui.Widgets.Layout;
 using Gui.Widgets.Painting;
@@ -12,7 +13,8 @@ namespace Gui.Widgets.Input;
 
 public class RadioButton<T> : StatefulWidget where T : IEquatable<T>
 {
-    public RadioButton(
+    public RadioButton
+    (
         T value,
         T groupValue,
         Action<T>? onChanged = null,
@@ -44,47 +46,80 @@ public class RadioButton<T> : StatefulWidget where T : IEquatable<T>
     public override State CreateState() => new RadioButtonState<T>();
 }
 
-internal class RadioButtonState<T> : State<RadioButton<T>> where T : IEquatable<T>
+internal class RadioButtonState<T> : FocusableState<RadioButton<T>>, IActivatable
+    where T : IEquatable<T>
 {
     private SKBitmap? _backgroundTexture;
+    private bool _hovered;
+    private bool _pressed;
+
+    /// <inheritdoc />
+    public void Activate()
+    {
+        if (!Widget.Value.Equals(Widget.GroupValue))
+        {
+            Widget.OnChanged?.Invoke(Widget.Value);
+        }
+    }
 
     public override void InitState()
     {
         base.InitState();
-        _backgroundTexture = GuiModSystem.Instance?.SkiaAssetLoader?.LoadBitmap(
+        _backgroundTexture = GuiModSystem.Instance?.SkiaAssetLoader?.LoadBitmap
+        (
             "game",
             "textures/gui/gui-parchment.png"
         );
     }
 
-    public override Widget Build(
+    public override Widget Build
+    (
         BuildContext context
     )
     {
-        var style = Widget.Style ?? Theme.Of(context).RadioButtonStyle;
+        var theme = Theme.Of(context);
+        var style = Widget.Style ?? theme.RadioButtonStyle;
         var radius = Widget.Size / 2f;
+        var focused = FocusNode.ShowsFocusIndicator;
 
         var isSelected = Widget.Value.Equals(Widget.GroupValue);
-        var dot = new AnimatedScale(
-            isSelected
-                ? 1f
-                : 0f,
+
+        var dotValue = (isSelected, _hovered, _pressed) switch
+        {
+            (true, _, _) => 1f,
+            (false, true, false) => 0.75f,
+            (false, _, true) => 0.9f,
+            _ => 0
+        };
+        var dot = new AnimatedOpacity
+        (
+            dotValue,
             TimeSpan.FromMilliseconds(150),
             Curves.EaseOut,
-            child: new Center(
-                new Container(
-                    new BoxStyle
-                    {
-                        Width = Widget.Size * 0.5f,
-                        Height = Widget.Size * 0.5f,
-                        Color = style.DotColor,
-                        CornerRadius = new Vector4(radius)
-                    }
+            child:
+            new AnimatedScale
+            (
+                dotValue,
+                TimeSpan.FromMilliseconds(180),
+                Curves.EaseOutBack,
+                child: new Center
+                (
+                    new Container
+                    (
+                        new BoxStyle
+                        {
+                            Width = Widget.Size * 0.5f,
+                            Height = Widget.Size * 0.5f,
+                            Color = style.DotColor,
+                            CornerRadius = new Vector4(radius)
+                        }
+                    )
                 )
             )
         );
 
-        var circle = new Container(
+        var circle = new Container
+        (
             new BoxStyle
             {
                 Width = Widget.Size,
@@ -93,8 +128,12 @@ internal class RadioButtonState<T> : State<RadioButton<T>> where T : IEquatable<
                     ? style.BackgroundColor
                     : Vector4.One,
                 Texture = _backgroundTexture,
-                BorderThickness = style.BorderThickness,
-                BorderColor = style.BorderColor,
+                BorderThickness = focused
+                    ? theme.FocusOutlineWidth
+                    : style.BorderThickness,
+                BorderColor = focused
+                    ? theme.FocusOutlineColor
+                    : style.BorderColor,
                 CornerRadius = new Vector4(radius)
             },
             dot
@@ -102,20 +141,37 @@ internal class RadioButtonState<T> : State<RadioButton<T>> where T : IEquatable<
 
         var content = Widget.Label == null
             ? (Widget)circle
-            : new Row(
+            : new Row
+            (
                 mainAxisAlignment: MainAxisAlignment.Start,
                 crossAxisAlignment: CrossAxisAlignment.Center,
                 children:
                 [
                     circle,
-                    new Padding(
+                    new Padding
+                    (
                         EdgeInsets.Only(8),
                         new Text(Widget.Label, style.LabelStyle)
                     )
                 ]
             );
 
-        return new GestureDetector(
+        var bodyScale = (_hovered, _pressed) switch
+        {
+            (true, true) => 1.005f,
+            (true, false) => 1.01f,
+            _ => 1f
+        };
+        var body = new AnimatedScale
+        (
+            bodyScale,
+            TimeSpan.FromMilliseconds(140),
+            Curves.EaseOut,
+            child: content
+        );
+
+        return new GestureDetector
+        (
             onTap: e =>
             {
                 SetState(() => { });
@@ -124,7 +180,17 @@ internal class RadioButtonState<T> : State<RadioButton<T>> where T : IEquatable<
                     Widget.OnChanged?.Invoke(Widget.Value);
                 }
             },
-            child: content
+            onEnter: _ => SetState(() => _hovered = true),
+            onExit: _ => SetState
+            (() =>
+                {
+                    _hovered = false;
+                    _pressed = false;
+                }
+            ),
+            onPress: _ => SetState(() => _pressed = true),
+            onRelease: _ => SetState(() => _pressed = false),
+            child: body
         );
     }
 

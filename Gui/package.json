@@ -1,0 +1,14 @@
+{
+  "name": "vslibgui-docs",
+  "version": "1.0.0",
+  "scripts": {
+    "docs:dev": "vitepress dev docs --port 8080 --host --force",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
+    "docs:clean": "rimraf .vitepress/cache .vitepress/dist"
+  },
+  "devDependencies": {
+    "vitepress": "^1.0.0",
+    "rimraf": "^5.0.0"
+  }
+}

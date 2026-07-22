@@ -6,7 +6,6 @@ using Gui.Widgets.Framework;
 using Gui.Widgets.Input;
 using Gui.Widgets.Layout;
 using Gui.Widgets.Overlay;
-using Gui.Widgets.Painting;
 using OpenTK.Mathematics;
 using Vintagestory.API.Client;
 
@@ -34,49 +33,25 @@ internal class InputPage : StatefulWidget
 
         public override Widget Build(BuildContext context)
         {
-            var colors = Theme.Of(context).ColorScheme;
+            var theme = Theme.Of(context);
+            var colors = theme.ColorScheme;
+            var headerStyle = theme.TextTheme.Headline;
+            headerStyle.Color = colors.Primary;
 
-            return new Column(
+            return new Column
+            (
                 crossAxisAlignment: CrossAxisAlignment.Stretch,
                 spacing: 16,
                 children:
                 [
-                    new Text("Input",
-                        new TextStyle
-                        {
-                            FontSize = 22, Weight = FontWeight.Bold, Color = colors.Primary
-                        }),
+                    new Text("Input", headerStyle),
 
-                    new DemoCard(
-                        "Button",
-                        description: "Theme-aware button. Variant controls visual style.",
-                        demo: new Row(
-                            12,
-                            children:
-                            [
-                                new Button(
-                                    new Text("Primary", new TextStyle { Color = colors.OnPrimary })
-                                ),
-                                new Button(
-                                    new Text("Ghost", new TextStyle { Color = colors.Primary }),
-                                    ButtonVariant.Ghost
-                                )
-                            ]
-                        ),
-                        code: """
-                              new Button(
-                                new Text("Primary"),
-                                variant: ButtonVariant.Primary,
-                                onTap:   _ => { /* handle */ }
-                              )
-                              """,
-                        capi: Widget.Capi
-                    ),
-
-                    new DemoCard(
+                    new DemoCard
+                    (
                         "Checkbox",
                         description: "Toggleable checkbox with optional label.",
-                        demo: new Checkbox(
+                        demo: new Checkbox
+                        (
                             _checked,
                             label: "Enable feature",
                             onChanged: v => SetState(() => _checked = v)
@@ -91,28 +66,33 @@ internal class InputPage : StatefulWidget
                         capi: Widget.Capi
                     ),
 
-                    new DemoCard(
+                    new DemoCard
+                    (
                         "RadioButton",
                         description:
                         "Single-select group. A button is selected when its value equals groupValue.",
-                        demo: new Column(
+                        demo: new Column
+                        (
                             crossAxisAlignment: CrossAxisAlignment.Start,
                             spacing: 8,
                             children:
                             [
-                                new RadioButton<int>(
+                                new RadioButton<int>
+                                (
                                     0,
                                     _radio,
                                     v => SetState(() => _radio = v),
                                     "Option A"
                                 ),
-                                new RadioButton<int>(
+                                new RadioButton<int>
+                                (
                                     1,
                                     _radio,
                                     v => SetState(() => _radio = v),
                                     "Option B"
                                 ),
-                                new RadioButton<int>(
+                                new RadioButton<int>
+                                (
                                     2,
                                     _radio,
                                     v => SetState(() => _radio = v),
@@ -131,19 +111,31 @@ internal class InputPage : StatefulWidget
                         capi: Widget.Capi
                     ),
 
-                    new DemoCard(
+                    new DemoCard
+                    (
                         "Dropdown",
                         description:
                         "Opens a floating overlay menu. Shares the Overlay infrastructure with Tooltip.",
-                        demo: new SizedBox(
+                        demo: new SizedBox
+                        (
                             220,
-                            child: new Dropdown<int>(
+                            child: new Dropdown<int>
+                            (
                                 _dropdown,
                                 new List<DropdownItem<int>>
                                 {
-                                    new() { Value = 1, Label = "Survival" },
-                                    new() { Value = 2, Label = "Creative" },
-                                    new() { Value = 3, Label = "Spectator" }
+                                    new()
+                                    {
+                                        Value = 1, Label = "Survival"
+                                    },
+                                    new()
+                                    {
+                                        Value = 2, Label = "Creative"
+                                    },
+                                    new()
+                                    {
+                                        Value = 3, Label = "Spectator"
+                                    }
                                 },
                                 v => SetState(() => _dropdown = v)
                             )
@@ -162,12 +154,15 @@ internal class InputPage : StatefulWidget
                         capi: Widget.Capi
                     ),
 
-                    new DemoCard(
+                    new DemoCard
+                    (
                         "Slider",
                         description: "Continuous value selector. Use divisions for discrete steps.",
-                        demo: new SizedBox(
+                        demo: new SizedBox
+                        (
                             320,
-                            child: new Slider(
+                            child: new Slider
+                            (
                                 _slider,
                                 v => SetState(() => _slider = v)
                             )
@@ -190,13 +185,16 @@ internal class InputPage : StatefulWidget
                         capi: Widget.Capi
                     ),
 
-                    new DemoCard(
+                    new DemoCard
+                    (
                         "NumericField",
                         description:
                         "A − / + button pair around a text field. Validates input as a float.",
-                        demo: new SizedBox(
+                        demo: new SizedBox
+                        (
                             200,
-                            child: new NumericField(
+                            child: new NumericField
+                            (
                                 _numeric,
                                 5f,
                                 v => SetState(() => _numeric = v)
@@ -212,21 +210,23 @@ internal class InputPage : StatefulWidget
                         capi: Widget.Capi
                     ),
 
-                    new DemoCard(
+                    new DemoCard
+                    (
                         "TextField",
                         description:
                         "Single-line text input with cursor, caret scrolling, and keyboard handling.",
-                        demo: new SizedBox(
+                        demo: new SizedBox
+                        (
                             320,
-                            child: new TextField(
+                            child: new TextField
+                            (
                                 _textController,
-                                style: new BoxStyle
+                                style: theme.TextFieldStyle with
                                 {
                                     Height = 35,
-                                    Color = new Vector4(0f, 0f, 0f, 0.3f),
+                                    FillColor = new Vector4(0f, 0f, 0f, 0.3f),
                                     BorderThickness = 1f,
                                     BorderColor = colors.Border,
-                                    CornerRadius = Vector4.One * 4
                                 }
                             )
                         ),
@@ -236,29 +236,30 @@ internal class InputPage : StatefulWidget
 
                               new TextField(
                                 controller: _ctrl,
-                                style: new BoxStyle { Height = 35, BorderThickness = 1 }
+                                style: theme.TextFieldStyle with { Height = 35, BorderThickness = 1 }
                               )
                               """,
                         capi: Widget.Capi
                     ),
 
-                    new DemoCard(
+                    new DemoCard
+                    (
                         "ProgressBar",
                         description:
                         "Displays a 0–1 progress value. Move the Slider above to change it.",
-                        demo: new Column(
+                        demo: new Column
+                        (
                             crossAxisAlignment: CrossAxisAlignment.Stretch,
                             spacing: 8,
                             children:
                             [
                                 new ProgressBar(_slider),
-                                new ProgressBar(
+                                new ProgressBar
+                                (
                                     _slider,
                                     new ProgressBarStyle
                                     {
-                                        Height = 14,
-                                        CornerRadius = 7,
-                                        FillColor = colors.Primary
+                                        Height = 14, CornerRadius = 7, FillColor = colors.Primary
                                     }
                                 )
                             ]
@@ -275,15 +276,30 @@ internal class InputPage : StatefulWidget
                         capi: Widget.Capi
                     ),
 
-                    new DemoCard(
+                    new DemoCard
+                    (
                         "Tooltip",
                         description:
                         "Shows a floating bubble above the child after a 500 ms hover delay.",
-                        demo: new Tooltip(
-                            content: new Text("This is a tooltip!",
-                                new TextStyle { FontSize = 12, Color = colors.OnSurface }),
-                            child: new Button(
-                                new Text("Hover me", new TextStyle { Color = colors.OnPrimary })
+                        demo: new Tooltip
+                        (
+                            content: new Text
+                            (
+                                "This is a tooltip!",
+                                new TextStyle
+                                {
+                                    FontSize = 12, Color = colors.OnSurface
+                                }
+                            ),
+                            child: new Button
+                            (
+                                new Text
+                                (
+                                    "Hover me", new TextStyle
+                                    {
+                                        Color = colors.OnPrimary
+                                    }
+                                )
                             )
                         ),
                         code: """

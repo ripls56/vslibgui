@@ -86,7 +86,7 @@ public static class GuiComposerExtensions
         this GuiComposer composer,
         ElementBounds bounds,
         Action<PaintingContext> onPaint,
-        string key = null
+        string? key = null
     )
     {
         composer.AddInteractiveElement(

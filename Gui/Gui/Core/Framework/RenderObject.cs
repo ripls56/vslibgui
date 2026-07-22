@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Gui.Core.Painting;
+using Gui.Debugging;
 using Gui.Rendering;
 using Gui.Widgets.Framework;
 using OpenTK.Mathematics;
@@ -173,6 +174,14 @@ public abstract class RenderObject : IDisposable
     public static Action<RenderObject>? OnAnyPaint { get; set; }
 
     /// <summary>
+    ///     The element that created and owns this render object, set by
+    ///     <c>RenderObjectElement.Mount</c>. Used by profiling/debug tooling to label a
+    ///     render object with its source widget. May be <see langword="null" /> for
+    ///     render objects created outside the element tree (e.g. in tests).
+    /// </summary>
+    internal Element? OwnerElement { get; set; }
+
+    /// <summary>
     ///     When set, called during layout whenever a constraint violation is detected.
     ///     The arguments are the offending <see cref="RenderObject" /> and a human-readable message.
     ///     Set this in <c>GuiBase</c> when layout debugging is enabled; clear it otherwise.
@@ -328,6 +337,8 @@ public abstract class RenderObject : IDisposable
     /// </summary>
     public void MarkNeedsLayout()
     {
+        GuiProfiler.Current?.RecordDirtyInitiator(this);
+
         if (NeedsLayout)
         {
             return;
@@ -352,6 +363,8 @@ public abstract class RenderObject : IDisposable
     /// </summary>
     public void MarkNeedsPaint()
     {
+        GuiProfiler.Current?.RecordDirtyInitiator(this);
+
         if (NeedsPaint)
         {
             return;
@@ -543,6 +556,15 @@ public abstract class RenderObject : IDisposable
         float width
     ) =>
         0f;
+
+    /// <summary>
+    ///     Returns the distance from the top of this render object to its text baseline,
+    ///     or <c>null</c> if this object has no baseline (falls back to bottom of box).
+    /// </summary>
+    public virtual float? GetDistanceToBaseline(
+        Gui.Widgets.Layout.TextBaseline baseline
+    ) =>
+        null;
 
     /// <summary>
     ///     Updates the rolling repaint frequency counter used for heat-map visualization.

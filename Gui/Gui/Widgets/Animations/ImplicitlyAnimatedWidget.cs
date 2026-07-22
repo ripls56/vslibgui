@@ -112,7 +112,7 @@ public class TweenVisitor
 ///     animation value changes.
 ///     <para>
 ///         Subclasses must override <see cref="ForEachTween" /> to register their
-///         tweens, and <see cref="State{T}.Build" /> to use the interpolated values.
+///         tweens, and <see cref="State.Build" /> to use the interpolated values.
 ///     </para>
 /// </summary>
 /// <typeparam name="T">
@@ -128,7 +128,7 @@ public abstract class ImplicitlyAnimatedWidgetState<T> : State<T>
 
     /// <summary>
     ///     The curved animation driven by the controller. Use this to evaluate
-    ///     tweens in <see cref="State{T}.Build" />.
+    ///     tweens in <see cref="State.Build" />.
     /// </summary>
     protected IAnimation Animation => _curvedAnimation;
 

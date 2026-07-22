@@ -65,30 +65,34 @@ internal class InventoryPage : StatefulWidget
 
         public override Widget Build(BuildContext context)
         {
-            var colors = Theme.Of(context).ColorScheme;
+            var theme = Theme.Of(context);
+            var colors = theme.ColorScheme;
+            var headerStyle = theme.TextTheme.Headline;
+            headerStyle.Color = colors.Primary;
             var slot0 = _slots.Count > 0 ? _slots[0] : null;
             var slot1 = _slots.Count > 1 ? _slots[1] : null;
             var slot2 = _slots.Count > 2 ? _slots[2] : null;
 
-            return new Column(
+            return new Column
+            (
                 crossAxisAlignment: CrossAxisAlignment.Stretch,
                 spacing: 16,
                 children:
                 [
-                    new Text("Inventory",
-                        new TextStyle
-                        {
-                            FontSize = 22, Weight = FontWeight.Bold, Color = colors.Primary
-                        }),
+                    new Text("Inventory", headerStyle),
 
-                    new DemoCard(
+                    new DemoCard
+                    (
                         "FlatItemSlot",
                         description:
                         "Interactive slot: click, right-click, shift-click, scroll-wheel transfers.",
-                        demo: new Row(4, children: _slots
-                            .Take(4)
-                            .Select(s => (Widget)new FlatItemSlot(s, _ctrl))
-                            .ToList()),
+                        demo: new Row
+                        (
+                            4, children: _slots
+                                .Take(4)
+                                .Select(s => (Widget)new FlatItemSlot(s, _ctrl))
+                                .ToList()
+                        ),
                         code: """
                               new FlatItemSlot(
                                 slot:       hotbarSlot,
@@ -98,29 +102,42 @@ internal class InventoryPage : StatefulWidget
                         capi: Widget.Capi
                     ),
 
-                    new DemoCard(
+                    new DemoCard
+                    (
                         "NineSliceItemSlot",
                         description:
                         "Slot with a nine-slice bitmap background. Corners stay sharp at any size.",
                         demo: _tileTex != null
-                            ? new Row(4, children: _slots
-                                .Take(5)
-                                .Select(s =>
+                            ? new Row
+                            (
+                                4, children: _slots
+                                    .Take(5)
+                                    .Select
+                                    (s =>
+                                        {
+                                            var slotId = s?.Inventory.GetSlotId(s) ?? 1;
+                                            return (Widget)new NineSliceItemSlot
+                                            (
+                                                _tileTex,
+                                                EdgeInsets.All(16),
+                                                padding: EdgeInsets.All(6 * slotId),
+                                                size: 48 * slotId,
+                                                slot: s,
+                                                controller: _ctrl,
+                                                scale: 1f * slotId
+                                            );
+                                        }
+                                    )
+                                    .ToList()
+                            )
+                            : new Text
+                            (
+                                "Texture not loaded",
+                                new TextStyle
                                 {
-                                    var slotId = s?.Inventory.GetSlotId(s) ?? 1;
-                                    return (Widget)new NineSliceItemSlot(
-                                        _tileTex,
-                                        EdgeInsets.All(16),
-                                        padding: EdgeInsets.All(6 * slotId),
-                                        size: 48 * slotId,
-                                        slot: s,
-                                        controller: _ctrl,
-                                        scale: 1f * slotId
-                                    );
-                                })
-                                .ToList())
-                            : new Text("Texture not loaded",
-                                new TextStyle { Color = colors.Error }),
+                                    Color = colors.Error
+                                }
+                            ),
                         code: """
                               new NineSliceItemSlot(
                                 texture:    tileBitmap,
@@ -134,11 +151,13 @@ internal class InventoryPage : StatefulWidget
                         capi: Widget.Capi
                     ),
 
-                    new DemoCard(
+                    new DemoCard
+                    (
                         "SlotGrid",
                         description:
                         "Arranges slots in a configurable grid. Columns and slot size are independent.",
-                        demo: new SlotGrid(
+                        demo: new SlotGrid
+                        (
                             _slots,
                             _ctrl,
                             4
@@ -154,24 +173,32 @@ internal class InventoryPage : StatefulWidget
                         capi: Widget.Capi
                     ),
 
-                    new DemoCard(
+                    new DemoCard
+                    (
                         "IsHighlighted",
                         description:
                         "ValueNotifier<bool> drives a persistent gold highlight border, independent of hover.",
-                        demo: new Row(
+                        demo: new Row
+                        (
                             crossAxisAlignment: CrossAxisAlignment.Center,
                             spacing: 12,
                             children:
                             [
-                                new FlatItemSlot(
+                                new FlatItemSlot
+                                (
                                     slot0,
                                     _ctrl,
                                     isHighlighted: _highlight
                                 ),
-                                new Button(
-                                    new Text(
+                                new Button
+                                (
+                                    new Text
+                                    (
                                         _highlight.Value ? "Clear" : "Highlight",
-                                        new TextStyle { Color = colors.OnPrimary }
+                                        new TextStyle
+                                        {
+                                            Color = colors.OnPrimary
+                                        }
                                     ),
                                     onTap: _ => SetState(() => _highlight.Value = !_highlight.Value)
                                 )
@@ -190,18 +217,38 @@ internal class InventoryPage : StatefulWidget
                         capi: Widget.Capi
                     ),
 
-                    new DemoCard(
+                    new DemoCard
+                    (
                         "ItemSlotStyle — sizes",
                         description:
                         "ItemSlotStyle.Size scales the slot widget (32 / 48 / 64 px shown).",
-                        demo: new Row(
+                        demo: new Row
+                        (
                             crossAxisAlignment: CrossAxisAlignment.Center,
                             spacing: 8,
                             children:
                             [
-                                new FlatItemSlot(slot0, _ctrl, new ItemSlotStyle { Size = 32 }),
-                                new FlatItemSlot(slot1, _ctrl, new ItemSlotStyle { Size = 48 }),
-                                new FlatItemSlot(slot2, _ctrl, new ItemSlotStyle { Size = 64 })
+                                new FlatItemSlot
+                                (
+                                    slot0, _ctrl, new ItemSlotStyle
+                                    {
+                                        Size = 32
+                                    }
+                                ),
+                                new FlatItemSlot
+                                (
+                                    slot1, _ctrl, new ItemSlotStyle
+                                    {
+                                        Size = 48
+                                    }
+                                ),
+                                new FlatItemSlot
+                                (
+                                    slot2, _ctrl, new ItemSlotStyle
+                                    {
+                                        Size = 64
+                                    }
+                                )
                             ]
                         ),
                         code: """
@@ -213,21 +260,49 @@ internal class InventoryPage : StatefulWidget
                         capi: Widget.Capi
                     ),
 
-                    new DemoCard(
+                    new DemoCard
+                    (
                         "HexBackgroundColor",
                         description:
                         "Slot.HexBackgroundColor tints the border — used in VS for dye slots, crafting output, and special inputs.",
-                        demo: new Row(8, children:
-                        [
-                            new FlatItemSlot(new TintedSlot("#ff4444"),
-                                style: new ItemSlotStyle { Size = 48 }),
-                            new FlatItemSlot(new TintedSlot("#44aaff"),
-                                style: new ItemSlotStyle { Size = 48 }),
-                            new FlatItemSlot(new TintedSlot("#44ff88"),
-                                style: new ItemSlotStyle { Size = 48 }),
-                            new FlatItemSlot(new TintedSlot("#ffcc44"),
-                                style: new ItemSlotStyle { Size = 48 })
-                        ]),
+                        demo: new Row
+                        (
+                            8, children:
+                            [
+                                new FlatItemSlot
+                                (
+                                    new TintedSlot("#ff4444"),
+                                    style: new ItemSlotStyle
+                                    {
+                                        Size = 48
+                                    }
+                                ),
+                                new FlatItemSlot
+                                (
+                                    new TintedSlot("#44aaff"),
+                                    style: new ItemSlotStyle
+                                    {
+                                        Size = 48
+                                    }
+                                ),
+                                new FlatItemSlot
+                                (
+                                    new TintedSlot("#44ff88"),
+                                    style: new ItemSlotStyle
+                                    {
+                                        Size = 48
+                                    }
+                                ),
+                                new FlatItemSlot
+                                (
+                                    new TintedSlot("#ffcc44"),
+                                    style: new ItemSlotStyle
+                                    {
+                                        Size = 48
+                                    }
+                                )
+                            ]
+                        ),
                         code: """
                               class TintedSlot : DummySlot
                               {
@@ -239,19 +314,41 @@ internal class InventoryPage : StatefulWidget
                         capi: Widget.Capi
                     ),
 
-                    new DemoCard(
+                    new DemoCard
+                    (
                         "DrawUnavailable",
                         description:
                         "Slot.DrawUnavailable = true overlays a red diagonal slash — e.g. locked crafting inputs.",
-                        demo: new Row(4, children:
-                        [
-                            new FlatItemSlot(new UnavailableSlot(),
-                                style: new ItemSlotStyle { Size = 48 }),
-                            new FlatItemSlot(new UnavailableSlot(),
-                                style: new ItemSlotStyle { Size = 48 }),
-                            new FlatItemSlot(new UnavailableSlot(),
-                                style: new ItemSlotStyle { Size = 48 })
-                        ]),
+                        demo: new Row
+                        (
+                            4, children:
+                            [
+                                new FlatItemSlot
+                                (
+                                    new UnavailableSlot(),
+                                    style: new ItemSlotStyle
+                                    {
+                                        Size = 48
+                                    }
+                                ),
+                                new FlatItemSlot
+                                (
+                                    new UnavailableSlot(),
+                                    style: new ItemSlotStyle
+                                    {
+                                        Size = 48
+                                    }
+                                ),
+                                new FlatItemSlot
+                                (
+                                    new UnavailableSlot(),
+                                    style: new ItemSlotStyle
+                                    {
+                                        Size = 48
+                                    }
+                                )
+                            ]
+                        ),
                         code: """
                               class UnavailableSlot : DummySlot
                               {

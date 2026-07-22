@@ -231,7 +231,7 @@ public class TransformTests
     {
         private readonly Vector2 _size;
 
-        public FixedWidget(Vector2 size)
+        public FixedWidget(Vector2 size) : base()
         {
             _size = size;
         }

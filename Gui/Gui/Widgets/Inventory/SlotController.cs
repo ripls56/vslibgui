@@ -32,6 +32,8 @@ public class SlotController : ChangeNotifier
 
     private readonly HashSet<InventoryBase> _pausedInventories = new();
 
+    private readonly HashSet<IInventory> _warnedInventories = new();
+
     private readonly HashSet<IInventory> _watched = new();
 
     private bool _isLeftDragActive;
@@ -149,6 +151,11 @@ public class SlotController : ChangeNotifier
         var slotId = slotInv.GetSlotId(slot);
         var activateInv = outerInventory ?? slotInv;
 
+        if (!CanActivate(activateInv, slotId))
+        {
+            return;
+        }
+
         var wasMouseEmpty = mouse.Itemstack == null;
         var prevCollectible = mouse.Itemstack?.Collectible;
 
@@ -221,6 +228,11 @@ public class SlotController : ChangeNotifier
         var slotId = slotInv.GetSlotId(slot);
         var activateInv = outerInventory ?? slotInv;
 
+        if (!CanActivate(activateInv, slotId))
+        {
+            return false;
+        }
+
         var op = new ItemStackMoveOperation(
             _capi.World,
             EnumMouseButton.Wheel,
@@ -238,6 +250,35 @@ public class SlotController : ChangeNotifier
         SendPacket(packet);
         NotifyListeners();
         return true;
+    }
+
+    /// <summary>
+    ///     Returns <c>true</c> when the slot can be safely activated: <paramref name="slotId" />
+    ///     is a valid index and <paramref name="inventory" /> is network-ready (its
+    ///     <c>InvNetworkUtil</c> has been created during initialization). A negative id — the slot
+    ///     is not part of its inventory, e.g. a stale bag-content slot recreated by a reload — or
+    ///     an uninitialized inventory would otherwise crash inside
+    ///     <see cref="IInventory.ActivateSlot" />.
+    /// </summary>
+    internal static bool IsActivatable(IInventory inventory, int slotId) =>
+        slotId >= 0 && inventory is not InventoryBase { InvNetworkUtil: null };
+
+    private bool CanActivate(IInventory inventory, int slotId)
+    {
+        if (IsActivatable(inventory, slotId))
+        {
+            return true;
+        }
+
+        if (_warnedInventories.Add(inventory))
+        {
+            _capi.Logger.Warning(
+                "[gui] Skipped slot activation in inventory '{0}' (slotId={1}): inventory is " +
+                "not network-ready or the slot is not part of it.",
+                inventory.InventoryID, slotId);
+        }
+
+        return false;
     }
 
     private void PlaySlotSound(
@@ -392,12 +433,7 @@ public class SlotController : ChangeNotifier
     /// </summary>
     public void EndDrag()
     {
-        foreach (var inv in _pausedInventories)
-        {
-            inv.InvNetworkUtil.PauseInventoryUpdates = false;
-        }
-
-        _pausedInventories.Clear();
+        ResumePausedInventories();
 
         _isLeftDragActive = false;
         _isRightDragActive = false;
@@ -411,10 +447,23 @@ public class SlotController : ChangeNotifier
         IInventory? inventory
     )
     {
-        if (inventory is InventoryBase b && _pausedInventories.Add(b))
+        if (inventory is InventoryBase { InvNetworkUtil: not null } b && _pausedInventories.Add(b))
         {
             b.InvNetworkUtil.PauseInventoryUpdates = true;
         }
+    }
+
+    private void ResumePausedInventories()
+    {
+        foreach (var inv in _pausedInventories)
+        {
+            if (inv.InvNetworkUtil != null)
+            {
+                inv.InvNetworkUtil.PauseInventoryUpdates = false;
+            }
+        }
+
+        _pausedInventories.Clear();
     }
 
     private bool IsAlreadyVisited(
@@ -557,12 +606,7 @@ public class SlotController : ChangeNotifier
 
         _watched.Clear();
 
-        foreach (var inv in _pausedInventories)
-        {
-            inv.InvNetworkUtil.PauseInventoryUpdates = false;
-        }
-
-        _pausedInventories.Clear();
+        ResumePausedInventories();
 
         base.Dispose();
     }

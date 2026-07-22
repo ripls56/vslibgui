@@ -1,11 +1,11 @@
 using System;
-using System.Linq;
 using Gui.Core.Framework;
 using Gui.Debugging;
 using Gui.Widgets.Events;
 using Gui.Widgets.Framework;
 using Gui.Widgets.Input;
 using OpenTK.Mathematics;
+using Vintagestory.API.Client;
 
 namespace Gui.Widgets.Gestures;
 
@@ -23,7 +23,8 @@ public class EventDispatcher
     private Element? _hoveredElement;
     private Element? _pressedElement;
 
-    private void InvokeHandlers<T>(
+    private void InvokeHandlers<T>
+    (
         Element el,
         Action<T> action
     ) where T : class
@@ -39,7 +40,8 @@ public class EventDispatcher
         }
     }
 
-    private void DispatchToHierarchy<T>(
+    private void DispatchToHierarchy<T>
+    (
         Element? start,
         Action<T> action,
         bool stopOnHandled = false,
@@ -50,7 +52,8 @@ public class EventDispatcher
         var curr = start;
         while (curr != null)
         {
-            InvokeHandlers(
+            InvokeHandlers
+            (
                 curr,
                 action
             );
@@ -63,7 +66,8 @@ public class EventDispatcher
         }
     }
 
-    private Element? FindTarget(
+    private Element? FindTarget
+    (
         HitTestResult result,
         Func<object, bool>? filter = null
     )
@@ -91,7 +95,8 @@ public class EventDispatcher
         return target;
     }
 
-    private static bool IsAnyActiveTarget(
+    private static bool IsAnyActiveTarget
+    (
         Element el
     )
     {
@@ -100,7 +105,8 @@ public class EventDispatcher
                 EventCheckHelper.HandlesAnyPointerEvent(se.State));
     }
 
-    private static bool IsActiveTarget<THandler>(
+    private static bool IsActiveTarget<THandler>
+    (
         object source
     ) where THandler : class
     {
@@ -117,12 +123,14 @@ public class EventDispatcher
         return true;
     }
 
-    public void DispatchPointerMove(
+    public void DispatchPointerMove
+    (
         Element root,
         PointerEvent e
     )
     {
-        DebugPainter.LastPointerPos = new Vector2(
+        DebugPainter.LastPointerPos = new Vector2
+        (
             e.X,
             e.Y
         );
@@ -131,7 +139,8 @@ public class EventDispatcher
         {
             _hitTestResult.Clear();
             e.Handled = true;
-            DispatchToHierarchy<IPointerMoveHandler>(
+            DispatchToHierarchy<IPointerMoveHandler>
+            (
                 _capturedElement,
                 h => h.OnPointerMove(e),
                 true,
@@ -141,9 +150,11 @@ public class EventDispatcher
             // Continue normal enter/exit tracking during capture so
             // that hover-based drag-to-distribute works across slots.
             _dragHitTestResult.Clear();
-            root.HitTest(
+            root.HitTest
+            (
                 _dragHitTestResult,
-                new Vector2(
+                new Vector2
+                (
                     e.X,
                     e.Y
                 )
@@ -154,7 +165,8 @@ public class EventDispatcher
             {
                 if (_dragHoveredElement != null)
                 {
-                    DispatchToHierarchy<IPointerExitHandler>(
+                    DispatchToHierarchy<IPointerExitHandler>
+                    (
                         _dragHoveredElement,
                         h => h.OnPointerExit(e)
                     );
@@ -164,7 +176,8 @@ public class EventDispatcher
 
                 if (_dragHoveredElement != null)
                 {
-                    DispatchToHierarchy<IPointerEnterHandler>(
+                    DispatchToHierarchy<IPointerEnterHandler>
+                    (
                         _dragHoveredElement,
                         h => h.OnPointerEnter(e)
                     );
@@ -175,9 +188,11 @@ public class EventDispatcher
         }
 
         _hitTestResult.Clear();
-        root.HitTest(
+        root.HitTest
+        (
             _hitTestResult,
-            new Vector2(
+            new Vector2
+            (
                 e.X,
                 e.Y
             )
@@ -193,7 +208,8 @@ public class EventDispatcher
         {
             if (_hoveredElement != null)
             {
-                DispatchToHierarchy<IPointerExitHandler>(
+                DispatchToHierarchy<IPointerExitHandler>
+                (
                     _hoveredElement,
                     h => h.OnPointerExit(e)
                 );
@@ -203,7 +219,8 @@ public class EventDispatcher
 
             if (_hoveredElement != null)
             {
-                DispatchToHierarchy<IPointerEnterHandler>(
+                DispatchToHierarchy<IPointerEnterHandler>
+                (
                     _hoveredElement,
                     h => h.OnPointerEnter(e)
                 );
@@ -212,7 +229,8 @@ public class EventDispatcher
 
         if (_hoveredElement != null)
         {
-            DispatchToHierarchy<IPointerMoveHandler>(
+            DispatchToHierarchy<IPointerMoveHandler>
+            (
                 _hoveredElement,
                 h => h.OnPointerMove(e),
                 true,
@@ -224,19 +242,23 @@ public class EventDispatcher
     /// <summary>
     ///     Returns true when an interactive target was found and captured.
     /// </summary>
-    public bool DispatchPointerDown(
+    public bool DispatchPointerDown
+    (
         Element root,
         PointerEvent e
     )
     {
-        DebugPainter.LastPointerPos = new Vector2(
+        DebugPainter.LastPointerPos = new Vector2
+        (
             e.X,
             e.Y
         );
         _hitTestResult.Clear();
-        root.HitTest(
+        root.HitTest
+        (
             _hitTestResult,
-            new Vector2(
+            new Vector2
+            (
                 e.X,
                 e.Y
             )
@@ -246,22 +268,27 @@ public class EventDispatcher
             e.Handled = true;
         }
 
-        // Clear focus whenever the clicked path contains no focusable element.
-        var hasFocusTarget = _hitTestResult.Path.Any(entry =>
-            entry.Element.Widget is IFocusable ||
-            (entry.Element is StatefulElement se2 && se2.State is IFocusable)
-        );
-        if (!hasFocusTarget)
+        // Move focus to the innermost focusable element in the clicked path, or clear
+        // focus when the click landed on nothing focusable.
+        FocusNode? clickedFocus = null;
+        for (var i = 0; i < _hitTestResult.Path.Count; i++)
         {
-            root.Owner?.FocusManager?.RequestFocus(null);
+            clickedFocus = FocusNode.Resolve(_hitTestResult.Path[i].Element);
+            if (clickedFocus != null)
+            {
+                break;
+            }
         }
+
+        root.Owner?.FocusManager?.RequestFocus(clickedFocus);
 
         var hit = FindTarget(_hitTestResult);
         if (hit != null)
         {
             _pressedElement = hit;
             _capturedElement = hit;
-            DispatchToHierarchy<IPointerDownHandler>(
+            DispatchToHierarchy<IPointerDownHandler>
+            (
                 hit,
                 h => h.OnPointerDown(e),
                 true,
@@ -273,15 +300,18 @@ public class EventDispatcher
         return false;
     }
 
-    public void DispatchPointerUp(
+    public void DispatchPointerUp
+    (
         Element root,
         PointerEvent e
     )
     {
         _hitTestResult.Clear();
-        root.HitTest(
+        root.HitTest
+        (
             _hitTestResult,
-            new Vector2(
+            new Vector2
+            (
                 e.X,
                 e.Y
             )
@@ -294,7 +324,8 @@ public class EventDispatcher
         var target = _capturedElement ?? _pressedElement;
         if (target != null)
         {
-            DispatchToHierarchy<IPointerUpHandler>(
+            DispatchToHierarchy<IPointerUpHandler>
+            (
                 target,
                 h => h.OnPointerUp(e),
                 true,
@@ -304,7 +335,8 @@ public class EventDispatcher
             var hit = FindTarget(_hitTestResult);
             if (hit == target)
             {
-                DispatchToHierarchy<IPointerClickHandler>(
+                DispatchToHierarchy<IPointerClickHandler>
+                (
                     target,
                     h => h.OnPointerClick(e),
                     true,
@@ -345,28 +377,33 @@ public class EventDispatcher
         return null;
     }
 
-    public void DispatchMouseWheel(
+    public void DispatchMouseWheel
+    (
         Element root,
         PointerEvent e
     )
     {
         _hitTestResult.Clear();
-        root.HitTest(
+        root.HitTest
+        (
             _hitTestResult,
-            new Vector2(
+            new Vector2
+            (
                 e.X,
                 e.Y
             )
         );
         var anyHit = _hitTestResult.Path.Count > 0;
 
-        var hit = FindTarget(
+        var hit = FindTarget
+        (
             _hitTestResult,
             IsWheelTarget
         );
         if (hit != null)
         {
-            DispatchToHierarchy<IPointerWheelHandler>(
+            DispatchToHierarchy<IPointerWheelHandler>
+            (
                 hit,
                 h => h.OnMouseWheel(e),
                 true,
@@ -380,24 +417,60 @@ public class EventDispatcher
         }
     }
 
-    public void DispatchKeyDown(
+    public void DispatchKeyDown
+    (
         FocusManager? focusManager,
         KeyboardEvent e
     )
     {
         var focus = focusManager?.PrimaryFocus;
-        if (focus?.Owner != null)
+        if (focus?.Owner is not { } owner)
         {
-            DispatchToHierarchy<IKeyDownHandler>(
-                focus.Owner,
-                h => h.OnKeyDown(e),
-                true,
-                ke: e
-            );
+            return;
         }
+
+        if (IsActivationKey(e.KeyCode) && ResolveActivatable(owner) is { } activatable)
+        {
+            activatable.Activate();
+            e.Handled = true;
+            return;
+        }
+
+        DispatchToHierarchy<IKeyDownHandler>
+        (
+            owner,
+            h => h.OnKeyDown(e),
+            true,
+            ke: e
+        );
     }
 
-    public void DispatchKeyUp(
+    private static bool IsActivationKey
+    (
+        int keyCode
+    ) =>
+        keyCode == (int)GlKeys.Enter || keyCode == (int)GlKeys.Space;
+
+    private static IActivatable? ResolveActivatable
+    (
+        Element element
+    )
+    {
+        if (element.Widget is IActivatable widget)
+        {
+            return widget;
+        }
+
+        if (element is StatefulElement stateful && stateful.State is IActivatable state)
+        {
+            return state;
+        }
+
+        return null;
+    }
+
+    public void DispatchKeyUp
+    (
         FocusManager? focusManager,
         KeyboardEvent e
     )
@@ -405,7 +478,8 @@ public class EventDispatcher
         var focus = focusManager?.PrimaryFocus;
         if (focus?.Owner != null)
         {
-            DispatchToHierarchy<IKeyUpHandler>(
+            DispatchToHierarchy<IKeyUpHandler>
+            (
                 focus.Owner,
                 h => h.OnKeyUp(e),
                 true,
@@ -414,7 +488,8 @@ public class EventDispatcher
         }
     }
 
-    public void DispatchKeyChar(
+    public void DispatchKeyChar
+    (
         FocusManager? focusManager,
         KeyboardEvent e
     )
@@ -422,7 +497,8 @@ public class EventDispatcher
         var focus = focusManager?.PrimaryFocus;
         if (focus?.Owner != null)
         {
-            DispatchToHierarchy<IKeyCharHandler>(
+            DispatchToHierarchy<IKeyCharHandler>
+            (
                 focus.Owner,
                 h => h.OnKeyChar(e),
                 true,

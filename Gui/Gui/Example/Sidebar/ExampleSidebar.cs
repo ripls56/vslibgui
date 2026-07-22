@@ -22,12 +22,15 @@ internal class ExampleSidebar : StatelessWidget
     private static readonly (string IconPath, string Label)[] Entries =
     [
         ("textures/icons/layout-dashboard.svg", "Layout"),
-        ("textures/icons/mouse-pointer.svg", "Input"),
+        ("textures/icons/mouse-pointer-click.svg", "Button"),
+        ("textures/icons/edit-3.svg", "Input"),
         ("textures/icons/scroll.svg", "Scroll"),
         ("textures/icons/sparkles.svg", "Animations"),
         ("textures/icons/type.svg", "Typography"),
         ("textures/icons/package.svg", "Inventory"),
-        ("textures/icons/palette.svg", "Theming")
+        ("textures/icons/palette.svg", "Theming"),
+        ("textures/icons/mouse-pointer.svg", "Focus"),
+        ("textures/icons/square.svg", "Borders")
     ];
 
     public ExampleSidebar(int selectedIndex, Action<int> onSelect)
@@ -44,23 +47,30 @@ internal class ExampleSidebar : StatelessWidget
         var items = new List<Widget>();
         for (var i = 0; i < Entries.Length; i++)
         {
-            items.Add(new ExampleSidebarItem(
-                Entries[i].IconPath,
-                Entries[i].Label,
-                i,
-                SelectedIndex,
-                OnSelect
-            ));
+            items.Add
+            (
+                new ExampleSidebarItem
+                (
+                    Entries[i].IconPath,
+                    Entries[i].Label,
+                    i,
+                    SelectedIndex,
+                    OnSelect
+                )
+            );
         }
 
         // SizedBox forces the column to be ExpandedWidth wide so CrossAxisAlignment.End
         // right-aligns items — the icon lands at x=TransparentW..ExpandedWidth and the
         // label expands leftward into the transparent (game-world-visible) region.
-        return new SizedBox(
+        return new SizedBox
+        (
             ExpandedWidth,
-            child: new Padding(
+            child: new Padding
+            (
                 EdgeInsets.Symmetric(24),
-                new Column(
+                new Column
+                (
                     crossAxisAlignment: CrossAxisAlignment.End,
                     spacing: 6,
                     children: items
@@ -72,7 +82,8 @@ internal class ExampleSidebar : StatelessWidget
 
 internal class ExampleSidebarItem : StatefulWidget
 {
-    public ExampleSidebarItem(
+    public ExampleSidebarItem
+    (
         string iconPath,
         string label,
         int index,
@@ -109,25 +120,36 @@ internal class ExampleSidebarItemState : State<ExampleSidebarItem>
         var bgColor = selected
             ? colors.Surface
             : _hovered
-                ? new Vector4(colors.Surface.X * 1.2f, colors.Surface.Y * 1.2f,
-                    colors.Surface.Z * 1.2f, 1f)
-                : new Vector4(colors.Background.X * 0.85f, colors.Background.Y * 0.85f,
+                ? new Vector4
+                (
+                    colors.Surface.X * 1.2f, colors.Surface.Y * 1.2f,
+                    colors.Surface.Z * 1.2f, 1f
+                )
+                : new Vector4
+                (
+                    colors.Background.X * 0.85f, colors.Background.Y * 0.85f,
                     colors.Background.Z * 0.85f,
-                    0.95f);
+                    0.95f
+                );
 
         var iconColor = active
             ? colors.Primary
-            : new Vector4(colors.Primary.X * 0.5f, colors.Primary.Y * 0.5f, colors.Primary.Z * 0.5f,
-                1f);
+            : new Vector4
+            (
+                colors.Primary.X * 0.5f, colors.Primary.Y * 0.5f, colors.Primary.Z * 0.5f,
+                1f
+            );
 
         // Left corners rounded (face the game world), right side can also be rounded.
         var radius = new Vector4(0, 0, 5, 5);
 
-        return new GestureDetector(
+        return new GestureDetector
+        (
             onTap: _ => Widget.OnSelect(Widget.Index),
             onEnter: _ => SetState(() => _hovered = true),
             onExit: _ => SetState(() => _hovered = false),
-            child: new AnimatedContainer(
+            child: new AnimatedContainer
+            (
                 duration: TimeSpan.FromMilliseconds(220),
                 curve: Curves.EaseOutCubic,
                 style: new BoxStyle
@@ -141,25 +163,32 @@ internal class ExampleSidebarItemState : State<ExampleSidebarItem>
                     Width = active ? ExampleSidebar.ExpandedWidth : ExampleSidebar.IconWidth,
                     ClipBehavior = ClipBehavior.HardEdge
                 },
-                child: new Row(
+                child: new Row
+                (
                     crossAxisAlignment: CrossAxisAlignment.Center,
                     children:
                     [
                         // Icon — left side, leads the slide-out animation.
-                        new SizedBox(
+                        new SizedBox
+                        (
                             ExampleSidebar.IconWidth,
-                            child: new Center(
+                            child: new Center
+                            (
                                 new Icon("gui", Widget.IconPath, 20, iconColor)
                             )
                         ),
                         // Label — right side. Interval delays the fade until the icon has
                         // nearly finished sliding, so text never overlaps a half-open button.
-                        new Expanded(
-                            new AnimatedOpacity(
+                        new Expanded
+                        (
+                            new AnimatedOpacity
+                            (
                                 active ? 1f : 0f,
                                 TimeSpan.FromMilliseconds(220),
                                 new Interval(0.65, 1.0, Curves.EaseOut),
-                                child: new Text(Widget.Label,
+                                child: new Text
+                                (
+                                    Widget.Label,
                                     new TextStyle
                                     {
                                         FontSize = 13,
@@ -167,7 +196,8 @@ internal class ExampleSidebarItemState : State<ExampleSidebarItem>
                                         SoftWrap = false,
                                         Overflow = TextOverflow.Clip,
                                         MaxLines = 1
-                                    })
+                                    }
+                                )
                             )
                         )
                     ]

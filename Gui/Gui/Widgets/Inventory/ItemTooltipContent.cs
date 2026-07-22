@@ -1,13 +1,17 @@
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Gui.Core.Layout;
 using Gui.Rendering;
 using Gui.Rendering.Text;
+using Gui.Widgets.Animations;
 using Gui.Widgets.Basic;
 using Gui.Widgets.Framework;
 using Gui.Widgets.Layout;
 using Gui.Widgets.Overlay;
+using Gui.Widgets.Painting;
 using Vintagestory.API.Common;
+using Vintagestory.Client.NoObf;
 
 namespace Gui.Widgets.Inventory;
 
@@ -19,15 +23,16 @@ namespace Gui.Widgets.Inventory;
 ///     Designed to be passed as the <c>content</c> parameter of
 ///     <see cref="Tooltip" />.
 /// </summary>
-public class ItemTooltipContent : StatelessWidget
+public class ItemTooltipContent : StatefulWidget
 {
     /// <summary>Maximum tooltip width in pixels.</summary>
-    private const float MaxWidth = 350f;
+    public const float MaxWidth = 350f;
 
     /// <summary>
     ///     Creates a new <see cref="ItemTooltipContent" />.
     /// </summary>
-    public ItemTooltipContent(
+    public ItemTooltipContent
+    (
         ItemSlot slot,
         IWorldAccessor world
     )
@@ -45,12 +50,39 @@ public class ItemTooltipContent : StatelessWidget
     /// </summary>
     public IWorldAccessor World { get; }
 
-    public override Widget Build(
+    public override State CreateState() => new ItemTooltipContentState();
+}
+
+internal class ItemTooltipContentState : State<ItemTooltipContent>
+{
+    private AnimationController _controller = null!;
+    private CurvedAnimation _curved = null!;
+
+    public override void InitState()
+    {
+        base.InitState();
+        _controller = new AnimationController
+        (
+            TimeSpan.FromMilliseconds(400),
+            Element.Owner!.GetTickerProvider()
+        );
+        _curved = new CurvedAnimation(_controller, Curves.EaseOut);
+        _controller.Forward();
+    }
+
+    public override void Dispose()
+    {
+        _controller.Dispose();
+        base.Dispose();
+    }
+
+    public override Widget Build
+    (
         BuildContext context
     )
     {
         var theme = Theme.Of(context);
-        var itemStack = Slot.Itemstack;
+        var itemStack = Widget.Slot.Itemstack;
         if (itemStack == null)
         {
             return new Text("ItemStack null");
@@ -60,8 +92,10 @@ public class ItemTooltipContent : StatelessWidget
         var children = new List<Widget>();
 
         var name = collectible.GetHeldItemName(itemStack);
-        children.Add(
-            new VtmlText(
+        children.Add
+        (
+            new VtmlText
+            (
                 name,
                 new TextStyle
                 {
@@ -74,36 +108,54 @@ public class ItemTooltipContent : StatelessWidget
         );
 
         var sb = new StringBuilder();
-        collectible.GetHeldItemInfo(
-            Slot,
+        collectible.GetHeldItemInfo
+        (
+            Widget.Slot,
             sb,
-            World,
-            true
+            Widget.World,
+            ClientSettings.ExtendedDebugInfo
         );
         var info = sb.ToString().Trim();
 
         if (!string.IsNullOrEmpty(info))
         {
             const int size = 96;
-            children.Add(
-                new Padding(
+            children.Add
+            (
+                new Padding
+                (
                     EdgeInsets.Only(top: 6),
-                    new Row(
+                    new Row
+                    (
                         crossAxisAlignment: CrossAxisAlignment.Start,
                         mainAxisSize: MainAxisSize.Min,
                         spacing: 8,
                         children: new List<Widget>
                         {
-                            new ItemStackDisplay(
-                                itemStack,
-                                size,
-                                size,
-                                size * 2
+                            new AnimatedBuilder
+                            (
+                                _controller,
+                                _ => new Opacity
+                                (
+                                    (float)_curved.Value,
+                                    child: new ItemStackDisplay
+                                    (
+                                        itemStack,
+                                        size,
+                                        size,
+                                        size * 2
+                                    )
+                                )
                             ),
-                            new Expanded(
-                                new VtmlText(
+                            new Expanded
+                            (
+                                new VtmlText
+                                (
                                     info,
-                                    new TextStyle { FontSize = 14, SoftWrap = true }
+                                    new TextStyle
+                                    {
+                                        FontSize = 14, SoftWrap = true
+                                    }
                                 )
                             )
                         }
@@ -112,14 +164,18 @@ public class ItemTooltipContent : StatelessWidget
             );
         }
 
-        return new ConstrainedBox(
-            new LayoutConstraints(
+        return new ConstrainedBox
+        (
+            new LayoutConstraints
+            (
                 0,
-                MaxWidth
+                ItemTooltipContent.MaxWidth
             ),
-            new Padding(
+            new Padding
+            (
                 EdgeInsets.All(8),
-                new Column(
+                new Column
+                (
                     crossAxisAlignment: CrossAxisAlignment.Start,
                     mainAxisSize: MainAxisSize.Min,
                     children: children

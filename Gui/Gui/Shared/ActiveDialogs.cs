@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using Vintagestory.API.MathTools;
 
 namespace Gui.Shared;
@@ -9,6 +10,7 @@ namespace Gui.Shared;
 ///     event. The auto-remove handler is identity-checked, so closing the previous entry on
 ///     <see cref="Add" /> for an already-occupied position does NOT remove the new entry.
 /// </summary>
+[UsedImplicitly]
 public sealed class ActiveDialogs
 {
     private readonly Dictionary<BlockPos, IClosableDialog> _map = new();

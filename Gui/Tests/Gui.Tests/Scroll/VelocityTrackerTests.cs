@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Gui.Widgets.Gestures;
 
 namespace Gui.Tests.Scroll;
@@ -18,13 +19,15 @@ public class VelocityTrackerTests
         var tracker = new VelocityTracker();
 
         tracker.AddPosition(0, 0);
+        var elapsed = Stopwatch.StartNew();
         Thread.Sleep(50);
         tracker.AddPosition(0, 100);
+        elapsed.Stop();
 
         var velocity = tracker.GetVelocity();
+        var expected = 100f / (float)elapsed.Elapsed.TotalSeconds;
 
-        // 100px in ~50ms -> ~2000 px/s
-        Assert.That(velocity, Is.GreaterThan(1000));
+        Assert.That(velocity, Is.EqualTo(expected).Within(expected * 0.1f));
     }
 
     [Test]

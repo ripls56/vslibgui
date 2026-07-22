@@ -91,5 +91,32 @@ public enum CrossAxisAlignment
     Start,
     Center,
     End,
-    Stretch
+    Stretch,
+
+    /// <summary>
+    ///     Aligns children along their text baseline. In a horizontal <see cref="Gui.Core.Layout.RenderFlex" />,
+    ///     children are positioned so their alphabetic baselines are co-linear.
+    ///     Falls back to <see cref="Start" /> in a vertical flex.
+    /// </summary>
+    Baseline
+}
+
+/// <summary>
+///     Identifies the text baseline to use when aligning children with
+///     <see cref="CrossAxisAlignment.Baseline" />.
+/// </summary>
+public enum TextBaseline
+{
+    /// <summary>
+    ///     The alphabetic baseline — the line on which most Latin characters sit.
+    ///     Corresponds to the negated <c>Ascent</c> from <c>SKFontMetrics</c>.
+    /// </summary>
+    Alphabetic,
+
+    /// <summary>
+    ///     The ideographic baseline — used for CJK characters.
+    ///     Approximated as <c>CapHeight</c> from <c>SKFontMetrics</c>, or falls
+    ///     back to <see cref="Alphabetic" /> when cap-height is unavailable.
+    /// </summary>
+    Ideographic
 }

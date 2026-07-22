@@ -1,0 +1,205 @@
+/*
+ * VSLIBGUI · Technical Documentation Skin
+ * High-fidelity design system based on Catppuccin & VitePress internals.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
+:root {
+    /* VS Professional Palette (Light) */
+    --vs-base: #F4F1EA; /* Main background */
+    --vs-mantle: #EDE9E0; /* Sidebar/Nav background */
+    --vs-crust: #E5DFC9; /* Code block background */
+    --vs-surface: #D6CFC1; /* Borders and dividers */
+    --vs-overlay: #A69477; /* Secondary text / comments */
+
+    --vs-text: #33240F; /* Primary text */
+    --vs-subtext: #5C4B3F; /* Secondary text */
+
+    --vs-accent: #D1AB54; /* Copper primary */
+    --vs-accent-soft: #E5C37A;
+    --vs-accent-deep: #B08D3E;
+
+    /* VitePress System Overrides */
+    --vp-c-bg: var(--vs-base);
+    --vp-c-bg-soft: var(--vs-mantle);
+    --vp-c-bg-alt: var(--vs-crust);
+    --vp-c-bg-elv: var(--vs-mantle);
+
+    --vp-c-text-1: var(--vs-text);
+    --vp-c-text-2: var(--vs-subtext);
+    --vp-c-text-3: var(--vs-overlay);
+
+    --vp-c-brand-1: var(--vs-accent);
+    --vp-c-brand-2: var(--vs-accent-deep);
+    --vp-c-brand-3: var(--vs-accent-soft);
+    --vp-c-brand-soft: rgba(209, 171, 84, 0.15);
+
+    --vp-c-border: var(--vs-surface);
+    --vp-c-divider: var(--vs-surface);
+    --vp-c-gutter: var(--vs-surface);
+
+    --vp-sidebar-bg-color: var(--vs-mantle);
+
+    /* Layout width (по умолчанию VitePress — 1440px, расширяем под широкий код) */
+    --vp-layout-max-width: 1680px;
+
+    /* Code & Syntax */
+    --vp-code-bg: var(--vs-crust);
+    --vp-code-group-bg: var(--vs-crust);
+    --vp-code-group-tab-active-bg: var(--vs-crust);
+}
+
+.dark {
+    /* VS Professional Palette (Dark) */
+    --vs-base: #17120A; /* Main background */
+    --vs-mantle: #120E08; /* Sidebar/Nav background */
+    --vs-crust: #0E0B07; /* Code block background */
+    --vs-surface: #291F12; /* Borders and dividers */
+    --vs-overlay: #5C4B3F; /* Secondary text / comments */
+
+    --vs-text: #E9E1D1; /* Primary text */
+    --vs-subtext: #A69477; /* Secondary text */
+
+    --vs-accent: #D1AB54; /* Copper primary */
+    --vs-accent-soft: #E5C37A;
+    --vs-accent-deep: #B08D3E;
+
+    /* VitePress System Overrides */
+    --vp-c-bg: var(--vs-base);
+    --vp-c-bg-soft: var(--vs-surface);
+    --vp-c-bg-alt: var(--vs-crust);
+    --vp-c-bg-elv: var(--vs-mantle);
+
+    --vp-c-text-1: var(--vs-text);
+    --vp-c-text-2: var(--vs-subtext);
+    --vp-c-text-3: var(--vs-overlay);
+
+    --vp-c-brand-1: var(--vs-accent);
+    --vp-c-brand-2: #E5C37A;
+    --vp-c-brand-3: #B08D3E;
+    --vp-c-brand-soft: rgba(209, 171, 84, 0.1);
+
+    --vp-c-border: #3E2F1C;
+    --vp-c-divider: #3E2F1C;
+    --vp-c-gutter: #3E2F1C;
+
+    --vp-sidebar-bg-color: #1F1810;
+    --vp-layout-max-width: 1680px;
+}
+
+/* --- UI COMPONENTS --- */
+
+/* Sidebar */
+.VPSidebar {
+    background-color: var(--vp-sidebar-bg-color) !important;
+    border-right: 1px solid var(--vp-c-border) !important;
+}
+
+.VPSidebarItem.active > .item > .link > .text {
+    color: var(--vp-c-brand-1) !important;
+    font-weight: 700;
+}
+
+/* Home Hero */
+.VPHero .name {
+    background: linear-gradient(135deg, var(--vs-accent) 0%, var(--vs-accent-deep) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+/* --- SYNTAX HIGHLIGHTING (STANDARD) --- */
+
+.vp-doc pre {
+    background-color: var(--vs-crust) !important;
+    border: 1px solid var(--vp-c-border) !important;
+    border-radius: 8px !important;
+    padding: 1.5rem !important;
+}
+
+.vp-doc code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9em;
+}
+
+/* --- WIDE CONTENT COLUMN (для длинных строк Flutter-подобного кода) --- */
+
+/* У VitePress текстовая колонка документации по умолчанию жёстко
+   ограничена 688px (когда справа есть outline/aside), независимо от
+   --vp-layout-max-width. Именно это "душит" длинный код. Расширяем. */
+.VPDoc.has-aside .content-container {
+    max-width: 1000px !important;
+}
+
+/* Блоки кода: принудительный горизонтальный скролл вместо переноса строк,
+   даже если ширина колонки всё ещё меньше, чем строка кода */
+.vp-doc div[class*='language-'],
+.vp-doc [class*='language-'] pre {
+    overflow-x: auto !important;
+}
+
+.vp-doc [class*='language-'] code {
+    white-space: pre !important;
+}
+
+/* Тонкий горизонтальный скроллбар именно для блоков кода */
+.vp-doc div[class*='language-']::-webkit-scrollbar {
+    height: 8px;
+}
+
+.vp-doc div[class*='language-']::-webkit-scrollbar-thumb {
+    background: var(--vs-surface);
+    border-radius: 4px;
+}
+
+/* --- GLOBAL BODY --- */
+body {
+    font-family: var(--vp-font-family-base);
+    background-color: var(--vp-c-bg);
+    color: var(--vp-c-text-1);
+    -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--vp-c-bg-alt);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--vs-surface);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--vs-accent);
+}
+
+/* Tables */
+.vp-doc table {
+    border-collapse: collapse;
+    margin: 2rem 0;
+    width: 100%;
+}
+
+.vp-doc th, .vp-doc td {
+    border: 1px solid var(--vp-c-border);
+    padding: 0.75rem;
+    text-align: left;
+}
+
+.vp-doc th {
+    background-color: var(--vp-c-bg-soft);
+    font-weight: 600;
+}
+
+/* Code Groups & Cleanup */
+.vp-code-group {
+    margin-top: 1.5rem !important;
+}
+
+.index-manual, .prose-doc, .cat-container, .workbench-hero {
+    display: none !important;
+}

@@ -100,8 +100,8 @@ public class FlexibleTests
     [Test]
     public void Flexible_Loose_TwoChildren_SplitSpace()
     {
-        var a = MakeFlexChild(new Vector2(30, 10));
-        var b = MakeFlexChild(new Vector2(30, 10), 2);
+        var a = MakeFlexChild(new Vector2(30, 10), 1, FlexFit.Loose);
+        var b = MakeFlexChild(new Vector2(30, 10), 2, FlexFit.Loose);
         var flex = new RenderFlex { Direction = FlexDirection.Horizontal };
         flex.AddChild(a);
         flex.AddChild(b);
@@ -117,7 +117,7 @@ public class FlexibleTests
     [Test]
     public void Flexible_LooseAndTight_Mixed()
     {
-        var loose = MakeFlexChild(new Vector2(30, 10));
+        var loose = MakeFlexChild(new Vector2(30, 10), 1, FlexFit.Loose);
         var tight = MakeFlexChild(new Vector2(30, 10), 1, FlexFit.Tight);
         var flex = new RenderFlex { Direction = FlexDirection.Horizontal };
         flex.AddChild(loose);

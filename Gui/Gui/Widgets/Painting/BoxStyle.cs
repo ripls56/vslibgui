@@ -32,7 +32,7 @@ public enum HitTestBehavior
 
 /// <summary>
 ///     Immutable visual description for a <see cref="Gui.Widgets.Basic.Container" />.
-///     Passed to <see cref="Gui.Core.Basic.RenderBox" /> which translates it into Skia
+///     Passed to <see cref="Gui.Core.Framework.RenderBox" /> which translates it into Skia
 ///     draw calls each paint frame.
 /// </summary>
 public class BoxStyle
@@ -64,12 +64,20 @@ public class BoxStyle
     ///     Border stroke color as RGBA. Default is white at 50% opacity.
     ///     Only painted when <see cref="BorderThickness" /> is greater than zero.
     /// </summary>
-    public Vector4 BorderColor { get; set; } = new(
+    public Vector4 BorderColor { get; set; } = new
+    (
         1,
         1,
         1,
         0.5f
     );
+
+    /// <summary>
+    ///     Optional per-side border. When set it overrides
+    ///     <see cref="BorderThickness" /> and <see cref="BorderColor" />. Null
+    ///     (default) keeps the uniform border.
+    /// </summary>
+    public Border? Border { get; set; }
 
     /// <summary>Inner padding applied before children are laid out.</summary>
     public EdgeInsets Padding { get; set; } = EdgeInsets.Zero;

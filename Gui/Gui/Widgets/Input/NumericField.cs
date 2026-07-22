@@ -1,5 +1,6 @@
 using System;
-using Gui.Rendering.Text;
+using System.Globalization;
+using Gui.Core.Framework;
 using Gui.Widgets.Basic;
 using Gui.Widgets.Events;
 using Gui.Widgets.Framework;
@@ -11,7 +12,8 @@ namespace Gui.Widgets.Input;
 
 public class NumericField : StatefulWidget
 {
-    public NumericField(
+    public NumericField
+    (
         float initialValue = 0,
         float step = 1,
         Action<float>? onChanged = null,
@@ -21,7 +23,10 @@ public class NumericField : StatefulWidget
         Value = initialValue;
         Step = step;
         OnChanged = onChanged;
-        Style = style ?? new BoxStyle { Height = 40, Width = 100 };
+        Style = style ?? new BoxStyle
+        {
+            Height = 40, Width = 100
+        };
     }
 
     public float Value { get; }
@@ -32,11 +37,10 @@ public class NumericField : StatefulWidget
     public override State CreateState() => new NumericFieldState();
 }
 
-internal class NumericFieldState : State<NumericField>
+internal class NumericFieldState : FocusableState<NumericField>
 {
     private TextEditingController _controller = null!;
     private float _currentValue;
-    private FocusNode _focusNode = null!;
 
     public override void InitState()
     {
@@ -44,12 +48,12 @@ internal class NumericFieldState : State<NumericField>
         _currentValue = Widget.Value;
         _controller = new TextEditingController(_currentValue.ToString());
         _controller.AddListener(OnTextChanged);
-        _focusNode = new FocusNode();
     }
 
     private void OnTextChanged()
     {
-        if (float.TryParse(
+        if (float.TryParse
+            (
                 _controller.Text,
                 out var newValue
             ))
@@ -63,96 +67,74 @@ internal class NumericFieldState : State<NumericField>
         else if (_controller.Text != "" && _controller.Text != "-" && _controller.Text != "." &&
                  _controller.Text != "," && _controller.Text != " ")
         {
-            _controller.Value = new TextEditingValue(
-                _currentValue.ToString(),
-                TextSelection.Collapsed(_currentValue.ToString().Length)
+            _controller.Value = new TextEditingValue
+            (
+                _currentValue.ToString(CultureInfo.InvariantCulture),
+                TextSelection.Collapsed(_currentValue.ToString(CultureInfo.InvariantCulture).Length)
             );
         }
     }
 
-    private void Adjust(
+    private void Adjust
+    (
         float delta
     )
     {
-        _focusNode.RequestFocus(); // Ensure focus when using buttons
+        FocusNode.RequestFocus();
         _currentValue += delta;
-        _controller.Text = _currentValue.ToString();
+        _controller.Text = _currentValue.ToString(CultureInfo.InvariantCulture);
         Widget.OnChanged?.Invoke(_currentValue);
         SetState(() => { });
     }
 
-    public override Widget Build(
+    public override Widget Build
+    (
         BuildContext context
     )
     {
         var theme = Theme.Of(context);
-        var colors = theme.ColorScheme;
+        var fieldStyle = theme.TextFieldStyle;
+        var fieldHeight = Widget.Style.Height ?? fieldStyle.Height;
+        var spinnerWidth = fieldHeight / 2f;
 
-        var fieldHeight = Widget.Style.Height ?? 40;
-        var buttonSize = fieldHeight / 2;
-
-        Widget MakeButton(
-            string label,
-            Action<PointerEvent> onTap
-        )
-        {
-            return new GestureDetector(
-                onTap: onTap,
-                child: new Container(
-                    new BoxStyle
-                    {
-                        Width = buttonSize,
-                        Height = buttonSize,
-                        Color = colors.Primary,
-                        CornerRadius = Vector4.Zero
-                    },
-                    new Center(
-                        new Text(
-                            label,
-                            new TextStyle
-                            {
-                                FontSize = theme.TextTheme.Body.FontSize,
-                                Color = colors.OnPrimary
-                            }
-                        )
-                    )
-                )
-            );
-        }
-
-        return new Container(
+        return new Container
+        (
             Widget.Style,
-            new Row(
+            new Row
+            (
                 children:
                 [
-                    new Expanded(
-                        new TextField(
+                    new Expanded
+                    (
+                        new TextField
+                        (
                             _controller,
-                            _focusNode,
-                            new BoxStyle
+                            FocusNode,
+                            fieldStyle with
                             {
                                 Height = fieldHeight,
-                                Color = new Vector4(
-                                    colors.Background.X,
-                                    colors.Background.Y,
-                                    colors.Background.Z,
-                                    0.9f
-                                ),
-                                BorderThickness = 1,
-                                BorderColor = colors.Border
+                                CornerRadius = fieldStyle.CornerRadius with
+                                {
+                                    X = 0, Y = 0
+                                }
                             }
                         )
                     ),
-                    new Column(
+                    new Column
+                    (
                         children:
                         [
-                            MakeButton(
-                                "+",
-                                e => Adjust(Widget.Step)
+                            new StepperButton
+                            (
+                                "textures/icons/plus.svg",
+                                _ => Adjust(Widget.Step),
+                                spinnerWidth
                             ),
-                            MakeButton(
-                                "-",
-                                e => Adjust(-Widget.Step)
+                            new StepperButton
+                            (
+                                "textures/icons/minus.svg",
+                                _ => Adjust(-Widget.Step),
+                                spinnerWidth
                             )
                         ]
                     )
@@ -165,7 +147,77 @@ internal class NumericFieldState : State<NumericField>
     {
         _controller.RemoveListener(OnTextChanged);
         _controller.Dispose();
-        _focusNode.Dispose();
         base.Dispose();
+    }
+}
+
+internal class StepperButton
+(
+    string iconPath,
+    Action<PointerEvent> onTap,
+    float size
+) : StatefulWidget
+{
+    public string IconPath { get; } = iconPath;
+    public Action<PointerEvent> OnTap { get; } = onTap;
+    public float Size { get; } = size;
+
+    public override State CreateState() => new StepperButtonState();
+}
+
+internal class StepperButtonState : State<StepperButton>
+{
+    private bool _isHovered;
+    private bool _isPressed;
+
+    public override Widget Build
+    (
+        BuildContext context
+    )
+    {
+        var theme = Theme.Of(context);
+        var variant = theme.ButtonStyle.Primary;
+
+        var fill = _isPressed
+            ? variant.PressBackgroundColor
+            : _isHovered
+                ? variant.HoverBackgroundColor
+                : variant.BackgroundColor;
+
+        return new MouseRegion
+        (
+            cursor: MouseCursor.LinkSelect,
+            child: new GestureDetector
+            (
+                onTap: Widget.OnTap,
+                onPress: _ => SetState(() => _isPressed = true),
+                onRelease: _ => SetState(() => _isPressed = false),
+                onEnter: _ => SetState(() => _isHovered = true),
+                onExit: _ => SetState
+                (() =>
+                    {
+                        _isHovered = false;
+                        _isPressed = false;
+                    }
+                ),
+                child: new Container
+                (
+                    new BoxStyle
+                    {
+                        Width = Widget.Size, Height = Widget.Size, Color = fill
+                    },
+                    new Center
+                    (
+                        new Icon
+                        (
+                            "gui",
+                            Widget.IconPath,
+                            Widget.Size * 0.6f,
+                            theme.ColorScheme.OnPrimary
+                        )
+                    )
+                )
+            )
+        );
     }
 }

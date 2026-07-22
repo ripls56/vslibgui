@@ -144,7 +144,7 @@ public class LayoutWidgetsTests
     {
         private readonly Vector2 _intrinsicSize;
 
-        public TestInteractiveWidget(Vector2 size)
+        public TestInteractiveWidget(Vector2 size) : base()
         {
             _intrinsicSize = size;
         }

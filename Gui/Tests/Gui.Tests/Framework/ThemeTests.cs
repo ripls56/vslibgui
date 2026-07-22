@@ -1,4 +1,5 @@
 using Gui.Core.Framework;
+using Gui.Rendering.Text;
 using Gui.Widgets.Framework;
 using OpenTK.Mathematics;
 
@@ -110,7 +111,8 @@ public class ThemeTests
     [Test]
     public void ThemeOf_ReturnsThemeData_WhenPresent()
     {
-        var theme = new ThemeData(
+        var theme = new ThemeData
+        (
             new ColorScheme
             {
                 Primary = new Vector4(1, 0, 0, 1),
@@ -125,7 +127,8 @@ public class ThemeTests
                 Border = Vector4.Zero,
                 Error = Vector4.Zero,
                 OnError = Vector4.One
-            });
+            }
+        );
 
         var reader = new ThemeReaderWidget();
         var tree = new Theme(theme, reader);
@@ -133,8 +136,11 @@ public class ThemeTests
         var (_, _, readerState) = MountTree<ThemeReaderState>(tree);
 
         Assert.That(readerState.ReadTheme, Is.SameAs(theme));
-        Assert.That(readerState.ReadTheme!.ColorScheme.Primary,
-            Is.EqualTo(new Vector4(1, 0, 0, 1)));
+        Assert.That
+        (
+            readerState.ReadTheme!.ColorScheme.Primary,
+            Is.EqualTo(new Vector4(1, 0, 0, 1))
+        );
     }
 
     [Test]
@@ -159,7 +165,8 @@ public class ThemeTests
         var buildsBefore = readerState.BuildCount;
 
         // Swap to a different ThemeData instance
-        var theme2 = new ThemeData(
+        var theme2 = new ThemeData
+        (
             new ColorScheme
             {
                 Primary = new Vector4(0, 1, 0, 1),
@@ -174,7 +181,8 @@ public class ThemeTests
                 Border = Vector4.Zero,
                 Error = Vector4.Zero,
                 OnError = Vector4.One
-            });
+            }
+        );
 
         rootState.RebuildWith(new Theme(theme2, reader));
         owner.BuildDirtyElements();
@@ -223,5 +231,44 @@ public class ThemeTests
         // We check that no extra DidChangeDependencies-triggered rebuild happened
         // beyond the normal parent rebuild.
         Assert.That(readerState.BuildCount, Is.LessThanOrEqualTo(buildsBefore + 1));
+    }
+
+    [Test]
+    public void TextTheme_Default_HasFullScale()
+    {
+        var scheme = ColorScheme.Default();
+        var text = TextTheme.Default(scheme);
+
+        Assert.Multiple
+        (() =>
+            {
+                Assert.That(text.Display.FontSize, Is.EqualTo(30f));
+                Assert.That(text.Display.Weight, Is.EqualTo(FontWeight.Bold));
+                Assert.That(text.Headline.FontSize, Is.EqualTo(24f));
+                Assert.That(text.Headline.Weight, Is.EqualTo(FontWeight.Bold));
+                Assert.That(text.Title.FontSize, Is.EqualTo(18f));
+                Assert.That(text.Title.Weight, Is.EqualTo(FontWeight.SemiBold));
+                Assert.That(text.Subtitle.FontSize, Is.EqualTo(16f));
+                Assert.That(text.Body.FontSize, Is.EqualTo(14f));
+                Assert.That(text.Label.FontSize, Is.EqualTo(12f));
+                Assert.That(text.Caption.FontSize, Is.EqualTo(11f));
+                Assert.That(text.Caption.Color, Is.EqualTo(scheme.OnSurfaceVariant));
+
+                Assert.That
+                (
+                    text.Display.FontSize,
+                    Is.GreaterThan(text.Headline.FontSize)
+                );
+                Assert.That
+                (
+                    text.Headline.FontSize,
+                    Is.GreaterThan(text.Title.FontSize)
+                );
+                Assert.That(text.Title.FontSize, Is.GreaterThan(text.Subtitle.FontSize));
+                Assert.That(text.Subtitle.FontSize, Is.GreaterThan(text.Body.FontSize));
+                Assert.That(text.Body.FontSize, Is.GreaterThan(text.Label.FontSize));
+                Assert.That(text.Label.FontSize, Is.GreaterThan(text.Caption.FontSize));
+            }
+        );
     }
 }

@@ -23,8 +23,17 @@ namespace Gui.Widgets.Inventory;
 /// </summary>
 public class ItemSlotOverlay : StatelessWidget
 {
+    /// <summary>Key of the root <see cref="Stack" /> — use with <see cref="IWidgetTransformer" /> to intercept it.</summary>
+    public static readonly Framework.Key RootStackKey = new ValueKey<string>
+        ("item_slot_overlay.root_stack");
+
+    /// <summary>Key of the <see cref="Positioned" /> wrapper anchoring the durability bar — use with <see cref="IWidgetTransformer" /> to replace it.</summary>
+    public static readonly Framework.Key DurabilityBarKey = new ValueKey<string>
+        ("item_slot_overlay.durability_bar");
+
     /// <summary>Creates an overlay for <paramref name="slot" /> sized to <paramref name="size" />.</summary>
-    public ItemSlotOverlay(
+    public ItemSlotOverlay
+    (
         ItemSlot? slot,
         float size,
         Vector4? hoverColor = null,
@@ -58,10 +67,8 @@ public class ItemSlotOverlay : StatelessWidget
     {
         var itemStack = Slot?.Itemstack;
         var hoverAnim = ItemSlotHoverData.Of(context)?.HoverAnimation;
-        var hoverOpacity = (float)(hoverAnim?.Value ?? 0) * 0.08f;
         var theme = Theme.Of(context);
         var slotStyle = theme.ItemSlotStyle;
-        var hoverOverlayColor = HoverColor ?? slotStyle.HoverColor ?? new Vector4(1);
         var pad = Padding ?? slotStyle.Padding ?? EdgeInsets.Zero;
 
         var hoverDataCtx = ItemSlotHoverData.Of(context);
@@ -102,11 +109,14 @@ public class ItemSlotOverlay : StatelessWidget
 
                 if (itemStackStackSize > 1 || containableProps != null)
                 {
-                    iconChildren.Add(
-                        new Positioned(
+                    iconChildren.Add
+                    (
+                        new Positioned
+                        (
                             right: 2,
                             bottom: 2,
-                            child: new Text(
+                            child: new Text
+                            (
                                 stackSizeText,
                                 new TextStyle
                                 {
@@ -128,7 +138,8 @@ public class ItemSlotOverlay : StatelessWidget
             itemIcon = new SizedBox();
         }
 
-        itemIcon = new AnimatedScale(
+        itemIcon = new AnimatedScale
+        (
             punchScale,
             TimeSpan.FromMilliseconds(150),
             Curves.EaseOut,
@@ -149,9 +160,14 @@ public class ItemSlotOverlay : StatelessWidget
 
         if (!string.IsNullOrEmpty(backgroundIcon) && itemStack == null)
         {
-            var bgIconColor = theme.ColorScheme.Secondary with { W = 0.45f };
-            outerChildren.Add(
-                new Center(
+            var bgIconColor = theme.ColorScheme.Secondary with
+            {
+                W = 0.45f
+            };
+            outerChildren.Add
+            (
+                new Center
+                (
                     new VsIcon(backgroundIcon, Size * 0.7f, bgIconColor)
                 )
             );
@@ -168,8 +184,16 @@ public class ItemSlotOverlay : StatelessWidget
                 if (maxDur != remaining)
                 {
                     var dur = new DurabilityBar((float)remaining / maxDur, Size);
-                    outerChildren.Add(
-                        new Positioned(bottom: 3, child: new Align(Alignment.BottomCenter, dur))
+                    outerChildren.Add
+                    (
+                        new Positioned
+                        (
+                            key: DurabilityBarKey,
+                            child: new Padding
+                            (
+                                pad, new Align(Alignment.BottomCenter, dur)
+                            )
+                        )
                     );
                 }
             }
@@ -184,8 +208,10 @@ public class ItemSlotOverlay : StatelessWidget
         if (EnableSpotlight && hoverIntensity > 0f)
         {
             var color = Slot?.HexBackgroundColor?.FromHex() ?? theme.ColorScheme.Primary;
-            outerChildren.Add(
-                new SpotlightBorder(
+            outerChildren.Add
+            (
+                new SpotlightBorder
+                (
                     hoverIntensity,
                     color,
                     hoverDataCtx?.PointerPosition
@@ -193,8 +219,38 @@ public class ItemSlotOverlay : StatelessWidget
             );
         }
 
-        return new Stack(outerChildren);
+        return new ItemSlotOverlayStack(outerChildren, itemStack, Size);
     }
+}
+
+/// <summary>
+///     Root <see cref="Stack" /> of an <see cref="ItemSlotOverlay" />, keyed with
+///     <see cref="ItemSlotOverlay.RootStackKey" />. Carries the displayed
+///     <see cref="ItemStack" /> and slot size so <see cref="IWidgetTransformer" />
+///     implementations can append slot decorations without walking the widget tree.
+/// </summary>
+public sealed class ItemSlotOverlayStack : Stack
+{
+    /// <summary>
+    ///     Creates the overlay root from <paramref name="children" />, tagging it with
+    ///     the displayed <paramref name="itemStack" /> and <paramref name="slotSize" />.
+    /// </summary>
+    public ItemSlotOverlayStack
+    (
+        IEnumerable<Widget> children,
+        ItemStack? itemStack,
+        float slotSize
+    ) : base(children, ItemSlotOverlay.RootStackKey)
+    {
+        ItemStack = itemStack;
+        SlotSize = slotSize;
+    }
+
+    /// <summary>The item stack displayed by the slot, or null when the slot is empty.</summary>
+    public ItemStack? ItemStack { get; }
+
+    /// <summary>Side length of the slot in pixels.</summary>
+    public float SlotSize { get; }
 }
 
 /// <summary>
@@ -219,7 +275,8 @@ internal sealed class RenderUnavailableSlash : RenderBox
     /// <inheritdoc />
     protected override void PerformLayout()
     {
-        Size = Constraints.Constrain(
+        Size = Constraints.Constrain
+        (
             new Vector2(Constraints.MaxWidth, Constraints.MaxHeight)
         );
     }
@@ -249,7 +306,7 @@ internal sealed class RenderUnavailableSlash : RenderBox
 ///     Positioned bar indicating remaining durability at the bottom of a slot.
 ///     Color interpolates red → yellow → green based on <paramref name="ratio" />.
 /// </summary>
-internal class DurabilityBar : StatelessWidget
+public class DurabilityBar : StatelessWidget
 {
     public DurabilityBar(float ratio, float slotSize)
     {
@@ -268,30 +325,43 @@ internal class DurabilityBar : StatelessWidget
         var fillWidth = Math.Max(trackWidth * Ratio, barH);
 
         var barColor = Ratio > 0.5f
-            ? Vector4.Lerp(
+            ? Vector4.Lerp
+            (
                 new Vector4(1f, 0.72f, 0f, 1f),
                 new Vector4(0.2f, 0.88f, 0.25f, 1f),
-                (Ratio - 0.5f) * 2f)
-            : Vector4.Lerp(
+                (Ratio - 0.5f) * 2f
+            )
+            : Vector4.Lerp
+            (
                 new Vector4(0.88f, 0.15f, 0.15f, 1f),
                 new Vector4(1f, 0.72f, 0f, 1f),
-                Ratio * 2f);
+                Ratio * 2f
+            );
 
-        return new Stack([
-            new Container(new BoxStyle
-            {
-                // Width = trackWidth,
-                Height = barH,
-                Color = new Vector4(0f, 0f, 0f, 0.55f),
-                CornerRadius = new Vector4(barH / 2f)
-            }),
-            new Container(new BoxStyle
-            {
-                Width = fillWidth,
-                Height = barH,
-                Color = barColor,
-                CornerRadius = new Vector4(barH / 2f)
-            })
-        ]);
+        return new Stack
+        (
+            [
+                new Container
+                (
+                    new BoxStyle
+                    {
+                        // Width = trackWidth,
+                        Height = barH,
+                        Color = new Vector4(0f, 0f, 0f, 0.55f),
+                        CornerRadius = new Vector4(barH / 2f)
+                    }
+                ),
+                new Container
+                (
+                    new BoxStyle
+                    {
+                        Width = fillWidth,
+                        Height = barH,
+                        Color = barColor,
+                        CornerRadius = new Vector4(barH / 2f)
+                    }
+                )
+            ]
+        );
     }
 }

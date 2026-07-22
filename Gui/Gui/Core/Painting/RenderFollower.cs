@@ -18,6 +18,8 @@ internal class RenderFollower : RenderProxyBox
     public Vector2 Offset { get; set; }
     public bool ShowAbove { get; set; }
 
+    private bool _registeredWithLink;
+
     /// <summary>
     ///     Eagerly writes <see cref="StackParentData" /> with <c>Left=0, Top=0</c>
     ///     so that <see cref="RenderStack" /> identifies this child as positioned
@@ -36,17 +38,38 @@ internal class RenderFollower : RenderProxyBox
     ///     space, accounting for the difference in window offsets when the
     ///     target lives in a different window.
     /// </summary>
-    private Vector2 TargetInLocal()
+    protected Vector2 TargetInLocal()
     {
-        var target = Link?.Target;
+        var link = Link;
+        var target = link?.Target;
         if (target == null)
         {
             return Vector2.Zero;
         }
 
+        // Subscribe on first use; the target may mount after the follower.
+        if (!_registeredWithLink)
+        {
+            _registeredWithLink = true;
+            link!.AddListener(OnTargetMoved);
+        }
+
         var pos = target.LocalToGlobal(Vector2.Zero);
         pos += target.GetScreenOffset() - GetScreenOffset();
         return pos;
+    }
+
+    // The target moved in another window; nudge our own window to repaint.
+    private void OnTargetMoved() => MarkNeedsPaint();
+
+    public override void Dispose()
+    {
+        if (_registeredWithLink)
+        {
+            Link?.RemoveListener(OnTargetMoved);
+        }
+
+        base.Dispose();
     }
 
     public override void Layout(

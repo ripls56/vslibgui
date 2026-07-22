@@ -90,9 +90,6 @@ public class RenderItemStack : RenderBox
         HitTestBehavior == HitTestBehavior.Opaque ||
         (HitTestBehavior == HitTestBehavior.Defer && _itemStack != null);
 
-    /// <summary>The stack currently assigned to this slot, or null when empty.</summary>
-    internal ItemStack? CurrentStack => _itemStack;
-
     /// <inheritdoc />
     protected override void PerformLayout()
     {
@@ -182,6 +179,9 @@ public class RenderItemStack : RenderBox
         _waitingForBitmap = false;
         MarkNeedsPaint();
     }
+
+    /// <summary>The stack currently assigned to this slot, or null when empty.</summary>
+    internal ItemStack? CurrentStack => _itemStack;
 
     /// <summary>
     ///     Called by <see cref="ItemStackRenderer" /> when a glowing item has cooled into a new

@@ -1,6 +1,10 @@
+using System;
 using System.Collections.Generic;
+using Gui.Core.Layout;
+using Gui.Core.Scroll;
 using Gui.Rendering;
 using Gui.Rendering.Text;
+using Gui.Widgets.Animations;
 using Gui.Widgets.Framework;
 using Gui.Widgets.Input;
 using Gui.Widgets.Layout;
@@ -23,7 +27,8 @@ public enum TabPosition
 
 public class TabView : StatefulWidget
 {
-    public TabView(
+    public TabView
+    (
         List<TabItem> tabs,
         TabPosition position = TabPosition.Top,
         int initialIndex = 0
@@ -38,6 +43,10 @@ public class TabView : StatefulWidget
     public TabPosition Position { get; }
     public int InitialIndex { get; }
 
+    public Action<int>? OnTabChanged { get; set; }
+
+    public float? TabWidth { get; set; }
+
     public override State CreateState() => new TabViewState();
 }
 
@@ -51,81 +60,244 @@ internal class TabViewState : State<TabView>
         _activeIndex = Widget.InitialIndex;
     }
 
-    public override Widget Build(
-        BuildContext context
-    )
+    public override Widget Build(BuildContext context)
     {
         var theme = Theme.Of(context);
         var colors = theme.ColorScheme;
 
-        var tabButtons = Widget.Tabs.ConvertAll(t =>
+        var tabButtons = Widget.Tabs.ConvertAll
+        (t =>
             {
                 var index = Widget.Tabs.IndexOf(t);
                 var isActive = index == _activeIndex;
 
-                return (Widget)new GestureDetector(
-                    onTap: e => SetState(() => _activeIndex = index),
-                    child: new Container(
-                        new BoxStyle
-                        {
-                            Color = isActive
-                                ? new Vector4(
-                                    colors.Primary.X,
-                                    colors.Primary.Y,
-                                    colors.Primary.Z,
-                                    0.15f
-                                )
-                                : Vector4.Zero,
-                            Padding = EdgeInsets.All(4),
-                            CornerRadius = new Vector4(4),
-                            BorderThickness = 0
-                        },
-                        new Padding(
-                            EdgeInsets.All(8),
-                            new Text(
-                                t.Label,
-                                new TextStyle
-                                {
-                                    FontSize = theme.TextTheme.Body.FontSize,
-                                    Color = isActive
-                                        ? colors.Primary
-                                        : colors.OnSurface
-                                }
-                            )
-                        )
-                    )
+                return new TabButtonWidget
+                (
+                    label: t.Label,
+                    isActive: isActive,
+                    position: Widget.Position,
+                    width: Widget.TabWidth,
+                    onTap: () =>
+                    {
+                        SetState(() => _activeIndex = index);
+                        Widget.OnTabChanged?.Invoke(index);
+                    }
                 );
             }
         );
 
-        Widget header = Widget.Position == TabPosition.Top
-            ? new Row(children: tabButtons)
-            : new Column(children: tabButtons);
+        Widget content = Widget.Tabs[_activeIndex].Content;
 
-        Widget content = new Container(
-            new BoxStyle
-            {
-                Color = new Vector4(
-                    colors.Surface.X,
-                    colors.Surface.Y,
-                    colors.Surface.Z,
-                    0.05f
-                )
-            },
-            Widget.Tabs[_activeIndex].Content
+        content = new AnimatedSize
+        (
+            duration: TimeSpan.FromMilliseconds(400),
+            curve: Curves.EaseOutCubic,
+            child: content
         );
 
         if (Widget.Position == TabPosition.Top)
         {
-            return new Column(
+            return new Column
+            (
                 crossAxisAlignment: CrossAxisAlignment.Stretch,
-                children: [header, new Expanded(content)]
+                children:
+                [
+                    new Padding
+                    (
+                        EdgeInsets.Only(bottom: 12),
+                        new Container
+                        (
+                            style: new BoxStyle
+                            {
+                                Color = colors.SurfaceLow,
+                                CornerRadius = new Vector4(8),
+                                Padding = EdgeInsets.All(4)
+                            },
+                            child: new Row
+                            (
+                                mainAxisSize: MainAxisSize.Min,
+                                children: tabButtons
+                            )
+                        )
+                    ),
+                    new Expanded(content)
+                ]
             );
         }
 
-        return new Row(
+        return new Row
+        (
             crossAxisAlignment: CrossAxisAlignment.Stretch,
-            children: [header, new Expanded(content)]
+            children:
+            [
+                new Column(children: tabButtons),
+                new Divider(color: colors.OutlineVariant, axis: Axis.Vertical),
+                new Expanded(content)
+            ]
+        );
+    }
+}
+
+internal class TabButtonWidget : StatefulWidget
+{
+    public TabButtonWidget
+    (
+        string label,
+        bool isActive,
+        TabPosition position,
+        float? width,
+        Action onTap
+    )
+    {
+        Label = label;
+        IsActive = isActive;
+        Position = position;
+        Width = width;
+        OnTap = onTap;
+    }
+
+    public string Label { get; }
+    public bool IsActive { get; }
+    public TabPosition Position { get; }
+    public float? Width { get; }
+    public Action OnTap { get; }
+
+    public override State CreateState() => new TabButtonWidgetState();
+}
+
+internal class TabButtonWidgetState : State<TabButtonWidget>
+{
+    private bool _isHovered;
+    private bool _isPressed;
+
+    public override Widget Build(BuildContext context)
+    {
+        var theme = Theme.Of(context);
+        var colors = theme.ColorScheme;
+
+        var textStyle = new TextStyle
+        {
+            FontSize = theme.TextTheme.Label.FontSize,
+            Color = Widget.IsActive ? colors.Primary : colors.OnSurfaceVariant,
+            Weight = Widget.IsActive ? FontWeight.SemiBold : FontWeight.Normal
+        };
+
+        Widget label = new AnimatedText
+        (
+            Widget.Label,
+            style: textStyle,
+            duration: TimeSpan.FromMilliseconds(200)
+        );
+
+        if (Widget.Position == TabPosition.Top)
+        {
+            return BuildTopTab(colors, label);
+        }
+
+        return BuildLeftTab(colors, label);
+    }
+
+    private Widget BuildTopTab(ColorScheme colors, Widget label)
+    {
+        Widget content = new AnimatedContainer
+        (
+            duration: TimeSpan.FromMilliseconds(200),
+            curve: Curves.EaseOutCubic,
+            style: new BoxStyle
+            {
+                Padding = EdgeInsets.Symmetric(horizontal: 16, vertical: 8),
+                Color = Widget.IsActive
+                    ? colors.SurfaceHigh
+                    : (_isHovered ? colors.StateHover : Vector4.Zero),
+                CornerRadius = new Vector4(6),
+                Width = Widget.Width
+            },
+            child: label
+        );
+
+        return new Padding
+        (
+            EdgeInsets.Symmetric(horizontal: 2),
+            WrapGesture
+            (
+                new AnimatedScale
+                (
+                    scale: _isPressed ? 0.96f : (_isHovered ? 1.03f : 1.0f),
+                    duration: TimeSpan.FromMilliseconds(140),
+                    curve: Curves.EaseOut,
+                    child: content
+                )
+            )
+        );
+    }
+
+    private Widget BuildLeftTab(ColorScheme colors, Widget label)
+    {
+        Widget content = new AnimatedContainer
+        (
+            duration: TimeSpan.FromMilliseconds(250),
+            curve: Curves.EaseOutCubic,
+            style: new BoxStyle
+            {
+                Padding = EdgeInsets.Symmetric(horizontal: 12, vertical: 8),
+                Color = Widget.IsActive
+                    ? colors.StateSelected
+                    : (_isHovered ? colors.StateHover : Vector4.Zero),
+                CornerRadius = new Vector4(0, 0, 4, 4),
+                Width = Widget.Width
+            },
+            child: new Row
+            (
+                mainAxisSize: MainAxisSize.Min,
+                children:
+                [
+                    new AnimatedContainer
+                    (
+                        duration: TimeSpan.FromMilliseconds(300),
+                        style: new BoxStyle
+                        {
+                            Width = 3,
+                            Height = 16,
+                            Color = Widget.IsActive
+                                ? colors.Primary
+                                : (_isHovered ? colors.Border : Vector4.Zero),
+                            CornerRadius = new Vector4(1.5f)
+                        }
+                    ),
+                    new SizedBox(width: 12),
+                    new Expanded(child: label)
+                ]
+            )
+        );
+
+        return WrapGesture
+        (
+            new AnimatedScale
+            (
+                scale: _isPressed ? 0.96f : (_isHovered ? 1.03f : 1.0f),
+                duration: TimeSpan.FromMilliseconds(140),
+                curve: Curves.EaseOut,
+                child: content
+            )
+        );
+    }
+
+    private Widget WrapGesture(Widget child)
+    {
+        return new GestureDetector
+        (
+            onTap: _ => Widget.OnTap(),
+            onEnter: _ => SetState(() => _isHovered = true),
+            onExit: _ => SetState
+            (() =>
+                {
+                    _isHovered = false;
+                    _isPressed = false;
+                }
+            ),
+            onPress: _ => SetState(() => _isPressed = true),
+            onRelease: _ => SetState(() => _isPressed = false),
+            child: child
         );
     }
 }

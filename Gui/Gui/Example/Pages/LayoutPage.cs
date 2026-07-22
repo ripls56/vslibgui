@@ -24,49 +24,60 @@ internal class LayoutPage : StatelessWidget
 
     public override Widget Build(BuildContext context)
     {
-        var colors = Theme.Of(context).ColorScheme;
+        var theme = Theme.Of(context);
+        var colors = theme.ColorScheme;
+        var headerStyle = theme.TextTheme.Headline;
+        headerStyle.Color = colors.Primary;
 
-        return new Column(
+        return new Column
+        (
             crossAxisAlignment: CrossAxisAlignment.Stretch,
             spacing: 16,
             children:
             [
-                new Text("Layout",
-                    new TextStyle
-                    {
-                        FontSize = 22, Weight = FontWeight.Bold, Color = colors.Primary
-                    }),
+                new Text("Layout", headerStyle),
 
-                new DemoCard(
+                new DemoCard
+                (
                     "Row",
                     description: "Lays out children horizontally with optional spacing.",
-                    demo: new Row(
+                    demo: new Row
+                    (
                         8,
                         children:
                         [
-                            new Container(new BoxStyle
-                            {
-                                Color = colors.Primary,
-                                Width = 48,
-                                Height = 32,
-                                CornerRadius = Vector4.One * 4
-                            }),
-                            new Container(new BoxStyle
-                            {
-                                Color = colors.Surface,
-                                Width = 80,
-                                Height = 32,
-                                CornerRadius = Vector4.One * 4,
-                                BorderThickness = 1f,
-                                BorderColor = colors.Border
-                            }),
-                            new Container(new BoxStyle
-                            {
-                                Color = colors.Primary,
-                                Width = 48,
-                                Height = 32,
-                                CornerRadius = Vector4.One * 4
-                            })
+                            new Container
+                            (
+                                new BoxStyle
+                                {
+                                    Color = colors.Primary,
+                                    Width = 48,
+                                    Height = 32,
+                                    CornerRadius = Vector4.One * 4
+                                }
+                            ),
+                            new Container
+                            (
+                                new BoxStyle
+                                {
+                                    Color = colors.Surface,
+                                    Width = 80,
+                                    Height = 32,
+                                    CornerRadius = Vector4.One * 4,
+                                    BorderThickness = 1f,
+                                    BorderColor = colors.Border
+                                }
+                            ),
+                            new Container
+                            (
+                                new BoxStyle
+                                {
+                                    Color = colors.Primary,
+                                    Width = 48,
+                                    Height = 32,
+                                    CornerRadius = Vector4.One * 4
+                                }
+                            )
                         ]
                     ),
                     code: """
@@ -83,11 +94,13 @@ internal class LayoutPage : StatelessWidget
                     capi: Capi
                 ),
 
-                new DemoCard(
+                new DemoCard
+                (
                     "Row · MainAxisAlignment",
                     description:
                     "Distributes children along the main (horizontal) axis. Default is Start.",
-                    demo: new Column(
+                    demo: new Column
+                    (
                         mainAxisSize: MainAxisSize.Min,
                         crossAxisAlignment: CrossAxisAlignment.Stretch,
                         spacing: 8,
@@ -96,12 +109,21 @@ internal class LayoutPage : StatelessWidget
                             new MainAxisAlignmentSample("Start", MainAxisAlignment.Start),
                             new MainAxisAlignmentSample("Center", MainAxisAlignment.Center),
                             new MainAxisAlignmentSample("End", MainAxisAlignment.End),
-                            new MainAxisAlignmentSample("SpaceBetween",
-                                MainAxisAlignment.SpaceBetween),
-                            new MainAxisAlignmentSample("SpaceAround",
-                                MainAxisAlignment.SpaceAround),
-                            new MainAxisAlignmentSample("SpaceEvenly",
-                                MainAxisAlignment.SpaceEvenly)
+                            new MainAxisAlignmentSample
+                            (
+                                "SpaceBetween",
+                                MainAxisAlignment.SpaceBetween
+                            ),
+                            new MainAxisAlignmentSample
+                            (
+                                "SpaceAround",
+                                MainAxisAlignment.SpaceAround
+                            ),
+                            new MainAxisAlignmentSample
+                            (
+                                "SpaceEvenly",
+                                MainAxisAlignment.SpaceEvenly
+                            )
                         ]
                     ),
                     code: """
@@ -114,11 +136,13 @@ internal class LayoutPage : StatelessWidget
                     capi: Capi
                 ),
 
-                new DemoCard(
+                new DemoCard
+                (
                     "Row · CrossAxisAlignment",
                     description:
                     "Aligns children along the cross (vertical) axis. Stretch forces equal height.",
-                    demo: new Column(
+                    demo: new Column
+                    (
                         mainAxisSize: MainAxisSize.Min,
                         crossAxisAlignment: CrossAxisAlignment.Stretch,
                         spacing: 8,
@@ -140,38 +164,49 @@ internal class LayoutPage : StatelessWidget
                     capi: Capi
                 ),
 
-                new DemoCard(
+                new DemoCard
+                (
                     "Column",
                     description: "Lays out children vertically with optional spacing.",
-                    demo: new Column(
+                    demo: new Column
+                    (
                         mainAxisSize: MainAxisSize.Min,
                         crossAxisAlignment: CrossAxisAlignment.Start,
                         spacing: 6,
                         children:
                         [
-                            new Container(new BoxStyle
-                            {
-                                Color = colors.Primary,
-                                Width = 200,
-                                Height = 20,
-                                CornerRadius = Vector4.One * 3
-                            }),
-                            new Container(new BoxStyle
-                            {
-                                Color = colors.Surface,
-                                Width = 320,
-                                Height = 20,
-                                CornerRadius = Vector4.One * 3,
-                                BorderThickness = 1f,
-                                BorderColor = colors.Border
-                            }),
-                            new Container(new BoxStyle
-                            {
-                                Color = colors.Primary,
-                                Width = 140,
-                                Height = 20,
-                                CornerRadius = Vector4.One * 3
-                            })
+                            new Container
+                            (
+                                new BoxStyle
+                                {
+                                    Color = colors.Primary,
+                                    Width = 200,
+                                    Height = 20,
+                                    CornerRadius = Vector4.One * 3
+                                }
+                            ),
+                            new Container
+                            (
+                                new BoxStyle
+                                {
+                                    Color = colors.Surface,
+                                    Width = 320,
+                                    Height = 20,
+                                    CornerRadius = Vector4.One * 3,
+                                    BorderThickness = 1f,
+                                    BorderColor = colors.Border
+                                }
+                            ),
+                            new Container
+                            (
+                                new BoxStyle
+                                {
+                                    Color = colors.Primary,
+                                    Width = 140,
+                                    Height = 20,
+                                    CornerRadius = Vector4.One * 3
+                                }
+                            )
                         ]
                     ),
                     code: """
@@ -188,21 +223,36 @@ internal class LayoutPage : StatelessWidget
                     capi: Capi
                 ),
 
-                new DemoCard(
+                new DemoCard
+                (
                     "Column · MainAxisSize",
                     description:
                     "Max (default) fills the parent on the main axis. Min shrinks to content — useful for chips, badges, toolbar groups.",
-                    demo: new SizedBox(
+                    demo: new SizedBox
+                    (
                         height: 220,
-                        child: new Row(
+                        child: new Row
+                        (
                             12,
                             crossAxisAlignment: CrossAxisAlignment.Stretch,
                             children:
                             [
-                                new Expanded(new MainAxisSizeSample("MainAxisSize.Max",
-                                    MainAxisSize.Max)),
-                                new Expanded(new MainAxisSizeSample("MainAxisSize.Min",
-                                    MainAxisSize.Min))
+                                new Expanded
+                                (
+                                    new MainAxisSizeSample
+                                    (
+                                        "MainAxisSize.Max",
+                                        MainAxisSize.Max
+                                    )
+                                ),
+                                new Expanded
+                                (
+                                    new MainAxisSizeSample
+                                    (
+                                        "MainAxisSize.Min",
+                                        MainAxisSize.Min
+                                    )
+                                )
                             ]
                         )
                     ),
@@ -219,37 +269,49 @@ internal class LayoutPage : StatelessWidget
                     capi: Capi
                 ),
 
-                new DemoCard(
+                new DemoCard
+                (
                     "Expanded",
                     description: "Fills remaining space on the main axis inside a Row or Column.",
-                    demo: new Row(
+                    demo: new Row
+                    (
                         8,
                         children:
                         [
-                            new Container(new BoxStyle
-                            {
-                                Color = colors.Primary,
-                                Width = 60,
-                                Height = 32,
-                                CornerRadius = Vector4.One * 4
-                            }),
-                            new Expanded(
-                                new Container(new BoxStyle
+                            new Container
+                            (
+                                new BoxStyle
                                 {
-                                    Color = colors.Surface,
+                                    Color = colors.Primary,
+                                    Width = 60,
                                     Height = 32,
-                                    CornerRadius = Vector4.One * 4,
-                                    BorderThickness = 1f,
-                                    BorderColor = colors.Primary
-                                })
+                                    CornerRadius = Vector4.One * 4
+                                }
                             ),
-                            new Container(new BoxStyle
-                            {
-                                Color = colors.Primary,
-                                Width = 60,
-                                Height = 32,
-                                CornerRadius = Vector4.One * 4
-                            })
+                            new Expanded
+                            (
+                                new Container
+                                (
+                                    new BoxStyle
+                                    {
+                                        Color = colors.Surface,
+                                        Height = 32,
+                                        CornerRadius = Vector4.One * 4,
+                                        BorderThickness = 1f,
+                                        BorderColor = colors.Primary
+                                    }
+                                )
+                            ),
+                            new Container
+                            (
+                                new BoxStyle
+                                {
+                                    Color = colors.Primary,
+                                    Width = 60,
+                                    Height = 32,
+                                    CornerRadius = Vector4.One * 4
+                                }
+                            )
                         ]
                     ),
                     code: """
@@ -268,43 +330,57 @@ internal class LayoutPage : StatelessWidget
                     capi: Capi
                 ),
 
-                new DemoCard(
+                new DemoCard
+                (
                     "Flexible",
                     description:
                     "Distributes remaining main-axis space by integer flex factor. Loose (default) lets the child be smaller; pair with Expanded for tight fill.",
-                    demo: new Row(
+                    demo: new Row
+                    (
                         6,
                         children:
                         [
-                            new Flexible(
-                                new Container(new BoxStyle
-                                {
-                                    Color = colors.Primary,
-                                    Height = 32,
-                                    CornerRadius = Vector4.One * 4
-                                }),
+                            new Flexible
+                            (
+                                new Container
+                                (
+                                    new BoxStyle
+                                    {
+                                        Color = colors.Primary,
+                                        Height = 32,
+                                        CornerRadius = Vector4.One * 4
+                                    }
+                                ),
                                 1,
                                 FlexFit.Tight
                             ),
-                            new Flexible(
-                                new Container(new BoxStyle
-                                {
-                                    Color = colors.Surface,
-                                    Height = 32,
-                                    CornerRadius = Vector4.One * 4,
-                                    BorderThickness = 1f,
-                                    BorderColor = colors.Border
-                                }),
+                            new Flexible
+                            (
+                                new Container
+                                (
+                                    new BoxStyle
+                                    {
+                                        Color = colors.Surface,
+                                        Height = 32,
+                                        CornerRadius = Vector4.One * 4,
+                                        BorderThickness = 1f,
+                                        BorderColor = colors.Border
+                                    }
+                                ),
                                 2,
                                 FlexFit.Tight
                             ),
-                            new Flexible(
-                                new Container(new BoxStyle
-                                {
-                                    Color = colors.Primary,
-                                    Height = 32,
-                                    CornerRadius = Vector4.One * 4
-                                }),
+                            new Flexible
+                            (
+                                new Container
+                                (
+                                    new BoxStyle
+                                    {
+                                        Color = colors.Primary,
+                                        Height = 32,
+                                        CornerRadius = Vector4.One * 4
+                                    }
+                                ),
                                 1,
                                 FlexFit.Tight
                             )
@@ -322,36 +398,47 @@ internal class LayoutPage : StatelessWidget
                     capi: Capi
                 ),
 
-                new DemoCard(
+                new DemoCard
+                (
                     "Spacer",
                     description:
                     "Empty flexible gap. Pushes siblings apart inside a Row or Column.",
-                    demo: new Row(
+                    demo: new Row
+                    (
                         children:
                         [
-                            new Container(new BoxStyle
-                            {
-                                Color = colors.Primary,
-                                Width = 48,
-                                Height = 32,
-                                CornerRadius = Vector4.One * 4
-                            }),
+                            new Container
+                            (
+                                new BoxStyle
+                                {
+                                    Color = colors.Primary,
+                                    Width = 48,
+                                    Height = 32,
+                                    CornerRadius = Vector4.One * 4
+                                }
+                            ),
                             new Spacer(),
-                            new Container(new BoxStyle
-                            {
-                                Color = colors.Primary,
-                                Width = 48,
-                                Height = 32,
-                                CornerRadius = Vector4.One * 4
-                            }),
+                            new Container
+                            (
+                                new BoxStyle
+                                {
+                                    Color = colors.Primary,
+                                    Width = 48,
+                                    Height = 32,
+                                    CornerRadius = Vector4.One * 4
+                                }
+                            ),
                             new Spacer(2),
-                            new Container(new BoxStyle
-                            {
-                                Color = colors.Primary,
-                                Width = 48,
-                                Height = 32,
-                                CornerRadius = Vector4.One * 4
-                            })
+                            new Container
+                            (
+                                new BoxStyle
+                                {
+                                    Color = colors.Primary,
+                                    Width = 48,
+                                    Height = 32,
+                                    CornerRadius = Vector4.One * 4
+                                }
+                            )
                         ]
                     ),
                     code: """
@@ -366,10 +453,12 @@ internal class LayoutPage : StatelessWidget
                     capi: Capi
                 ),
 
-                new DemoCard(
+                new DemoCard
+                (
                     "Padding",
                     description: "Adds empty space around a child using EdgeInsets.",
-                    demo: new Container(
+                    demo: new Container
+                    (
                         new BoxStyle
                         {
                             Color = colors.Surface,
@@ -377,15 +466,19 @@ internal class LayoutPage : StatelessWidget
                             BorderThickness = 1f,
                             BorderColor = colors.Border
                         },
-                        new Padding(
+                        new Padding
+                        (
                             EdgeInsets.All(20),
-                            new Container(new BoxStyle
-                            {
-                                Color = colors.Primary,
-                                Height = 32,
-                                Width = 32,
-                                CornerRadius = Vector4.One * 3
-                            })
+                            new Container
+                            (
+                                new BoxStyle
+                                {
+                                    Color = colors.Primary,
+                                    Height = 32,
+                                    Width = 32,
+                                    CornerRadius = Vector4.One * 3
+                                }
+                            )
                         )
                     ),
                     code: """
@@ -400,26 +493,36 @@ internal class LayoutPage : StatelessWidget
                     capi: Capi
                 ),
 
-                new DemoCard(
+                new DemoCard
+                (
                     "Wrap",
                     description:
                     "Flows children into runs, wrapping to the next line when the main axis overflows.",
-                    demo: new Wrap(
+                    demo: new Wrap
+                    (
                         spacing: 6,
                         runSpacing: 6,
                         children:
                         [
-                            new Container(
+                            new Container
+                            (
                                 new BoxStyle
                                 {
                                     Color = colors.Primary,
                                     CornerRadius = Vector4.One * 12,
                                     Padding = EdgeInsets.Symmetric(horizontal: 10, vertical: 4)
                                 },
-                                new Text("Layout",
-                                    new TextStyle { FontSize = 12, Color = colors.OnPrimary })
+                                new Text
+                                (
+                                    "Layout",
+                                    new TextStyle
+                                    {
+                                        FontSize = 12, Color = colors.OnPrimary
+                                    }
+                                )
                             ),
-                            new Container(
+                            new Container
+                            (
                                 new BoxStyle
                                 {
                                     Color = colors.Surface,
@@ -428,20 +531,34 @@ internal class LayoutPage : StatelessWidget
                                     BorderColor = colors.Border,
                                     Padding = EdgeInsets.Symmetric(horizontal: 10, vertical: 4)
                                 },
-                                new Text("Animation",
-                                    new TextStyle { FontSize = 12, Color = colors.OnSurface })
+                                new Text
+                                (
+                                    "Animation",
+                                    new TextStyle
+                                    {
+                                        FontSize = 12, Color = colors.OnSurface
+                                    }
+                                )
                             ),
-                            new Container(
+                            new Container
+                            (
                                 new BoxStyle
                                 {
                                     Color = colors.Primary,
                                     CornerRadius = Vector4.One * 12,
                                     Padding = EdgeInsets.Symmetric(horizontal: 10, vertical: 4)
                                 },
-                                new Text("Scroll",
-                                    new TextStyle { FontSize = 12, Color = colors.OnPrimary })
+                                new Text
+                                (
+                                    "Scroll",
+                                    new TextStyle
+                                    {
+                                        FontSize = 12, Color = colors.OnPrimary
+                                    }
+                                )
                             ),
-                            new Container(
+                            new Container
+                            (
                                 new BoxStyle
                                 {
                                     Color = colors.Surface,
@@ -450,20 +567,34 @@ internal class LayoutPage : StatelessWidget
                                     BorderColor = colors.Border,
                                     Padding = EdgeInsets.Symmetric(horizontal: 10, vertical: 4)
                                 },
-                                new Text("Input",
-                                    new TextStyle { FontSize = 12, Color = colors.OnSurface })
+                                new Text
+                                (
+                                    "Input",
+                                    new TextStyle
+                                    {
+                                        FontSize = 12, Color = colors.OnSurface
+                                    }
+                                )
                             ),
-                            new Container(
+                            new Container
+                            (
                                 new BoxStyle
                                 {
                                     Color = colors.Primary,
                                     CornerRadius = Vector4.One * 12,
                                     Padding = EdgeInsets.Symmetric(horizontal: 10, vertical: 4)
                                 },
-                                new Text("State",
-                                    new TextStyle { FontSize = 12, Color = colors.OnPrimary })
+                                new Text
+                                (
+                                    "State",
+                                    new TextStyle
+                                    {
+                                        FontSize = 12, Color = colors.OnPrimary
+                                    }
+                                )
                             ),
-                            new Container(
+                            new Container
+                            (
                                 new BoxStyle
                                 {
                                     Color = colors.Surface,
@@ -472,20 +603,34 @@ internal class LayoutPage : StatelessWidget
                                     BorderColor = colors.Border,
                                     Padding = EdgeInsets.Symmetric(horizontal: 10, vertical: 4)
                                 },
-                                new Text("Events",
-                                    new TextStyle { FontSize = 12, Color = colors.OnSurface })
+                                new Text
+                                (
+                                    "Events",
+                                    new TextStyle
+                                    {
+                                        FontSize = 12, Color = colors.OnSurface
+                                    }
+                                )
                             ),
-                            new Container(
+                            new Container
+                            (
                                 new BoxStyle
                                 {
                                     Color = colors.Primary,
                                     CornerRadius = Vector4.One * 12,
                                     Padding = EdgeInsets.Symmetric(horizontal: 10, vertical: 4)
                                 },
-                                new Text("Overlay",
-                                    new TextStyle { FontSize = 12, Color = colors.OnPrimary })
+                                new Text
+                                (
+                                    "Overlay",
+                                    new TextStyle
+                                    {
+                                        FontSize = 12, Color = colors.OnPrimary
+                                    }
+                                )
                             ),
-                            new Container(
+                            new Container
+                            (
                                 new BoxStyle
                                 {
                                     Color = colors.Surface,
@@ -494,8 +639,14 @@ internal class LayoutPage : StatelessWidget
                                     BorderColor = colors.Border,
                                     Padding = EdgeInsets.Symmetric(horizontal: 10, vertical: 4)
                                 },
-                                new Text("Rendering",
-                                    new TextStyle { FontSize = 12, Color = colors.OnSurface })
+                                new Text
+                                (
+                                    "Rendering",
+                                    new TextStyle
+                                    {
+                                        FontSize = 12, Color = colors.OnSurface
+                                    }
+                                )
                             )
                         ]
                     ),
@@ -515,54 +666,75 @@ internal class LayoutPage : StatelessWidget
                     capi: Capi
                 ),
 
-                new DemoCard(
+                new DemoCard
+                (
                     "Stack + Positioned",
                     description:
                     "Layers children. Positioned anchors a child at absolute coordinates within the stack.",
-                    demo: new SizedBox(
+                    demo: new SizedBox
+                    (
                         220,
                         80,
-                        new Stack(
-                        [
-                            new Container(
-                                new BoxStyle
-                                {
-                                    Color = colors.Surface,
-                                    CornerRadius = Vector4.One * 8,
-                                    BorderThickness = 1f,
-                                    BorderColor = colors.Border
-                                }
-                            ),
-                            new Positioned(
-                                right: 0,
-                                top: 0,
-                                child: new Container(
+                        new Stack
+                        (
+                            [
+                                new Container
+                                (
                                     new BoxStyle
                                     {
-                                        Color = colors.Primary,
-                                        CornerRadius = new Vector4(6, 0, 0, 6),
-                                        Padding = EdgeInsets.Symmetric(horizontal: 8,
-                                            vertical: 4)
-                                    },
-                                    new Text("NEW",
-                                        new TextStyle
+                                        Color = colors.Surface,
+                                        CornerRadius = Vector4.One * 8,
+                                        BorderThickness = 1f,
+                                        BorderColor = colors.Border
+                                    }
+                                ),
+                                new Positioned
+                                (
+                                    right: 0,
+                                    top: 0,
+                                    child: new Container
+                                    (
+                                        new BoxStyle
                                         {
-                                            FontSize = 10,
-                                            Weight = FontWeight.Bold,
-                                            Color = colors.OnPrimary
-                                        })
+                                            Color = colors.Primary,
+                                            CornerRadius = new Vector4(6, 0, 0, 6),
+                                            Padding = EdgeInsets.Symmetric
+                                            (
+                                                horizontal: 8,
+                                                vertical: 4
+                                            )
+                                        },
+                                        new Text
+                                        (
+                                            "NEW",
+                                            new TextStyle
+                                            {
+                                                FontSize = 10,
+                                                Weight = FontWeight.Bold,
+                                                Color = colors.OnPrimary
+                                            }
+                                        )
+                                    )
+                                ),
+                                new Positioned
+                                (
+                                    16,
+                                    0,
+                                    bottom: 0,
+                                    child: new Center
+                                    (
+                                        new Text
+                                        (
+                                            "Content area",
+                                            new TextStyle
+                                            {
+                                                FontSize = 13, Color = colors.OnSurface
+                                            }
+                                        )
+                                    )
                                 )
-                            ),
-                            new Positioned(
-                                16,
-                                0,
-                                bottom: 0,
-                                child: new Center(
-                                    new Text("Content area",
-                                        new TextStyle { FontSize = 13, Color = colors.OnSurface })
-                                )
-                            )
-                        ])
+                            ]
+                        )
                     ),
                     code: """
                           new Stack(
@@ -581,13 +753,16 @@ internal class LayoutPage : StatelessWidget
                     capi: Capi
                 ),
 
-                new DemoCard(
+                new DemoCard
+                (
                     "Align",
                     description:
                     "Positions a child using normalized (-1,-1)→(1,1) space: TopLeft, Center, BottomRight, etc.",
-                    demo: new SizedBox(
+                    demo: new SizedBox
+                    (
                         height: 100,
-                        child: new Container(
+                        child: new Container
+                        (
                             new BoxStyle
                             {
                                 Color = colors.Surface,
@@ -595,39 +770,53 @@ internal class LayoutPage : StatelessWidget
                                 BorderThickness = 1f,
                                 BorderColor = colors.Border
                             },
-                            new Stack(
-                            [
-                                new Align(
-                                    Alignment.TopLeft,
-                                    new Container(new BoxStyle
-                                    {
-                                        Color = colors.Primary,
-                                        Width = 12,
-                                        Height = 12,
-                                        CornerRadius = Vector4.One * 6
-                                    })
-                                ),
-                                new Align(
-                                    Alignment.Center,
-                                    new Container(new BoxStyle
-                                    {
-                                        Color = colors.Primary,
-                                        Width = 12,
-                                        Height = 12,
-                                        CornerRadius = Vector4.One * 6
-                                    })
-                                ),
-                                new Align(
-                                    Alignment.BottomRight,
-                                    new Container(new BoxStyle
-                                    {
-                                        Color = colors.Primary,
-                                        Width = 12,
-                                        Height = 12,
-                                        CornerRadius = Vector4.One * 6
-                                    })
-                                )
-                            ])
+                            new Stack
+                            (
+                                [
+                                    new Align
+                                    (
+                                        Alignment.TopLeft,
+                                        new Container
+                                        (
+                                            new BoxStyle
+                                            {
+                                                Color = colors.Primary,
+                                                Width = 12,
+                                                Height = 12,
+                                                CornerRadius = Vector4.One * 6
+                                            }
+                                        )
+                                    ),
+                                    new Align
+                                    (
+                                        Alignment.Center,
+                                        new Container
+                                        (
+                                            new BoxStyle
+                                            {
+                                                Color = colors.Primary,
+                                                Width = 12,
+                                                Height = 12,
+                                                CornerRadius = Vector4.One * 6
+                                            }
+                                        )
+                                    ),
+                                    new Align
+                                    (
+                                        Alignment.BottomRight,
+                                        new Container
+                                        (
+                                            new BoxStyle
+                                            {
+                                                Color = colors.Primary,
+                                                Width = 12,
+                                                Height = 12,
+                                                CornerRadius = Vector4.One * 6
+                                            }
+                                        )
+                                    )
+                                ]
+                            )
                         )
                     ),
                     code: """
@@ -639,12 +828,15 @@ internal class LayoutPage : StatelessWidget
                     capi: Capi
                 ),
 
-                new DemoCard(
+                new DemoCard
+                (
                     "BoxShadow",
                     description:
                     "Drop shadows (outer) and inset shadows. Multiple shadows stacked in array order.",
-                    demo: new Center(
-                        new Container(
+                    demo: new Center
+                    (
+                        new Container
+                        (
                             new BoxStyle
                             {
                                 Color = colors.Surface,
@@ -653,28 +845,43 @@ internal class LayoutPage : StatelessWidget
                                 CornerRadius = Vector4.One * 8,
                                 BoxShadows = new[]
                                 {
-                                    new BoxShadow(
+                                    new BoxShadow
+                                    (
                                         new Vector4(0f, 0f, 0f, 0.5f),
                                         new Vector2(0f, 4f),
-                                        12f),
-                                    new BoxShadow(
-                                        new Vector4(
+                                        12f
+                                    ),
+                                    new BoxShadow
+                                    (
+                                        new Vector4
+                                        (
                                             colors.Primary.X,
                                             colors.Primary.Y,
                                             colors.Primary.Z,
-                                            0.15f),
+                                            0.15f
+                                        ),
                                         Vector2.Zero,
-                                        20f),
-                                    new BoxShadow(
+                                        20f
+                                    ),
+                                    new BoxShadow
+                                    (
                                         new Vector4(0f, 0f, 0f, 0.25f),
                                         new Vector2(0f, 2f),
                                         6f,
-                                        Inset: true)
+                                        Inset: true
+                                    )
                                 }
                             },
-                            new Center(
-                                new Text("Shadowed card",
-                                    new TextStyle { FontSize = 13, Color = colors.OnSurface })
+                            new Center
+                            (
+                                new Text
+                                (
+                                    "Shadowed card",
+                                    new TextStyle
+                                    {
+                                        FontSize = 13, Color = colors.OnSurface
+                                    }
+                                )
                             )
                         )
                     ),
@@ -694,42 +901,65 @@ internal class LayoutPage : StatelessWidget
                     capi: Capi
                 ),
 
-                new DemoCard(
+                new DemoCard
+                (
                     "Divider",
                     description:
                     "A thin separator line. Horizontal stretches across a Column; vertical across a Row. Indent/endIndent inset the ends.",
-                    demo: new Column(
+                    demo: new Column
+                    (
                         mainAxisSize: MainAxisSize.Min,
                         crossAxisAlignment: CrossAxisAlignment.Stretch,
                         spacing: 8,
                         children:
                         [
-                            new Text("Above",
-                                new TextStyle { FontSize = 13, Color = colors.OnSurface }),
+                            new Text
+                            (
+                                "Above",
+                                new TextStyle
+                                {
+                                    FontSize = 13, Color = colors.OnSurface
+                                }
+                            ),
                             new Divider(),
-                            new Text("Below",
-                                new TextStyle { FontSize = 13, Color = colors.OnSurface }),
+                            new Text
+                            (
+                                "Below",
+                                new TextStyle
+                                {
+                                    FontSize = 13, Color = colors.OnSurface
+                                }
+                            ),
                             new Divider(2, 24, 24, colors.Primary),
-                            new SizedBox(
+                            new SizedBox
+                            (
                                 height: 32,
-                                child: new Row(
+                                child: new Row
+                                (
                                     crossAxisAlignment: CrossAxisAlignment.Stretch,
                                     children:
                                     [
-                                        new Text("Left",
+                                        new Text
+                                        (
+                                            "Left",
                                             new TextStyle
                                             {
                                                 FontSize = 13, Color = colors.OnSurface
-                                            }),
-                                        new Padding(
+                                            }
+                                        ),
+                                        new Padding
+                                        (
                                             EdgeInsets.Symmetric(horizontal: 10),
                                             new Divider(axis: Axis.Vertical)
                                         ),
-                                        new Text("Right",
+                                        new Text
+                                        (
+                                            "Right",
                                             new TextStyle
                                             {
                                                 FontSize = 13, Color = colors.OnSurface
-                                            })
+                                            }
+                                        )
                                     ]
                                 )
                             )
@@ -745,11 +975,13 @@ internal class LayoutPage : StatelessWidget
                     capi: Capi
                 ),
 
-                new DemoCard(
+                new DemoCard
+                (
                     "Marquee",
                     description:
                     "A single line of text that scrolls horizontally when it does not fit. Text that fits is drawn statically.",
-                    demo: new Container(
+                    demo: new Container
+                    (
                         new BoxStyle
                         {
                             Color = colors.Background,
@@ -758,11 +990,16 @@ internal class LayoutPage : StatelessWidget
                             BorderColor = colors.Border,
                             Padding = EdgeInsets.Symmetric(horizontal: 10, vertical: 8)
                         },
-                        new SizedBox(
+                        new SizedBox
+                        (
                             240,
-                            child: new Marquee(
+                            child: new Marquee
+                            (
                                 "This label is far too long to fit, so it scrolls.",
-                                new TextStyle { FontSize = 13, Color = colors.OnSurface },
+                                new TextStyle
+                                {
+                                    FontSize = 13, Color = colors.OnSurface
+                                },
                                 36
                             )
                         )

@@ -8,8 +8,9 @@ namespace Gui.Widgets.Framework;
 ///     when the widget first appears in the tree; the returned <see cref="State" /> object
 ///     persists across rebuilds for as long as the element lives.
 ///     <para>
-///         Use <see cref="State{T}.SetState" /> inside the state to trigger rebuilds when data
+///         Use <see cref="State.SetState" /> inside the state to trigger rebuilds when data
 ///         changes. The widget itself is immutable — only the state holds mutable fields.
+
 ///     </para>
 /// </summary>
 public abstract class StatefulWidget : Widget
@@ -170,23 +171,18 @@ public class StatefulElement : Element
 
     public override void Rebuild()
     {
-        base.Rebuild(); // Clear dirty flag
+        base.Rebuild();
         var oldRo = _child?.RenderObject;
-        var builtWidget = State.Build(
-            new BuildContext(
-                Widget,
-                this
-            )
-        );
+        var pendingError = PendingError;
+        PendingError = null;
+        Widget builtWidget = pendingError != null
+            ? ErrorWidget.Builder(pendingError)
+            : State.Build(new BuildContext(Widget, this));
         _child = UpdateChild(
             _child,
             builtWidget
         );
 
-        // When the child's RenderObject changes type, the old RO is
-        // removed and the new one appended to the ancestor's children
-        // list, breaking the expected order.  Ask the nearest ancestor
-        // MultiChildElement to re-sync.
         if (oldRo != _child?.RenderObject)
         {
             (FindAncestorRenderObjectElement() as MultiChildElement)

@@ -18,7 +18,10 @@ public class Padding : SingleChildWidget
 
     public EdgeInsets EdgeInsets { get; }
 
-    public override RenderObject CreateRenderObject() => new RenderPadding { Padding = EdgeInsets };
+    public override RenderObject CreateRenderObject()
+    {
+        return new RenderPadding { Padding = EdgeInsets };
+    }
 
     public override void UpdateRenderObject(
         RenderObject renderObject

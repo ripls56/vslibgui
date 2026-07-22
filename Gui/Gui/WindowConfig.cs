@@ -7,7 +7,7 @@ namespace Gui;
 ///     Describes the window behavior for a <see cref="GuiBase" /> instance:
 ///     position, size, drag/resize.
 ///     <para>
-///         For dialog type (Dialog vs HUD), override <see cref="GuiBase.DialogType" /> directly.
+///         For dialog type (Dialog vs HUD), override <see cref="Vintagestory.API.Client.GuiDialog.DialogType" /> directly.
 ///     </para>
 /// </summary>
 public class WindowConfig

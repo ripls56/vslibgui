@@ -48,8 +48,10 @@ public class Clip : SingleChildWidget
     public ClipBehavior ClipBehavior { get; }
 
     /// <inheritdoc />
-    public override RenderObject CreateRenderObject() =>
-        new RenderClip { BorderRadius = BorderRadius, ClipBehavior = ClipBehavior };
+    public override RenderObject CreateRenderObject()
+    {
+        return new RenderClip { BorderRadius = BorderRadius, ClipBehavior = ClipBehavior };
+    }
 
     /// <inheritdoc />
     public override void UpdateRenderObject(

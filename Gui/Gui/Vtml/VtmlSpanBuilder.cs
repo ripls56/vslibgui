@@ -79,7 +79,10 @@ public static class VtmlSpanBuilder
                 return new ClearSpan();
 
             case VtmlIconRun icon:
-                return ConvertIcon(icon);
+                return ConvertIcon(
+                    icon,
+                    baseStyle
+                );
 
             case VtmlHotkeyRun hotkey:
                 return ConvertHotkey(hotkey);
@@ -97,9 +100,10 @@ public static class VtmlSpanBuilder
         Action<string>? onLinkClick
     )
     {
-        if (run.Href != null && onLinkClick != null)
+        if (run.Href != null)
         {
             var href = run.Href;
+            var handler = onLinkClick ?? HandleLink;
             return new TextSpan(
                 run.Text,
                 new SpanStyle
@@ -120,7 +124,7 @@ public static class VtmlSpanBuilder
                     GlowColor = run.Style.GlowColor,
                     Decoration = TextDecoration.Underline
                 },
-                recognizer: new TapGestureRecognizer { OnTap = () => onLinkClick(href) }
+                recognizer: new TapGestureRecognizer { OnTap = () => handler(href) }
             );
         }
 
@@ -141,47 +145,65 @@ public static class VtmlSpanBuilder
         );
     }
 
-    private static InlineSpan ConvertIcon(
-        VtmlIconRun icon
+    private static void HandleLink(
+        string href
     )
     {
-        var domain = "game";
-        string path;
+        var capi = GuiModSystem.Instance?.Capi;
+        if (capi == null || href == null)
+        {
+            return;
+        }
 
+        new LinkTextComponent(
+            capi,
+            "",
+            CairoFont.WhiteSmallText(),
+            null
+        ).SetHref(href).Trigger();
+    }
+
+    private static InlineSpan ConvertIcon(
+        VtmlIconRun icon,
+        TextStyle baseStyle
+    )
+    {
         if (icon.Path != null)
         {
+            var domain = "game";
             var colonIdx = icon.Path.IndexOf(':');
+            var path = colonIdx > 0
+                ? icon.Path.Substring(colonIdx + 1)
+                : icon.Path;
             if (colonIdx > 0)
             {
                 domain = icon.Path.Substring(
                     0,
                     colonIdx
                 );
-                path = icon.Path.Substring(colonIdx + 1);
             }
-            else
-            {
-                path = icon.Path;
-            }
-        }
-        else if (icon.Name != null)
-        {
-            path = icon.Name.StartsWith("wp")
-                ? $"icons/waypoint/{icon.Name.Substring(2).ToLowerInvariant()}.svg"
-                : $"icons/{icon.Name}.svg";
-        }
-        else
-        {
-            return new TextSpan("");
+
+            return new WidgetSpan(
+                new Icon(
+                    domain,
+                    path,
+                    icon.Size
+                )
+            );
         }
 
-        return new WidgetSpan(
-            new Icon(
-                domain,
-                path,
-                icon.Size
-            )
-        );
+        if (icon.Name != null)
+        {
+            return new WidgetSpan(
+                new VsIcon(
+                    icon.Name,
+                    icon.Size,
+                    baseStyle.Color
+                )
+            );
+        }
+
+        return new TextSpan("");
     }
 
     private static InlineSpan ConvertHotkey(

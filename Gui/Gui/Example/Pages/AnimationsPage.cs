@@ -33,8 +33,11 @@ internal class AnimationsPage : StatefulWidget
         public override void InitState()
         {
             base.InitState();
-            _ctrl = new AnimationController(TimeSpan.FromMilliseconds(800),
-                Element.Owner!.GetTickerProvider());
+            _ctrl = new AnimationController
+            (
+                TimeSpan.FromMilliseconds(800),
+                Element.Owner!.GetTickerProvider()
+            );
             _curved = new CurvedAnimation(_ctrl, Curves.EaseInOut);
             _ctrl.OnStatusChanged += OnStatus;
             _ctrl.Forward();
@@ -60,36 +63,44 @@ internal class AnimationsPage : StatefulWidget
 
         public override Widget Build(BuildContext context)
         {
-            var colors = Theme.Of(context).ColorScheme;
+            var theme = Theme.Of(context);
+            var colors = theme.ColorScheme;
+            var headerStyle = theme.TextTheme.Headline;
+            headerStyle.Color = colors.Primary;
 
-            return new Column(
+            return new Column
+            (
                 crossAxisAlignment: CrossAxisAlignment.Stretch,
                 spacing: 16,
                 children:
                 [
-                    new Text("Animations",
-                        new TextStyle
-                        {
-                            FontSize = 22, Weight = FontWeight.Bold, Color = colors.Primary
-                        }),
+                    new Text("Animations", headerStyle),
 
-                    new DemoCard(
+                    new DemoCard
+                    (
                         "AnimatedContainer",
                         description:
                         "Smoothly interpolates BoxStyle changes (color, size, radius) on rebuild.",
-                        demo: new Column(
+                        demo: new Column
+                        (
                             crossAxisAlignment: CrossAxisAlignment.Stretch,
                             spacing: 10,
                             children:
                             [
-                                new Button(
-                                    new Text(
+                                new Button
+                                (
+                                    new Text
+                                    (
                                         _expanded ? "Collapse" : "Expand",
-                                        new TextStyle { Color = colors.OnPrimary }
+                                        new TextStyle
+                                        {
+                                            Color = colors.OnPrimary
+                                        }
                                     ),
                                     onTap: _ => SetState(() => _expanded = !_expanded)
                                 ),
-                                new AnimatedContainer(
+                                new AnimatedContainer
+                                (
                                     duration: TimeSpan.FromMilliseconds(300),
                                     style: new BoxStyle
                                     {
@@ -115,26 +126,35 @@ internal class AnimationsPage : StatefulWidget
                         capi: Widget.Capi
                     ),
 
-                    new DemoCard(
+                    new DemoCard
+                    (
                         "AnimatedOpacity",
                         description:
                         "Fades a child widget in and out by interpolating its opacity.",
-                        demo: new Column(
+                        demo: new Column
+                        (
                             crossAxisAlignment: CrossAxisAlignment.Stretch,
                             spacing: 10,
                             children:
                             [
-                                new Button(
-                                    new Text(
+                                new Button
+                                (
+                                    new Text
+                                    (
                                         _visible ? "Hide" : "Show",
-                                        new TextStyle { Color = colors.OnPrimary }
+                                        new TextStyle
+                                        {
+                                            Color = colors.OnPrimary
+                                        }
                                     ),
                                     onTap: _ => SetState(() => _visible = !_visible)
                                 ),
-                                new AnimatedOpacity(
+                                new AnimatedOpacity
+                                (
                                     _visible ? 1f : 0f,
                                     TimeSpan.FromMilliseconds(250),
-                                    child: new Container(
+                                    child: new Container
+                                    (
                                         new BoxStyle
                                         {
                                             Color = colors.Primary,
@@ -155,22 +175,30 @@ internal class AnimationsPage : StatefulWidget
                         capi: Widget.Capi
                     ),
 
-                    new DemoCard(
+                    new DemoCard
+                    (
                         "AnimatedPadding",
                         description: "Smoothly transitions padding around a child.",
-                        demo: new Column(
+                        demo: new Column
+                        (
                             crossAxisAlignment: CrossAxisAlignment.Stretch,
                             spacing: 10,
                             children:
                             [
-                                new Button(
-                                    new Text(
+                                new Button
+                                (
+                                    new Text
+                                    (
                                         _expanded ? "Less padding" : "More padding",
-                                        new TextStyle { Color = colors.OnPrimary }
+                                        new TextStyle
+                                        {
+                                            Color = colors.OnPrimary
+                                        }
                                     ),
                                     onTap: _ => SetState(() => _expanded = !_expanded)
                                 ),
-                                new Container(
+                                new Container
+                                (
                                     new BoxStyle
                                     {
                                         Color = colors.Surface,
@@ -178,10 +206,12 @@ internal class AnimationsPage : StatefulWidget
                                         BorderThickness = 1f,
                                         BorderColor = colors.Border
                                     },
-                                    new AnimatedPadding(
+                                    new AnimatedPadding
+                                    (
                                         _expanded ? EdgeInsets.All(24) : EdgeInsets.All(6),
                                         TimeSpan.FromMilliseconds(300),
-                                        child: new Container(
+                                        child: new Container
+                                        (
                                             new BoxStyle
                                             {
                                                 Color = colors.Primary,
@@ -203,29 +233,38 @@ internal class AnimationsPage : StatefulWidget
                         capi: Widget.Capi
                     ),
 
-                    new DemoCard(
+                    new DemoCard
+                    (
                         "AnimatedBuilder",
                         description:
                         "Rebuilds a subtree every animation frame. Uses an AnimationController with ping-pong loop.",
-                        demo: new SizedBox(
+                        demo: new SizedBox
+                        (
                             height: 80,
-                            child: new AnimatedBuilder(
+                            child: new AnimatedBuilder
+                            (
                                 _ctrl,
                                 ctx =>
                                 {
                                     var size = new FloatTween(14f, 26f).Evaluate(_curved);
                                     var alpha = new FloatTween(0.4f, 1f).Evaluate(_curved);
-                                    return new Center(
-                                        new Text("Animated text", new TextStyle
-                                        {
-                                            FontSize = size,
-                                            Weight = FontWeight.Bold,
-                                            Color = new Vector4(
-                                                colors.Primary.X,
-                                                colors.Primary.Y,
-                                                colors.Primary.Z,
-                                                alpha)
-                                        })
+                                    return new Center
+                                    (
+                                        new Text
+                                        (
+                                            "Animated text", new TextStyle
+                                            {
+                                                FontSize = size,
+                                                Weight = FontWeight.Bold,
+                                                Color = new Vector4
+                                                (
+                                                    colors.Primary.X,
+                                                    colors.Primary.Y,
+                                                    colors.Primary.Z,
+                                                    alpha
+                                                )
+                                            }
+                                        )
                                     );
                                 }
                             )
@@ -252,7 +291,8 @@ internal class AnimationsPage : StatefulWidget
                         capi: Widget.Capi
                     ),
 
-                    new DemoCard(
+                    new DemoCard
+                    (
                         "AnimatedScale",
                         description:
                         "Scales a child around its center. EaseOutBack gives a springy overshoot.",
@@ -271,7 +311,8 @@ internal class AnimationsPage : StatefulWidget
                         capi: Widget.Capi
                     ),
 
-                    new DemoCard(
+                    new DemoCard
+                    (
                         "AnimatedRotation",
                         description:
                         "Rotates a child by an angle in radians. Each click accumulates 90°.",
@@ -290,7 +331,8 @@ internal class AnimationsPage : StatefulWidget
                         capi: Widget.Capi
                     ),
 
-                    new DemoCard(
+                    new DemoCard
+                    (
                         "AnimatedSlide",
                         description:
                         "Translates a child by a pixel offset. Click to slide right and back.",
@@ -308,7 +350,8 @@ internal class AnimationsPage : StatefulWidget
                         capi: Widget.Capi
                     ),
 
-                    new DemoCard(
+                    new DemoCard
+                    (
                         "Curves comparison",
                         description:
                         "All 25 easing curves animate the same translation simultaneously. Click Play to compare.",
@@ -324,7 +367,8 @@ internal class AnimationsPage : StatefulWidget
                         capi: Widget.Capi
                     ),
 
-                    new DemoCard(
+                    new DemoCard
+                    (
                         "AnimatedSize",
                         description:
                         "Animates to the child's new size whenever it changes layout. Click to reveal extra content.",
@@ -365,25 +409,37 @@ internal class AnimationsPage : StatefulWidget
             public override Widget Build(BuildContext context)
             {
                 var colors = Theme.Of(context).ColorScheme;
-                return new Column(
+                return new Column
+                (
                     crossAxisAlignment: CrossAxisAlignment.Center,
                     spacing: 12,
                     children:
                     [
-                        new Button(
-                            new Text(_scaled ? "Shrink" : "Scale up",
-                                new TextStyle { Color = colors.OnPrimary }),
+                        new Button
+                        (
+                            new Text
+                            (
+                                _scaled ? "Shrink" : "Scale up",
+                                new TextStyle
+                                {
+                                    Color = colors.OnPrimary
+                                }
+                            ),
                             onTap: _ => SetState(() => _scaled = !_scaled)
                         ),
-                        new SizedBox(
+                        new SizedBox
+                        (
                             height: 80,
-                            child: new Center(
-                                new AnimatedScale(
+                            child: new Center
+                            (
+                                new AnimatedScale
+                                (
                                     _scaled ? 1.5f : 1f,
                                     TimeSpan.FromMilliseconds(300),
                                     Curves.EaseOutBack,
                                     alignment: Alignment.Center,
-                                    child: new Container(
+                                    child: new Container
+                                    (
                                         new BoxStyle
                                         {
                                             Color = colors.Primary,
@@ -419,24 +475,36 @@ internal class AnimationsPage : StatefulWidget
             public override Widget Build(BuildContext context)
             {
                 var colors = Theme.Of(context).ColorScheme;
-                return new Column(
+                return new Column
+                (
                     crossAxisAlignment: CrossAxisAlignment.Center,
                     spacing: 12,
                     children:
                     [
-                        new Button(
-                            new Text("Rotate 90°", new TextStyle { Color = colors.OnPrimary }),
+                        new Button
+                        (
+                            new Text
+                            (
+                                "Rotate 90°", new TextStyle
+                                {
+                                    Color = colors.OnPrimary
+                                }
+                            ),
                             onTap: _ => SetState(() => _angle += MathF.PI / 2f)
                         ),
-                        new SizedBox(
+                        new SizedBox
+                        (
                             height: 80,
-                            child: new Center(
-                                new AnimatedRotation(
+                            child: new Center
+                            (
+                                new AnimatedRotation
+                                (
                                     _angle,
                                     TimeSpan.FromMilliseconds(350),
                                     Curves.EaseOut,
                                     alignment: Alignment.Center,
-                                    child: new Container(
+                                    child: new Container
+                                    (
                                         new BoxStyle
                                         {
                                             Color = colors.Primary,
@@ -472,23 +540,34 @@ internal class AnimationsPage : StatefulWidget
             public override Widget Build(BuildContext context)
             {
                 var colors = Theme.Of(context).ColorScheme;
-                return new Column(
+                return new Column
+                (
                     crossAxisAlignment: CrossAxisAlignment.Center,
                     spacing: 12,
                     children:
                     [
-                        new Button(
-                            new Text(_slid ? "Slide back" : "Slide right",
-                                new TextStyle { Color = colors.OnPrimary }),
+                        new Button
+                        (
+                            new Text
+                            (
+                                _slid ? "Slide back" : "Slide right",
+                                new TextStyle
+                                {
+                                    Color = colors.OnPrimary
+                                }
+                            ),
                             onTap: _ => SetState(() => _slid = !_slid)
                         ),
-                        new SizedBox(
+                        new SizedBox
+                        (
                             height: 60,
-                            child: new AnimatedSlide(
+                            child: new AnimatedSlide
+                            (
                                 _slid ? new Vector2(80, 0) : Vector2.Zero,
                                 TimeSpan.FromMilliseconds(400),
                                 Curves.EaseInOut,
-                                child: new Container(
+                                child: new Container
+                                (
                                     new BoxStyle
                                     {
                                         Color = colors.Primary,
@@ -520,27 +599,43 @@ internal class AnimationsPage : StatefulWidget
         {
             private bool _playing;
 
-            private static Widget MakeRow(string label, Curve curve, Vector2 offset,
+            private static Widget MakeRow
+            (
+                string label,
+                Curve curve,
+                Vector2 offset,
                 Vector4 labelColor,
-                Vector4 dotColor)
+                Vector4 dotColor
+            )
             {
-                return new Row(
+                return new Row
+                (
                     crossAxisAlignment: CrossAxisAlignment.Center,
                     children:
                     [
-                        new SizedBox(
+                        new SizedBox
+                        (
                             128,
-                            child: new Text(label,
-                                new TextStyle { FontSize = 11, Color = labelColor })
+                            child: new Text
+                            (
+                                label,
+                                new TextStyle
+                                {
+                                    FontSize = 11, Color = labelColor
+                                }
+                            )
                         ),
-                        new SizedBox(
+                        new SizedBox
+                        (
                             180,
                             18,
-                            new AnimatedSlide(
+                            new AnimatedSlide
+                            (
                                 offset,
                                 TimeSpan.FromMilliseconds(900),
                                 curve,
-                                child: new Container(
+                                child: new Container
+                                (
                                     new BoxStyle
                                     {
                                         Color = dotColor,
@@ -562,14 +657,22 @@ internal class AnimationsPage : StatefulWidget
                 var lc = colors.OnSurface;
                 var dc = colors.Primary;
 
-                return new Column(
+                return new Column
+                (
                     crossAxisAlignment: CrossAxisAlignment.Start,
                     spacing: 3,
                     children:
                     [
-                        new Button(
-                            new Text(_playing ? "Reset" : "Play",
-                                new TextStyle { Color = colors.OnPrimary }),
+                        new Button
+                        (
+                            new Text
+                            (
+                                _playing ? "Reset" : "Play",
+                                new TextStyle
+                                {
+                                    Color = colors.OnPrimary
+                                }
+                            ),
                             onTap: _ => SetState(() => _playing = !_playing)
                         ),
                         MakeRow("Linear", Curves.Linear, off, lc, dc),
@@ -622,17 +725,26 @@ internal class AnimationsPage : StatefulWidget
             {
                 var colors = Theme.Of(context).ColorScheme;
 
-                Widget header = new Container(
+                Widget header = new Container
+                (
                     new BoxStyle
                     {
                         Color = colors.Primary, Height = 36, CornerRadius = Vector4.One * 6
                     },
-                    new Center(
-                        new Text("Header", new TextStyle { Color = colors.OnPrimary })
+                    new Center
+                    (
+                        new Text
+                        (
+                            "Header", new TextStyle
+                            {
+                                Color = colors.OnPrimary
+                            }
+                        )
                     )
                 );
 
-                Widget extra = new Container(
+                Widget extra = new Container
+                (
                     new BoxStyle
                     {
                         Color = colors.Surface,
@@ -641,26 +753,43 @@ internal class AnimationsPage : StatefulWidget
                         BorderThickness = 1f,
                         BorderColor = colors.Border
                     },
-                    new Center(
-                        new Text("Extra content", new TextStyle { Color = colors.OnSurface })
+                    new Center
+                    (
+                        new Text
+                        (
+                            "Extra content", new TextStyle
+                            {
+                                Color = colors.OnSurface
+                            }
+                        )
                     )
                 );
 
-                return new Column(
+                return new Column
+                (
                     crossAxisAlignment: CrossAxisAlignment.Stretch,
                     spacing: 10,
                     children:
                     [
-                        new Button(
-                            new Text(_expanded ? "Collapse" : "Expand",
-                                new TextStyle { Color = colors.OnPrimary }),
+                        new Button
+                        (
+                            new Text
+                            (
+                                _expanded ? "Collapse" : "Expand",
+                                new TextStyle
+                                {
+                                    Color = colors.OnPrimary
+                                }
+                            ),
                             onTap: _ => SetState(() => _expanded = !_expanded)
                         ),
-                        new AnimatedSize(
+                        new AnimatedSize
+                        (
                             TimeSpan.FromMilliseconds(300),
                             Curves.EaseInOut,
                             _expanded
-                                ? new Column(
+                                ? new Column
+                                (
                                     crossAxisAlignment: CrossAxisAlignment.Stretch,
                                     spacing: 6,
                                     children: [header, extra]

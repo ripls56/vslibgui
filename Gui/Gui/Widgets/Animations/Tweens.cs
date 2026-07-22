@@ -1,3 +1,4 @@
+using System;
 using Gui.Rendering;
 using Gui.Widgets.Painting;
 using OpenTK.Mathematics;
@@ -14,7 +15,8 @@ public abstract class Tween<T>
     ///     Creates a tween that interpolates from <paramref name="begin" /> to
     ///     <paramref name="end" />.
     /// </summary>
-    protected Tween(
+    protected Tween
+    (
         T begin,
         T end
     )
@@ -33,7 +35,8 @@ public abstract class Tween<T>
     ///     Returns the interpolated value at progress <paramref name="t" />
     ///     (0 = begin, 1 = end).
     /// </summary>
-    public abstract T Lerp(
+    public abstract T Lerp
+    (
         double t
     );
 
@@ -41,7 +44,8 @@ public abstract class Tween<T>
     ///     Evaluates this tween at the current value of
     ///     <paramref name="animation" />.
     /// </summary>
-    public T Evaluate(
+    public T Evaluate
+    (
         IAnimation animation
     ) =>
         Lerp(animation.Value);
@@ -56,10 +60,12 @@ public class FloatTween : Tween<float>
     ///     Creates a tween that interpolates from <paramref name="begin" /> to
     ///     <paramref name="end" />.
     /// </summary>
-    public FloatTween(
+    public FloatTween
+    (
         float begin,
         float end
-    ) : base(
+    ) : base
+    (
         begin,
         end
     )
@@ -67,7 +73,8 @@ public class FloatTween : Tween<float>
     }
 
     /// <inheritdoc />
-    public override float Lerp(
+    public override float Lerp
+    (
         double t
     ) =>
         Begin + (float)((End - Begin) * t);
@@ -83,10 +90,12 @@ public class Vector4Tween : Tween<Vector4>
     ///     Creates a tween that interpolates from <paramref name="begin" /> to
     ///     <paramref name="end" />.
     /// </summary>
-    public Vector4Tween(
+    public Vector4Tween
+    (
         Vector4 begin,
         Vector4 end
-    ) : base(
+    ) : base
+    (
         begin,
         end
     )
@@ -94,7 +103,8 @@ public class Vector4Tween : Tween<Vector4>
     }
 
     /// <inheritdoc />
-    public override Vector4 Lerp(
+    public override Vector4 Lerp
+    (
         double t
     )
     {
@@ -113,10 +123,12 @@ public class ColorTween : Vector4Tween
     ///     Creates a tween that interpolates from <paramref name="begin" /> to
     ///     <paramref name="end" />.
     /// </summary>
-    public ColorTween(
+    public ColorTween
+    (
         Vector4 begin,
         Vector4 end
-    ) : base(
+    ) : base
+    (
         begin,
         end
     )
@@ -134,10 +146,12 @@ public class OffsetTween : Tween<Vector2>
     ///     Creates a tween that interpolates from <paramref name="begin" /> to
     ///     <paramref name="end" />.
     /// </summary>
-    public OffsetTween(
+    public OffsetTween
+    (
         Vector2 begin,
         Vector2 end
-    ) : base(
+    ) : base
+    (
         begin,
         end
     )
@@ -145,7 +159,8 @@ public class OffsetTween : Tween<Vector2>
     }
 
     /// <inheritdoc />
-    public override Vector2 Lerp(
+    public override Vector2 Lerp
+    (
         double t
     )
     {
@@ -165,10 +180,12 @@ public class GradientTween : Tween<Gradient?>
     ///     Creates a tween that interpolates from <paramref name="begin" /> to
     ///     <paramref name="end" />.
     /// </summary>
-    public GradientTween(
+    public GradientTween
+    (
         Gradient? begin,
         Gradient? end
-    ) : base(
+    ) : base
+    (
         begin,
         end
     )
@@ -176,7 +193,8 @@ public class GradientTween : Tween<Gradient?>
     }
 
     /// <inheritdoc />
-    public override Gradient? Lerp(
+    public override Gradient? Lerp
+    (
         double t
     )
     {
@@ -202,7 +220,8 @@ public class GradientTween : Tween<Gradient?>
                 : End;
         }
 
-        return Begin.LerpTo(
+        return Begin.LerpTo
+        (
             End,
             t
         );
@@ -219,10 +238,12 @@ public class EdgeInsetsTween : Tween<EdgeInsets>
     ///     Creates a tween that interpolates from <paramref name="begin" /> to
     ///     <paramref name="end" />.
     /// </summary>
-    public EdgeInsetsTween(
+    public EdgeInsetsTween
+    (
         EdgeInsets begin,
         EdgeInsets end
-    ) : base(
+    ) : base
+    (
         begin,
         end
     )
@@ -230,12 +251,14 @@ public class EdgeInsetsTween : Tween<EdgeInsets>
     }
 
     /// <inheritdoc />
-    public override EdgeInsets Lerp(
+    public override EdgeInsets Lerp
+    (
         double t
     )
     {
         var ft = (float)t;
-        return new EdgeInsets(
+        return new EdgeInsets
+        (
             Begin.Left + (End.Left - Begin.Left) * ft,
             Begin.Top + (End.Top - Begin.Top) * ft,
             Begin.Right + (End.Right - Begin.Right) * ft,
@@ -254,10 +277,12 @@ public class SizeTween : Tween<Vector2>
     ///     Creates a tween that interpolates from <paramref name="begin" /> to
     ///     <paramref name="end" />.
     /// </summary>
-    public SizeTween(
+    public SizeTween
+    (
         Vector2 begin,
         Vector2 end
-    ) : base(
+    ) : base
+    (
         begin,
         end
     )
@@ -265,11 +290,195 @@ public class SizeTween : Tween<Vector2>
     }
 
     /// <inheritdoc />
-    public override Vector2 Lerp(
+    public override Vector2 Lerp
+    (
         double t
     )
     {
         var ft = (float)t;
         return Begin + (End - Begin) * ft;
+    }
+}
+
+/// <summary>
+///     Interpolates between two <see cref="Border" /> values by linearly
+///     interpolating each side's width and color independently.
+/// </summary>
+public class BorderTween : Tween<Border?>
+{
+    /// <summary>
+    ///     Creates a tween that interpolates from <paramref name="begin" /> to
+    ///     <paramref name="end" />.
+    /// </summary>
+    public BorderTween
+    (
+        Border? begin,
+        Border? end
+    ) : base
+    (
+        begin,
+        end
+    )
+    {
+    }
+
+    /// <inheritdoc />
+    public override Border? Lerp
+    (
+        double t
+    )
+    {
+        if (Begin == null && End == null)
+        {
+            return null;
+        }
+
+        var b = Begin ?? Border.Zero;
+        var e = End ?? Border.Zero;
+        var ft = (float)t;
+
+        return new Border
+        (
+            LerpSide
+            (
+                b.Left,
+                e.Left,
+                ft
+            ),
+            LerpSide
+            (
+                b.Top,
+                e.Top,
+                ft
+            ),
+            LerpSide
+            (
+                b.Right,
+                e.Right,
+                ft
+            ),
+            LerpSide
+            (
+                b.Bottom,
+                e.Bottom,
+                ft
+            )
+        );
+    }
+
+    private static BorderSide LerpSide
+    (
+        BorderSide b,
+        BorderSide e,
+        float t
+    ) =>
+        new
+        (
+            b.Width + (e.Width - b.Width) * t,
+            b.Color + (e.Color - b.Color) * t
+        );
+}
+
+/// <summary>
+///     Interpolates between two lists of <see cref="BoxShadow" /> values.
+/// </summary>
+public class BoxShadowListTween : Tween<BoxShadow[]?>
+{
+    /// <summary>
+    ///     Creates a tween that interpolates from <paramref name="begin" /> to
+    ///     <paramref name="end" />.
+    /// </summary>
+    public BoxShadowListTween
+    (
+        BoxShadow[]? begin,
+        BoxShadow[]? end
+    ) : base
+    (
+        begin,
+        end
+    )
+    {
+    }
+
+    /// <inheritdoc />
+    public override BoxShadow[]? Lerp
+    (
+        double t
+    )
+    {
+        if (Begin == null && End == null)
+        {
+            return null;
+        }
+
+        var b = Begin ?? Array.Empty<BoxShadow>();
+        var e = End ?? Array.Empty<BoxShadow>();
+        var ft = (float)t;
+
+        var maxLen = Math.Max
+        (
+            b.Length,
+            e.Length
+        );
+        var result = new BoxShadow[maxLen];
+
+        for (var i = 0; i < maxLen; i++)
+        {
+            if (i < b.Length && i < e.Length)
+            {
+                result[i] = BoxShadow.Lerp
+                (
+                    b[i],
+                    e[i],
+                    ft
+                );
+            }
+            else if (i < b.Length)
+            {
+                var target = b[i] with
+                {
+                    Color = new Vector4
+                    (
+                        b[i].Color.X,
+                        b[i].Color.Y,
+                        b[i].Color.Z,
+                        0
+                    ),
+                    Offset = Vector2.Zero,
+                    BlurRadius = 0,
+                    SpreadRadius = 0
+                };
+                result[i] = BoxShadow.Lerp
+                (
+                    b[i],
+                    target,
+                    ft
+                );
+            }
+            else
+            {
+                var start = e[i] with
+                {
+                    Color = new Vector4
+                    (
+                        e[i].Color.X,
+                        e[i].Color.Y,
+                        e[i].Color.Z,
+                        0
+                    ),
+                    Offset = Vector2.Zero,
+                    BlurRadius = 0,
+                    SpreadRadius = 0
+                };
+                result[i] = BoxShadow.Lerp
+                (
+                    start,
+                    e[i],
+                    ft
+                );
+            }
+        }
+
+        return result;
     }
 }

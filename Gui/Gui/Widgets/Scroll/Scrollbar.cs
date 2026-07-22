@@ -107,7 +107,8 @@ internal class ScrollbarState : State<Scrollbar>
     private float _dragStartOffset;
     private float _dragStartY;
 
-    private AnimationController _fade = null!;
+    private AnimationController _fadeController = null!;
+    private CurvedAnimation _fadeAnimation = null!;
     private TimeSpan _idleElapsed;
     private Ticker _idleTicker = null!;
     private bool _isDragging;
@@ -119,17 +120,15 @@ internal class ScrollbarState : State<Scrollbar>
         base.InitState();
         Widget.Controller.OnChanged += _HandleChanged;
         var vsync = Element.Owner!.GetTickerProvider();
-        _fade = new AnimationController(TimeSpan.FromMilliseconds(250), vsync);
-        _fade.OnValueChanged += _OnFadeTick;
+        _fadeController = new AnimationController(TimeSpan.FromMilliseconds(250), vsync);
+        _fadeAnimation = new CurvedAnimation(_fadeController, Curves.EaseInOut);
         _idleTicker = vsync.CreateTicker(_OnIdleTick);
     }
-
-    private void _OnFadeTick(double _) => SetState(() => { });
 
     private void _Show()
     {
         _idleElapsed = TimeSpan.Zero;
-        _fade.Forward();
+        _fadeController.Forward();
         _idleTicker.Start();
     }
 
@@ -148,7 +147,7 @@ internal class ScrollbarState : State<Scrollbar>
         }
 
         _idleTicker.Stop();
-        _fade.Reverse();
+        _fadeController.Reverse();
     }
 
     public override void UpdateWidget(
@@ -180,71 +179,77 @@ internal class ScrollbarState : State<Scrollbar>
         BuildContext context
     )
     {
-        var theme = Theme.Of(context);
-        var colors = theme.ColorScheme;
-
-        var trackColor = Widget.TrackColor ?? new Vector4(
-            colors.OnSurface.X,
-            colors.OnSurface.Y,
-            colors.OnSurface.Z,
-            0.1f
-        );
-        var thumbColor = Widget.ThumbColor ?? new Vector4(
-            colors.OnSurface.X,
-            colors.OnSurface.Y,
-            colors.OnSurface.Z,
-            0.4f
-        );
-
-        var visibility = Widget.AutoHide ? (float)_fade.Value : 1f;
-        var trackWidth = Widget.Width * visibility;
-        var isRight = Widget.Position == ScrollbarPosition.Right;
-
-        var scrollbarTrack = new ScrollbarTrackWidget(
-            Widget.Controller.Offset,
-            Widget.Controller.ContentSize,
-            Widget.Controller.ViewportSize,
-            trackColor: trackColor,
-            thumbColor: thumbColor,
-            thumbRadius: Widget.ThumbRadius,
-            reverse: Widget.Reverse,
-            onLayout: (
-                height,
-                ro
-            ) =>
+        return new AnimatedBuilder(
+            animation: _fadeController,
+            builder: ctx =>
             {
-                _trackHeight = height;
-                _trackRenderObject = ro;
-            },
-            child: new GestureDetector(
-                onPress: _OnPress,
-                onRelease: _OnRelease,
-                onMove: _OnMove
-            )
+                var theme = Theme.Of(context);
+                var colors = theme.ColorScheme;
+
+                var trackColor = Widget.TrackColor ?? new Vector4(
+                    colors.OnSurface.X,
+                    colors.OnSurface.Y,
+                    colors.OnSurface.Z,
+                    0.1f
+                );
+                var thumbColor = Widget.ThumbColor ?? new Vector4(
+                    colors.OnSurface.X,
+                    colors.OnSurface.Y,
+                    colors.OnSurface.Z,
+                    0.4f
+                );
+
+                var visibility = Widget.AutoHide ? (float)_fadeAnimation.Value : 1f;
+                var trackWidth = Widget.Width * visibility;
+                var isRight = Widget.Position == ScrollbarPosition.Right;
+
+                var scrollbarTrack = new ScrollbarTrackWidget(
+                    Widget.Controller.Offset,
+                    Widget.Controller.ContentSize,
+                    Widget.Controller.ViewportSize,
+                    trackColor: trackColor,
+                    thumbColor: thumbColor,
+                    thumbRadius: Widget.ThumbRadius,
+                    reverse: Widget.Reverse,
+                    onLayout: (
+                        height,
+                        ro
+                    ) =>
+                    {
+                        _trackHeight = height;
+                        _trackRenderObject = ro;
+                    },
+                    child: new GestureDetector(
+                        onPress: _OnPress,
+                        onRelease: _OnRelease,
+                        onMove: _OnMove
+                    )
+                );
+
+                var contentPadding = isRight
+                    ? EdgeInsets.Only(right: trackWidth)
+                    : EdgeInsets.Only(trackWidth);
+
+                return new Stack(new Widget[]
+                {
+                    new Positioned(
+                        0,
+                        0,
+                        0,
+                        0,
+                        child: new Padding(contentPadding, Widget.Child)
+                    ),
+                    new Positioned(
+                        top: 0,
+                        bottom: 0,
+                        left: isRight ? null : 0,
+                        right: isRight ? 0 : null,
+                        width: trackWidth,
+                        child: scrollbarTrack
+                    )
+                });
+            }
         );
-
-        var contentPadding = isRight
-            ? EdgeInsets.Only(right: trackWidth)
-            : EdgeInsets.Only(trackWidth);
-
-        return new Stack(new Widget[]
-        {
-            new Positioned(
-                0,
-                0,
-                0,
-                0,
-                child: new Padding(contentPadding, Widget.Child)
-            ),
-            new Positioned(
-                top: 0,
-                bottom: 0,
-                left: isRight ? null : 0,
-                right: isRight ? 0 : null,
-                width: trackWidth,
-                child: scrollbarTrack
-            )
-        });
     }
 
     private float _ToLocalY(
@@ -378,8 +383,7 @@ internal class ScrollbarState : State<Scrollbar>
     public override void Dispose()
     {
         Widget.Controller.OnChanged -= _HandleChanged;
-        _fade.OnValueChanged -= _OnFadeTick;
-        _fade.Dispose();
+        _fadeController.Dispose();
         _idleTicker.Dispose();
         base.Dispose();
     }

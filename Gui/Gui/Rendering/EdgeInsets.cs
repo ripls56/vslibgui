@@ -2,41 +2,37 @@ using System;
 
 namespace Gui.Rendering;
 
-public readonly struct EdgeInsets : IEquatable<EdgeInsets>
+public readonly struct EdgeInsets
+(
+    float left,
+    float top,
+    float right,
+    float bottom
+) : IEquatable<EdgeInsets>
 {
-    public float Left { get; }
-    public float Top { get; }
-    public float Right { get; }
-    public float Bottom { get; }
+    public float Left { get; init; } = left;
+    public float Top { get; init; } = top;
+    public float Right { get; init; } = right;
+    public float Bottom { get; init; } = bottom;
 
     public float Horizontal => Left + Right;
     public float Vertical => Top + Bottom;
 
-    public static readonly EdgeInsets Zero = new(
+    public static readonly EdgeInsets Zero = new
+    (
         0,
         0,
         0,
         0
     );
 
-    public EdgeInsets(
-        float left,
-        float top,
-        float right,
-        float bottom
-    )
-    {
-        Left = left;
-        Top = top;
-        Right = right;
-        Bottom = bottom;
-    }
-
-    public static EdgeInsets All(
+    public static EdgeInsets All
+    (
         float value
     )
     {
-        return new EdgeInsets(
+        return new EdgeInsets
+        (
             value,
             value,
             value,
@@ -44,12 +40,14 @@ public readonly struct EdgeInsets : IEquatable<EdgeInsets>
         );
     }
 
-    public static EdgeInsets Symmetric(
+    public static EdgeInsets Symmetric
+    (
         float vertical = 0,
         float horizontal = 0
     )
     {
-        return new EdgeInsets(
+        return new EdgeInsets
+        (
             horizontal,
             vertical,
             horizontal,
@@ -57,14 +55,16 @@ public readonly struct EdgeInsets : IEquatable<EdgeInsets>
         );
     }
 
-    public static EdgeInsets Only(
+    public static EdgeInsets Only
+    (
         float left = 0,
         float top = 0,
         float right = 0,
         float bottom = 0
     )
     {
-        return new EdgeInsets(
+        return new EdgeInsets
+        (
             left,
             top,
             right,
@@ -72,14 +72,16 @@ public readonly struct EdgeInsets : IEquatable<EdgeInsets>
         );
     }
 
-    public static EdgeInsets Ltrb(
+    public static EdgeInsets Ltrb
+    (
         float left,
         float top,
         float right,
         float bottom
     )
     {
-        return new EdgeInsets(
+        return new EdgeInsets
+        (
             left,
             top,
             right,
@@ -87,7 +89,8 @@ public readonly struct EdgeInsets : IEquatable<EdgeInsets>
         );
     }
 
-    public bool Equals(
+    public bool Equals
+    (
         EdgeInsets other
     )
     {
@@ -95,14 +98,16 @@ public readonly struct EdgeInsets : IEquatable<EdgeInsets>
                Right.Equals(other.Right) && Bottom.Equals(other.Bottom);
     }
 
-    public override bool Equals(
+    public override bool Equals
+    (
         object? obj
     ) =>
         obj is EdgeInsets other && Equals(other);
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(
+        return HashCode.Combine
+        (
             Left,
             Top,
             Right,
@@ -110,13 +115,15 @@ public readonly struct EdgeInsets : IEquatable<EdgeInsets>
         );
     }
 
-    public static bool operator ==(
+    public static bool operator ==
+    (
         EdgeInsets left,
         EdgeInsets right
     ) =>
         left.Equals(right);
 
-    public static bool operator !=(
+    public static bool operator !=
+    (
         EdgeInsets left,
         EdgeInsets right
     ) =>

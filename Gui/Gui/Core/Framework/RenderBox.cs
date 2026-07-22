@@ -10,6 +10,8 @@ namespace Gui.Core.Framework;
 public class RenderBox : RenderObject
 {
     [ThreadStatic] private static SKPoint[]? _shadowRadiiBuffer;
+    [ThreadStatic] private static SKPoint[]? _borderRadiiBuffer;
+    private Border? _border;
     private Gradient? _gradient;
     private Vector2? _preferredSize;
     private BoxShadow[]? _shadows;
@@ -17,7 +19,8 @@ public class RenderBox : RenderObject
     public Vector4 Color
     {
         get;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref field,
             value,
             true
@@ -29,7 +32,8 @@ public class RenderBox : RenderObject
         get => _gradient;
         set
         {
-            if (!ReferenceEquals(
+            if (!ReferenceEquals
+                (
                     _gradient,
                     value
                 ))
@@ -40,22 +44,13 @@ public class RenderBox : RenderObject
         }
     }
 
-    public HitTestBehavior HitTestBehavior
-    {
-        get;
-        set
-        {
-            if (field != value)
-            {
-                field = value;
-            }
-        }
-    } = HitTestBehavior.Defer;
+    public HitTestBehavior HitTestBehavior { get; set; } = HitTestBehavior.Defer;
 
     public SKBitmap? Texture
     {
         get;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref field,
             value,
             true
@@ -65,7 +60,8 @@ public class RenderBox : RenderObject
     public Vector4 CornerRadii
     {
         get;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref field,
             value,
             true
@@ -75,7 +71,8 @@ public class RenderBox : RenderObject
     public float BorderThickness
     {
         get;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref field,
             value,
             true
@@ -85,12 +82,32 @@ public class RenderBox : RenderObject
     public Vector4 BorderColor
     {
         get;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref field,
             value,
             true
         );
     } = Vector4.One;
+
+    /// <summary>
+    ///     Optional per-side border. When set and asymmetric it overrides the
+    ///     uniform <see cref="BorderThickness" /> and <see cref="BorderColor" />;
+    ///     when uniform it collapses back to the cheaper single-stroke path.
+    ///     Null (default) keeps the legacy uniform border.
+    /// </summary>
+    public Border? Border
+    {
+        get => _border;
+        set
+        {
+            if (_border != value)
+            {
+                _border = value;
+                MarkNeedsPaint();
+            }
+        }
+    }
 
     /// <summary>
     ///     Preferred size to use when there are no children. Falls back to this size
@@ -99,7 +116,8 @@ public class RenderBox : RenderObject
     public Vector2? PreferredSize
     {
         get => _preferredSize;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref _preferredSize,
             value,
             relayout: true
@@ -115,7 +133,8 @@ public class RenderBox : RenderObject
         get => _shadows;
         set
         {
-            if (ReferenceEquals(
+            if (ReferenceEquals
+                (
                     _shadows,
                     value
                 ))
@@ -131,7 +150,8 @@ public class RenderBox : RenderObject
     public override bool IsHitTestTarget =>
         HitTestBehavior == HitTestBehavior.Opaque ||
         (HitTestBehavior == HitTestBehavior.Defer &&
-         (Color.W > 0 || BorderThickness > 0 || Texture != null || Children.Count > 0));
+         (Color.W > 0 || BorderThickness > 0 ||
+          (_border.HasValue && _border.Value.AnyWidth) || Texture != null || Children.Count > 0));
 
     protected override void PerformLayout()
     {
@@ -140,7 +160,8 @@ public class RenderBox : RenderObject
 
         if (Children.Count > 0)
         {
-            var childConstraints = LayoutConstraints.Loose(
+            var childConstraints = LayoutConstraints.Loose
+            (
                 Constraints.MaxWidth,
                 Constraints.MaxHeight
             );
@@ -149,11 +170,13 @@ public class RenderBox : RenderObject
                 child.X = 0;
                 child.Y = 0;
                 child.Layout(childConstraints);
-                maxW = Math.Max(
+                maxW = Math.Max
+                (
                     maxW,
                     child.Size.X
                 );
-                maxH = Math.Max(
+                maxH = Math.Max
+                (
                     maxH,
                     child.Size.Y
                 );
@@ -175,8 +198,10 @@ public class RenderBox : RenderObject
             maxH = _preferredSize.Value.Y;
         }
 
-        Size = Constraints.Constrain(
-            new Vector2(
+        Size = Constraints.Constrain
+        (
+            new Vector2
+            (
                 maxW,
                 maxH
             )
@@ -189,7 +214,8 @@ public class RenderBox : RenderObject
     ///     the box bounds even when children are clipped to the rounded box shape.
     ///     The clip respects <see cref="CornerRadii" /> (rounded-rect, not plain rect).
     /// </summary>
-    public override void Paint(
+    public override void Paint
+    (
         PaintingContext context
     )
     {
@@ -223,7 +249,8 @@ public class RenderBox : RenderObject
         ChildNeedsPaint = false;
     }
 
-    private void PaintOuterShadows(
+    private void PaintOuterShadows
+    (
         PaintingContext context
     )
     {
@@ -236,7 +263,8 @@ public class RenderBox : RenderObject
         {
             if (!shadow.Inset)
             {
-                PaintOuterShadow(
+                PaintOuterShadow
+                (
                     context,
                     shadow
                 );
@@ -244,35 +272,41 @@ public class RenderBox : RenderObject
         }
     }
 
-    private void ApplyRoundedContentClip(
+    private void ApplyRoundedContentClip
+    (
         PaintingContext context
     )
     {
         var canvas = context.Canvas!;
-        var rect = new SKRect(
+        var rect = new SKRect
+        (
             0,
             0,
             Size.X,
             Size.Y
         );
         var rr = context.SharedRoundRect;
-        rr.SetRectRadii(
+        rr.SetRectRadii
+        (
             rect,
-            GetShadowRadii(
+            GetShadowRadii
+            (
                 CornerRadii.Z,
                 CornerRadii.X,
                 CornerRadii.Y,
                 CornerRadii.W
             )
         );
-        canvas.ClipRoundRect(
+        canvas.ClipRoundRect
+        (
             rr,
             SKClipOperation.Intersect,
             ClipBehavior == ClipBehavior.AntiAlias
         );
     }
 
-    protected override void PaintInternal(
+    protected override void PaintInternal
+    (
         PaintingContext context
     )
     {
@@ -285,36 +319,66 @@ public class RenderBox : RenderObject
         // so they can extend outside the box bounds.
 
         // 2. Fill (existing logic)
+        var perSide = _border.HasValue && !_border.Value.IsUniform;
+        float borderWidth;
+        Vector4 borderColor;
+        if (perSide)
+        {
+            borderWidth = 0f;
+            borderColor = Vector4.Zero;
+        }
+        else if (_border.HasValue)
+        {
+            borderWidth = _border.Value.Left.Width;
+            borderColor = _border.Value.Left.Color;
+        }
+        else
+        {
+            borderWidth = BorderThickness;
+            borderColor = BorderColor;
+        }
+
         var shader = _gradient?.CreateShader(Size);
         try
         {
             if (Texture != null)
             {
-                context.Canvas.DrawMaskedBox(
+                context.Canvas.DrawMaskedBox
+                (
                     Vector2.Zero,
                     Size,
                     Texture,
                     CornerRadii,
-                    BorderThickness,
-                    BorderColor,
+                    borderWidth,
+                    borderColor,
                     context.SharedPaint,
                     context.SharedRoundRect,
                     context.SharedBorderRoundRect
                 );
             }
-            else if (Color.W > 0 || BorderThickness > 0 || shader != null)
+            else if (Color.W > 0 || borderWidth > 0 || shader != null)
             {
-                context.Canvas.DrawBox(
+                context.Canvas.DrawBox
+                (
                     Vector2.Zero,
                     Size,
                     Color,
                     CornerRadii,
-                    BorderThickness,
-                    BorderColor,
+                    borderWidth,
+                    borderColor,
                     context.SharedPaint,
                     context.SharedRoundRect,
                     context.SharedBorderRoundRect,
                     shader
+                );
+            }
+
+            if (perSide)
+            {
+                DrawPerSideBorder
+                (
+                    context,
+                    _border!.Value
                 );
             }
         }
@@ -330,7 +394,8 @@ public class RenderBox : RenderObject
             {
                 if (shadow.Inset)
                 {
-                    PaintInnerShadow(
+                    PaintInnerShadow
+                    (
                         context,
                         shadow
                     );
@@ -339,7 +404,35 @@ public class RenderBox : RenderObject
         }
     }
 
-    private static SKPoint[] GetShadowRadii(
+    private void DrawPerSideBorder
+    (
+        PaintingContext context,
+        Border border
+    )
+    {
+        _borderRadiiBuffer ??= new SKPoint[4];
+
+        DrawingOperations.DrawBorder
+        (
+            context.Canvas!,
+            new SKRect
+            (
+                0,
+                0,
+                Size.X,
+                Size.Y
+            ),
+            CornerRadii,
+            border,
+            context.SharedPaint,
+            context.SharedRoundRect,
+            context.SharedBorderRoundRect,
+            _borderRadiiBuffer
+        );
+    }
+
+    private static SKPoint[] GetShadowRadii
+    (
         float tl,
         float tr,
         float br,
@@ -347,33 +440,39 @@ public class RenderBox : RenderObject
     )
     {
         _shadowRadiiBuffer ??= new SKPoint[4];
-        _shadowRadiiBuffer[0] = new SKPoint(
+        _shadowRadiiBuffer[0] = new SKPoint
+        (
             tl,
             tl
         );
-        _shadowRadiiBuffer[1] = new SKPoint(
+        _shadowRadiiBuffer[1] = new SKPoint
+        (
             tr,
             tr
         );
-        _shadowRadiiBuffer[2] = new SKPoint(
+        _shadowRadiiBuffer[2] = new SKPoint
+        (
             br,
             br
         );
-        _shadowRadiiBuffer[3] = new SKPoint(
+        _shadowRadiiBuffer[3] = new SKPoint
+        (
             bl,
             bl
         );
         return _shadowRadiiBuffer;
     }
 
-    private void PaintOuterShadow(
+    private void PaintOuterShadow
+    (
         PaintingContext context,
         BoxShadow shadow
     )
     {
         var canvas = context.Canvas!;
         var spread = shadow.SpreadRadius;
-        var sigma = MathF.Max(
+        var sigma = MathF.Max
+        (
             0f,
             shadow.BlurRadius
         );
@@ -381,7 +480,8 @@ public class RenderBox : RenderObject
         // Shadow shape: expanded by spread and shifted by offset.
         // The offset is baked into the rect so we don't need SKImageFilter
         // (ImageFilter + Dispose is unreliable on SKPictureRecorder canvases).
-        var shadowRect = new SKRect(
+        var shadowRect = new SKRect
+        (
             -spread + shadow.Offset.X,
             -spread + shadow.Offset.Y,
             Size.X + spread + shadow.Offset.X,
@@ -389,27 +489,33 @@ public class RenderBox : RenderObject
         );
 
         // Corner radii grow with positive spread
-        var tl = MathF.Max(
+        var tl = MathF.Max
+        (
             0f,
             CornerRadii.Z + spread
         );
-        var tr = MathF.Max(
+        var tr = MathF.Max
+        (
             0f,
             CornerRadii.X + spread
         );
-        var br = MathF.Max(
+        var br = MathF.Max
+        (
             0f,
             CornerRadii.Y + spread
         );
-        var bl = MathF.Max(
+        var bl = MathF.Max
+        (
             0f,
             CornerRadii.W + spread
         );
 
         var shadowRr = context.SharedShadowRoundRect;
-        shadowRr.SetRectRadii(
+        shadowRr.SetRectRadii
+        (
             shadowRect,
-            GetShadowRadii(
+            GetShadowRadii
+            (
                 tl,
                 tr,
                 br,
@@ -431,7 +537,8 @@ public class RenderBox : RenderObject
             ? context.GetOrCreateBlurMask(sigma)
             : null;
 
-        canvas.DrawRoundRect(
+        canvas.DrawRoundRect
+        (
             shadowRr,
             paint
         );
@@ -439,19 +546,22 @@ public class RenderBox : RenderObject
         paint.MaskFilter = null;
     }
 
-    private void PaintInnerShadow(
+    private void PaintInnerShadow
+    (
         PaintingContext context,
         BoxShadow shadow
     )
     {
         var canvas = context.Canvas!;
         var spread = shadow.SpreadRadius;
-        var sigma = MathF.Max(
+        var sigma = MathF.Max
+        (
             0f,
             shadow.BlurRadius
         );
 
-        var boxRect = new SKRect(
+        var boxRect = new SKRect
+        (
             0,
             0,
             Size.X,
@@ -462,42 +572,50 @@ public class RenderBox : RenderObject
         {
             // Clip to box boundary
             var clipRr = context.SharedRoundRect;
-            clipRr.SetRectRadii(
+            clipRr.SetRectRadii
+            (
                 boxRect,
-                GetShadowRadii(
+                GetShadowRadii
+                (
                     CornerRadii.Z,
                     CornerRadii.X,
                     CornerRadii.Y,
                     CornerRadii.W
                 )
             );
-            canvas.ClipRoundRect(
+            canvas.ClipRoundRect
+            (
                 clipRr,
                 SKClipOperation.Intersect,
                 true
             );
 
             // Inner rect (the "hole") — spread contracts it, offset shifts it
-            var innerRect = new SKRect(
+            var innerRect = new SKRect
+            (
                 spread + shadow.Offset.X,
                 spread + shadow.Offset.Y,
                 Size.X - spread + shadow.Offset.X,
                 Size.Y - spread + shadow.Offset.Y
             );
 
-            var tl = MathF.Max(
+            var tl = MathF.Max
+            (
                 0f,
                 CornerRadii.Z - spread
             );
-            var tr = MathF.Max(
+            var tr = MathF.Max
+            (
                 0f,
                 CornerRadii.X - spread
             );
-            var br = MathF.Max(
+            var br = MathF.Max
+            (
                 0f,
                 CornerRadii.Y - spread
             );
-            var bl = MathF.Max(
+            var bl = MathF.Max
+            (
                 0f,
                 CornerRadii.W - spread
             );
@@ -522,7 +640,8 @@ public class RenderBox : RenderObject
             fill.ImageFilter = null;
             fill.BlendMode = SKBlendMode.SrcOver;
             fill.IsAntialias = false;
-            canvas.DrawRect(
+            canvas.DrawRect
+            (
                 boxRect,
                 fill
             );
@@ -533,16 +652,19 @@ public class RenderBox : RenderObject
             fill.IsAntialias = true;
 
             var holeRr = context.SharedShadowRoundRect;
-            holeRr.SetRectRadii(
+            holeRr.SetRectRadii
+            (
                 innerRect,
-                GetShadowRadii(
+                GetShadowRadii
+                (
                     tl,
                     tr,
                     br,
                     bl
                 )
             );
-            canvas.DrawRoundRect(
+            canvas.DrawRoundRect
+            (
                 holeRr,
                 fill
             );

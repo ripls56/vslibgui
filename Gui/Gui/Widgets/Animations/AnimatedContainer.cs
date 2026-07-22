@@ -20,7 +20,8 @@ public class AnimatedContainer : ImplicitlyAnimatedWidget
     /// <param name="onEnd">Callback fired when animation completes.</param>
     /// <param name="child">Optional child widget.</param>
     /// <param name="key">Optional key for element identity.</param>
-    public AnimatedContainer(
+    public AnimatedContainer
+    (
         BoxStyle style,
         TimeSpan duration,
         Curve? curve = null,
@@ -28,7 +29,8 @@ public class AnimatedContainer : ImplicitlyAnimatedWidget
         Widget? child = null,
         Framework.Key? key = null
     )
-        : base(
+        : base
+        (
             duration,
             curve,
             onEnd,
@@ -51,61 +53,132 @@ public class AnimatedContainer : ImplicitlyAnimatedWidget
     private class AnimatedContainerState
         : ImplicitlyAnimatedWidgetState<AnimatedContainer>
     {
+        private BoxShadowListTween? _boxShadowsTween;
+        private ColorTween? _borderColorTween;
+        private FloatTween? _borderThicknessTween;
+        private BorderTween? _borderTween;
         private ColorTween? _colorTween;
         private GradientTween? _gradientTween;
         private FloatTween? _heightTween;
+        private EdgeInsetsTween? _paddingTween;
         private Vector4Tween? _radiusTween;
         private FloatTween? _widthTween;
 
         /// <inheritdoc />
-        protected override void ForEachTween(
+        protected override void ForEachTween
+        (
             TweenVisitor visitor
         )
         {
             var s = Widget.Style;
 
-            _colorTween = (ColorTween)visitor.Visit(
+            _colorTween = (ColorTween)visitor.Visit
+            (
                 _colorTween,
                 s.Color,
-                v => new ColorTween(
+                v => new ColorTween
+                (
                     v,
                     v
                 )
             );
 
-            _gradientTween = (GradientTween)visitor.Visit(
+            _gradientTween = (GradientTween)visitor.Visit
+            (
                 _gradientTween,
                 s.Gradient,
-                v => new GradientTween(
+                v => new GradientTween
+                (
                     v,
                     v
                 )
             );
 
-            _radiusTween = (Vector4Tween)visitor.Visit(
+            _radiusTween = (Vector4Tween)visitor.Visit
+            (
                 _radiusTween,
                 s.CornerRadius,
-                v => new Vector4Tween(
+                v => new Vector4Tween
+                (
                     v,
                     v
                 )
             );
 
             var targetW = s.Width ?? 0;
-            _widthTween = (FloatTween)visitor.Visit(
+            _widthTween = (FloatTween)visitor.Visit
+            (
                 _widthTween,
                 targetW,
-                v => new FloatTween(
+                v => new FloatTween
+                (
                     v,
                     v
                 )
             );
 
             var targetH = s.Height ?? 0;
-            _heightTween = (FloatTween)visitor.Visit(
+            _heightTween = (FloatTween)visitor.Visit
+            (
                 _heightTween,
                 targetH,
-                v => new FloatTween(
+                v => new FloatTween
+                (
+                    v,
+                    v
+                )
+            );
+
+            _borderThicknessTween = (FloatTween)visitor.Visit
+            (
+                _borderThicknessTween,
+                s.BorderThickness,
+                v => new FloatTween
+                (
+                    v,
+                    v
+                )
+            );
+
+            _borderColorTween = (ColorTween)visitor.Visit
+            (
+                _borderColorTween,
+                s.BorderColor,
+                v => new ColorTween
+                (
+                    v,
+                    v
+                )
+            );
+
+            _borderTween = (BorderTween)visitor.Visit
+            (
+                _borderTween,
+                s.Border,
+                v => new BorderTween
+                (
+                    v,
+                    v
+                )
+            );
+
+            _paddingTween = (EdgeInsetsTween)visitor.Visit
+            (
+                _paddingTween,
+                s.Padding,
+                v => new EdgeInsetsTween
+                (
+                    v,
+                    v
+                )
+            );
+
+            _boxShadowsTween = (BoxShadowListTween)visitor.Visit
+            (
+                _boxShadowsTween,
+                s.BoxShadows,
+                v => new BoxShadowListTween
+                (
                     v,
                     v
                 )
@@ -113,7 +186,8 @@ public class AnimatedContainer : ImplicitlyAnimatedWidget
         }
 
         /// <inheritdoc />
-        public override Widget Build(
+        public override Widget Build
+        (
             BuildContext context
         )
         {
@@ -128,16 +202,18 @@ public class AnimatedContainer : ImplicitlyAnimatedWidget
                 Height = Widget.Style.Height != null
                     ? _heightTween!.Evaluate(Animation)
                     : null,
-                BorderThickness = Widget.Style.BorderThickness,
-                BorderColor = Widget.Style.BorderColor,
-                Padding = Widget.Style.Padding,
+                BorderThickness = _borderThicknessTween!.Evaluate(Animation),
+                BorderColor = _borderColorTween!.Evaluate(Animation),
+                Border = _borderTween!.Evaluate(Animation),
+                Padding = _paddingTween!.Evaluate(Animation),
+                BoxShadows = _boxShadowsTween!.Evaluate(Animation),
                 ClipBehavior = Widget.Style.ClipBehavior,
                 HitTestBehavior = Widget.Style.HitTestBehavior,
-                Texture = Widget.Style.Texture,
-                BoxShadows = Widget.Style.BoxShadows
+                Texture = Widget.Style.Texture
             };
 
-            return new Container(
+            return new Container
+            (
                 currentStyle,
                 Widget.Child
             );

@@ -12,12 +12,11 @@ using Vintagestory.API.Client;
 namespace Gui.Widgets.Input;
 
 public class
-    TextField(
+    TextField
+    (
         TextEditingController? controller = null,
         FocusNode? focusNode = null,
-        BoxStyle? style = null,
-        TextStyle? textStyle = null,
-        Vector4? selectionColor = null,
+        TextFieldStyle? style = null,
         Action<string>? onSubmitted = null,
         Action<string>? onChanged = null,
         Action<KeyboardEvent>? onKeyDown = null
@@ -25,9 +24,7 @@ public class
     : StatefulWidget, IFocusable
 {
     public TextEditingController? Controller { get; } = controller;
-    public BoxStyle? Style { get; } = style;
-    public TextStyle? TextStyle { get; } = textStyle;
-    public Vector4? SelectionColor { get; } = selectionColor;
+    public TextFieldStyle? Style { get; } = style;
     public Action<string>? OnSubmitted { get; } = onSubmitted;
     public Action<string>? OnChanged { get; } = onChanged;
     public Action<KeyboardEvent>? OnKeyDown { get; } = onKeyDown;
@@ -40,6 +37,11 @@ internal class TextFieldState : State<TextField>,
     IKeyDownHandler, IKeyCharHandler, IKeyUpHandler
 {
     private const double CursorBlinkMs = 500;
+    private bool _borderInitialized;
+
+    private Ticker? _borderTicker;
+    private Vector4 _currentBorderColor;
+    private float _currentBorderThickness;
 
     private float _currentScrollOffset;
     private DateTime _cursorLastToggle = DateTime.MinValue;
@@ -52,18 +54,20 @@ internal class TextFieldState : State<TextField>,
     private bool _isDragging;
     private int _lastClickCharIndex = -1;
     private DateTime _lastClickTime;
+    private TextFieldStyle _resolvedFieldStyle;
     private Vector4 _resolvedSelectionColor;
 
-    // Resolved styles (theme-aware)
     private BoxStyle _resolvedStyle = null!;
     private TextStyle _resolvedTextStyle;
+    private ThemeData _resolvedTheme = null!;
     private Ticker? _scrollTicker;
     private float _targetScrollOffset;
 
     private TextEditingController Controller => Widget.Controller ?? _internalController!;
     private FocusNode FocusNode => Widget.FocusNode ?? _internalFocusNode!;
 
-    public void OnKeyChar(
+    public void OnKeyChar
+    (
         KeyboardEvent e
     )
     {
@@ -78,7 +82,8 @@ internal class TextFieldState : State<TextField>,
         var text = Controller.Text;
         var selection = Controller.Selection;
         var len = text.Length;
-        var start = Math.Clamp(
+        var start = Math.Clamp
+        (
             selection.Start,
             0,
             len
@@ -86,23 +91,27 @@ internal class TextFieldState : State<TextField>,
 
         if (!selection.IsEmpty)
         {
-            text = text.Remove(
+            text = text.Remove
+            (
                 start,
-                Math.Min(
+                Math.Min
+                (
                     selection.End - start,
                     len - start
                 )
             );
         }
 
-        Controller.Text = text.Insert(
+        Controller.Text = text.Insert
+        (
             start,
             e.KeyChar.ToString()
         );
         Controller.Selection = TextSelection.Collapsed(start + 1);
     }
 
-    public void OnKeyDown(
+    public void OnKeyDown
+    (
         KeyboardEvent e
     )
     {
@@ -218,7 +227,10 @@ internal class TextFieldState : State<TextField>,
                 break;
             case (int)GlKeys.Home when e.Shift:
                 Controller.Selection =
-                    new TextSelection { BaseOffset = selection.BaseOffset, ExtentOffset = 0 };
+                    new TextSelection
+                    {
+                        BaseOffset = selection.BaseOffset, ExtentOffset = 0
+                    };
                 break;
             case (int)GlKeys.Home:
                 Controller.Selection = TextSelection.Collapsed(0);
@@ -241,7 +253,8 @@ internal class TextFieldState : State<TextField>,
         }
     }
 
-    public void OnKeyUp(
+    public void OnKeyUp
+    (
         KeyboardEvent e
     )
     {
@@ -257,7 +270,10 @@ internal class TextFieldState : State<TextField>,
     }
 
     private void SelectAll(int len) => Controller.Selection =
-        new TextSelection { BaseOffset = 0, ExtentOffset = len };
+        new TextSelection
+        {
+            BaseOffset = 0, ExtentOffset = len
+        };
 
     private void CopySelection(string text, TextSelection selection) => Element.Owner!
         .GetClipboard().SetText(text[selection.Start..selection.End]);
@@ -284,14 +300,24 @@ internal class TextFieldState : State<TextField>,
         Controller.Selection = TextSelection.Collapsed(start + pasted.Length);
     }
 
-    private void DeleteSelection(string text, TextSelection selection, int len)
+    private void DeleteSelection
+    (
+        string text,
+        TextSelection selection,
+        int len
+    )
     {
         var start = Math.Clamp(selection.Start, 0, len);
         Controller.Text = text.Remove(start, Math.Min(selection.End - start, len - start));
         Controller.Selection = TextSelection.Collapsed(start);
     }
 
-    private void DeleteBackward(string text, TextSelection selection, int len)
+    private void DeleteBackward
+    (
+        string text,
+        TextSelection selection,
+        int len
+    )
     {
         if (selection.BaseOffset <= 0)
         {
@@ -303,7 +329,12 @@ internal class TextFieldState : State<TextField>,
         Controller.Selection = TextSelection.Collapsed(pos);
     }
 
-    private void DeleteForward(string text, TextSelection selection, int len)
+    private void DeleteForward
+    (
+        string text,
+        TextSelection selection,
+        int len
+    )
     {
         if (selection.BaseOffset >= len)
         {
@@ -331,12 +362,14 @@ internal class TextFieldState : State<TextField>,
         FocusNode.Owner = Element;
         _scrollTicker = Element.Owner!.GetTickerProvider().CreateTicker(OnScrollTick);
         _cursorTicker = Element.Owner!.GetTickerProvider().CreateTicker(OnCursorTick);
+        _borderTicker = Element.Owner!.GetTickerProvider().CreateTicker(OnBorderTick);
 
         Controller.AddListener(OnControllerChanged);
         FocusNode.AddListener(OnFocusChanged);
     }
 
-    private void OnScrollTick(
+    private void OnScrollTick
+    (
         TimeSpan elapsed
     )
     {
@@ -347,7 +380,8 @@ internal class TextFieldState : State<TextField>,
         }
         else
         {
-            _currentScrollOffset = MathHelper.Lerp(
+            _currentScrollOffset = MathHelper.Lerp
+            (
                 _currentScrollOffset,
                 _targetScrollOffset,
                 0.25f
@@ -357,7 +391,8 @@ internal class TextFieldState : State<TextField>,
         SetState(() => { });
     }
 
-    public override void UpdateWidget(
+    public override void UpdateWidget
+    (
         TextField oldWidget
     )
     {
@@ -424,7 +459,8 @@ internal class TextFieldState : State<TextField>,
             return;
         }
 
-        var font = TextLayoutHelper.GetFont(
+        var font = TextLayoutHelper.GetFont
+        (
             _resolvedTextStyle.FontFamily,
             _resolvedTextStyle.FontSize,
             _resolvedTextStyle.Weight
@@ -433,13 +469,16 @@ internal class TextFieldState : State<TextField>,
 
         var text = Controller.Text;
         var totalWidth = font.MeasureText(text);
-        var extentPos = Math.Clamp(
+        var extentPos = Math.Clamp
+        (
             Controller.Selection.ExtentOffset,
             0,
             text.Length
         );
-        var cursorX = font.MeasureText(
-            text.Substring(
+        var cursorX = font.MeasureText
+        (
+            text.Substring
+            (
                 0,
                 extentPos
             )
@@ -457,7 +496,8 @@ internal class TextFieldState : State<TextField>,
         {
             if (cursorX < _targetScrollOffset)
             {
-                _targetScrollOffset = Math.Max(
+                _targetScrollOffset = Math.Max
+                (
                     0,
                     cursorX - 10
                 );
@@ -468,10 +508,12 @@ internal class TextFieldState : State<TextField>,
             }
         }
 
-        _targetScrollOffset = Math.Clamp(
+        _targetScrollOffset = Math.Clamp
+        (
             _targetScrollOffset,
             0,
-            Math.Max(
+            Math.Max
+            (
                 0,
                 totalWidth - viewportWidth + 10
             )
@@ -483,7 +525,8 @@ internal class TextFieldState : State<TextField>,
         }
     }
 
-    private void OnCursorTick(
+    private void OnCursorTick
+    (
         TimeSpan elapsed
     )
     {
@@ -503,6 +546,110 @@ internal class TextFieldState : State<TextField>,
         }
     }
 
+    private void OnBorderTick
+    (
+        TimeSpan elapsed
+    )
+    {
+        ResolveBorder
+        (
+            out var targetColor,
+            out var targetThick
+        );
+        var colorSettled =
+            (_currentBorderColor - targetColor).LengthSquared < 0.0001f;
+        var thickSettled = Math.Abs(_currentBorderThickness - targetThick) < 0.01f;
+        if (colorSettled && thickSettled)
+        {
+            _currentBorderColor = targetColor;
+            _currentBorderThickness = targetThick;
+            _borderTicker?.Stop();
+        }
+        else
+        {
+            _currentBorderColor = Vector4.Lerp
+            (
+                _currentBorderColor,
+                targetColor,
+                0.25f
+            );
+            _currentBorderThickness = MathHelper.Lerp
+            (
+                _currentBorderThickness,
+                targetThick,
+                0.25f
+            );
+        }
+
+        SetState(() => { });
+    }
+
+    /// <summary>
+    ///     Resolves the border color and thickness for the current focus state. The bright
+    ///     focus outline is shown only for keyboard traversal (<see cref="FocusNode.ShowsFocusIndicator" />);
+    ///     pointer focus blends toward the outline for a subtle highlight, and the unfocused
+    ///     state keeps the configured style border.
+    /// </summary>
+    private void ResolveBorder
+    (
+        out Vector4 color,
+        out float thickness
+    )
+    {
+        ResolveBorder
+        (
+            _resolvedFieldStyle,
+            _resolvedTheme,
+            FocusNode.HasFocus,
+            FocusNode.ShowsFocusIndicator,
+            out color,
+            out thickness
+        );
+    }
+
+    /// <summary>
+    ///     Pure border resolver, testable without a mounted state. Keyboard focus yields the
+    ///     full focus outline; pointer focus blends the base border with the outline; the
+    ///     unfocused state returns the configured style border.
+    /// </summary>
+    internal static void ResolveBorder
+    (
+        TextFieldStyle style,
+        ThemeData theme,
+        bool focused,
+        bool keyboard,
+        out Vector4 color,
+        out float thickness
+    )
+    {
+        if (!focused)
+        {
+            color = style.BorderColor;
+            thickness = style.BorderThickness;
+            return;
+        }
+
+        if (keyboard)
+        {
+            color = theme.FocusOutlineColor;
+            thickness = theme.FocusOutlineWidth;
+            return;
+        }
+
+        color = Vector4.Lerp
+        (
+            style.BorderColor,
+            theme.FocusOutlineColor,
+            0.35f
+        );
+        thickness = MathHelper.Lerp
+        (
+            style.BorderThickness,
+            theme.FocusOutlineWidth,
+            0.4f
+        );
+    }
+
     private void OnFocusChanged()
     {
         if (FocusNode.HasFocus && Controller.Selection.IsEmpty)
@@ -520,14 +667,21 @@ internal class TextFieldState : State<TextField>,
             _cursorVisible = true;
         }
 
+        if (!_borderTicker!.IsTicking)
+        {
+            _borderTicker.Start();
+        }
+
         SetState(() => { });
     }
 
-    private int GetCharIndexAtX(
+    private int GetCharIndexAtX
+    (
         float localX
     )
     {
-        var font = TextLayoutHelper.GetFont(
+        var font = TextLayoutHelper.GetFont
+        (
             _resolvedTextStyle.FontFamily,
             _resolvedTextStyle.FontSize,
             _resolvedTextStyle.Weight
@@ -555,15 +709,19 @@ internal class TextFieldState : State<TextField>,
         while (lo < hi)
         {
             var mid = (lo + hi) / 2;
-            var midWidth = font.MeasureText(
-                text.Substring(
+            var midWidth = font.MeasureText
+            (
+                text.Substring
+                (
                     0,
                     mid + 1
                 )
             );
             var prevWidth = mid > 0
-                ? font.MeasureText(
-                    text.Substring(
+                ? font.MeasureText
+                (
+                    text.Substring
+                    (
                         0,
                         mid
                     )
@@ -627,7 +785,8 @@ internal class TextFieldState : State<TextField>,
         return pos;
     }
 
-    private static (int start, int end) FindWordBoundary(
+    private static (int start, int end) FindWordBoundary
+    (
         string text,
         int pos
     )
@@ -637,7 +796,8 @@ internal class TextFieldState : State<TextField>,
             return (0, 0);
         }
 
-        pos = Math.Clamp(
+        pos = Math.Clamp
+        (
             pos,
             0,
             text.Length - 1
@@ -669,7 +829,8 @@ internal class TextFieldState : State<TextField>,
         return (start, end);
     }
 
-    public void OnPointerDown(
+    public void OnPointerDown
+    (
         PointerEvent e
     )
     {
@@ -682,8 +843,10 @@ internal class TextFieldState : State<TextField>,
             return;
         }
 
-        var localPos = ro.GlobalToLocal(
-            new Vector2(
+        var localPos = ro.GlobalToLocal
+        (
+            new Vector2
+            (
                 e.X,
                 e.Y
             )
@@ -698,7 +861,8 @@ internal class TextFieldState : State<TextField>,
 
         if (isDoubleClick)
         {
-            var (wordStart, wordEnd) = FindWordBoundary(
+            var (wordStart, wordEnd) = FindWordBoundary
+            (
                 Controller.Text,
                 charIndex
             );
@@ -715,7 +879,8 @@ internal class TextFieldState : State<TextField>,
         }
     }
 
-    public void OnPointerMove(
+    public void OnPointerMove
+    (
         PointerEvent e
     )
     {
@@ -732,8 +897,10 @@ internal class TextFieldState : State<TextField>,
             return;
         }
 
-        var localPos = ro.GlobalToLocal(
-            new Vector2(
+        var localPos = ro.GlobalToLocal
+        (
+            new Vector2
+            (
                 e.X,
                 e.Y
             )
@@ -746,42 +913,49 @@ internal class TextFieldState : State<TextField>,
         };
     }
 
-    public override Widget Build(
+    public override Widget Build
+    (
         BuildContext context
     )
     {
         var theme = Theme.Of(context);
-        var colors = theme.ColorScheme;
+        var fieldStyle = Widget.Style ?? theme.TextFieldStyle;
 
-        _resolvedStyle = Widget.Style ?? new BoxStyle
+        _resolvedFieldStyle = fieldStyle;
+        _resolvedTheme = theme;
+
+        ResolveBorder(out var targetColor, out var targetThick);
+        if (!_borderInitialized)
         {
-            Color = new Vector4(
-                colors.Background.X,
-                colors.Background.Y,
-                colors.Background.Z,
-                0.8f
-            ),
-            BorderThickness = 1,
-            BorderColor = colors.Border,
-            Height = 40
-        };
-        _resolvedTextStyle = Widget.TextStyle ?? new TextStyle
+            _currentBorderColor = targetColor;
+            _currentBorderThickness = targetThick;
+            _borderInitialized = true;
+        }
+        else if (!FocusNode.HasFocus && !_borderTicker!.IsTicking)
         {
-            FontSize = theme.TextTheme.Body.FontSize, Color = colors.OnSurface
+            _currentBorderColor = targetColor;
+            _currentBorderThickness = targetThick;
+        }
+
+        _resolvedStyle = new BoxStyle
+        {
+            Color = fieldStyle.FillColor,
+            BorderThickness = _currentBorderThickness,
+            BorderColor = _currentBorderColor,
+            Height = fieldStyle.Height,
+            CornerRadius = fieldStyle.CornerRadius
         };
-        _resolvedSelectionColor = Widget.SelectionColor ?? new Vector4(
-            colors.Primary.X,
-            colors.Primary.Y,
-            colors.Primary.Z,
-            0.4f
-        );
+        _resolvedTextStyle = fieldStyle.TextStyle;
+        _resolvedSelectionColor = fieldStyle.SelectionColor;
 
         var selection = Controller.Selection;
-        return new GestureDetector(
+        return new GestureDetector
+        (
             onPress: OnPointerDown,
             onMove: OnPointerMove,
             onRelease: _ => _isDragging = false,
-            child: new TextFieldRenderWidget(
+            child: new TextFieldRenderWidget
+            (
                 Controller.Text,
                 selection.ExtentOffset,
                 selection.Start,
@@ -791,8 +965,7 @@ internal class TextFieldState : State<TextField>,
                 _resolvedStyle,
                 _resolvedTextStyle,
                 _currentScrollOffset,
-                _cursorVisible,
-                colors.Primary
+                _cursorVisible
             )
         );
     }
@@ -803,61 +976,42 @@ internal class TextFieldState : State<TextField>,
         FocusNode.RemoveListener(OnFocusChanged);
         _scrollTicker?.Dispose();
         _cursorTicker?.Dispose();
+        _borderTicker?.Dispose();
         _internalController?.Dispose();
         _internalFocusNode?.Dispose();
         base.Dispose();
     }
 }
 
-internal class TextFieldRenderWidget : RenderObjectWidget
+internal class TextFieldRenderWidget
+(
+    string text,
+    int cursorPosition,
+    int selectionStart,
+    int selectionEnd,
+    Vector4 selectionColor,
+    bool isFocused,
+    BoxStyle style,
+    TextStyle textStyle,
+    float scrollOffset,
+    bool cursorVisible
+) : RenderObjectWidget
 {
-    public TextFieldRenderWidget(
-        string text,
-        int cursorPosition,
-        int selectionStart,
-        int selectionEnd,
-        Vector4 selectionColor,
-        bool hasFocus,
-        BoxStyle style,
-        TextStyle textStyle,
-        float scrollOffset,
-        bool cursorVisible = true,
-        Vector4? focusBorderColor = null
-    )
-    {
-        Text = text;
-        CursorPosition = cursorPosition;
-        SelectionStart = selectionStart;
-        SelectionEnd = selectionEnd;
-        SelectionColor = selectionColor;
-        HasFocus = hasFocus;
-        Style = style;
-        TextStyle = textStyle;
-        ScrollOffset = scrollOffset;
-        CursorVisible = cursorVisible;
-        FocusBorderColor = focusBorderColor ?? new Vector4(
-            1,
-            0.8f,
-            0,
-            1
-        );
-    }
-
-    public string Text { get; }
-    public int CursorPosition { get; }
-    public int SelectionStart { get; }
-    public int SelectionEnd { get; }
-    public Vector4 SelectionColor { get; }
-    public bool HasFocus { get; }
-    public BoxStyle Style { get; }
-    public TextStyle TextStyle { get; }
-    public float ScrollOffset { get; }
-    public Vector4 FocusBorderColor { get; }
-    public bool CursorVisible { get; }
+    public string Text { get; } = text;
+    public int CursorPosition { get; } = cursorPosition;
+    public int SelectionStart { get; } = selectionStart;
+    public int SelectionEnd { get; } = selectionEnd;
+    public Vector4 SelectionColor { get; } = selectionColor;
+    public bool IsFocused { get; } = isFocused;
+    public BoxStyle Style { get; } = style;
+    public TextStyle TextStyle { get; } = textStyle;
+    public float ScrollOffset { get; } = scrollOffset;
+    public bool CursorVisible { get; } = cursorVisible;
 
     public override RenderObject CreateRenderObject() => new RenderTextField();
 
-    public override void UpdateRenderObject(
+    public override void UpdateRenderObject
+    (
         RenderObject renderObject
     )
     {
@@ -867,12 +1021,10 @@ internal class TextFieldRenderWidget : RenderObjectWidget
         ro.SelectionStart = SelectionStart;
         ro.SelectionEnd = SelectionEnd;
         ro.SelectionColor = SelectionColor;
-        ro.HasFocus = HasFocus;
+        ro.IsFocused = IsFocused;
         ro.Color = Style.Color;
         ro.BorderThickness = Style.BorderThickness;
-        ro.BorderColor = HasFocus
-            ? FocusBorderColor
-            : Style.BorderColor;
+        ro.BorderColor = Style.BorderColor;
         ro.CornerRadii = Style.CornerRadius;
         ro.TextStyle = TextStyle;
         ro.MinWidth = Style.Width;

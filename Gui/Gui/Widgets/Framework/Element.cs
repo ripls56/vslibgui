@@ -26,6 +26,13 @@ public abstract class Element : IRebuildable
     public int Depth { get; private set; }
     public bool IsDirty { get; private set; } = true;
 
+    /// <summary>
+    ///     Holds an exception captured by <see cref="BuildOwner" /> during a failed rebuild.
+    ///     On the next rebuild pass the element renders <see cref="ErrorWidget.Builder" />
+    ///     output instead of its normal widget tree.
+    /// </summary>
+    internal Exception? PendingError { get; set; }
+
     public abstract RenderObject? RenderObject { get; }
 
     public virtual void Rebuild() => IsDirty = false;
@@ -150,7 +157,7 @@ public abstract class Element : IRebuildable
     public T? GetInheritedWidgetOfExactType<T>() where T : InheritedWidget
     {
         var inherited = _GetInheritedElement<T>();
-        return (T)inherited?.Widget;
+        return inherited?.Widget as T;
     }
 
     private InheritedElement? _GetInheritedElement<T>() where T : InheritedWidget
@@ -380,6 +387,7 @@ public class RenderObjectElement : Element
     {
         base.Mount(parent);
         _renderObject = Widget.CreateRenderObject();
+        _renderObject.OwnerElement = this;
         UpdateRenderObject();
         AttachRenderObject();
     }
@@ -445,12 +453,11 @@ public class ComponentElement : Element
         base.Rebuild();
         var oldRo = _child?.RenderObject;
         var statelessWidget = (StatelessWidget)Widget;
-        var builtWidget = statelessWidget.Build(
-            new BuildContext(
-                Widget,
-                this
-            )
-        );
+        var pendingError = PendingError;
+        PendingError = null;
+        Widget builtWidget = pendingError != null
+            ? ErrorWidget.Builder(pendingError)
+            : statelessWidget.Build(new BuildContext(Widget, this));
         _child = UpdateChild(
             _child,
             builtWidget

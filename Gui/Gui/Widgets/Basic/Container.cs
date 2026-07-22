@@ -16,7 +16,8 @@ public class Container : StatelessWidget
     private readonly Widget? _child;
     private readonly BoxStyle _style;
 
-    public Container(
+    public Container
+    (
         BoxStyle? style = null,
         Widget? child = null
     )
@@ -25,7 +26,8 @@ public class Container : StatelessWidget
         _child = child;
     }
 
-    public override Widget Build(
+    public override Widget Build
+    (
         BuildContext context
     )
     {
@@ -34,7 +36,8 @@ public class Container : StatelessWidget
         // Padding goes INSIDE the box (between border and child)
         if (_style.Padding != EdgeInsets.Zero)
         {
-            current = new Padding(
+            current = new Padding
+            (
                 _style.Padding,
                 current
             );
@@ -44,7 +47,8 @@ public class Container : StatelessWidget
         Vector2? preferredSize = null;
         if (_style.Width.HasValue || _style.Height.HasValue)
         {
-            preferredSize = new Vector2(
+            preferredSize = new Vector2
+            (
                 _style.Width ?? 0,
                 _style.Height ?? 0
             );
@@ -53,12 +57,14 @@ public class Container : StatelessWidget
         // The core painting is done by _BoxWidget which creates a RenderBox directly.
         // ClipBehavior is forwarded to the RenderBox so the clip is applied AFTER
         // outer shadows are painted — shadows therefore extend outside the box.
-        current = new BoxWidget(
+        current = new BoxWidget
+        (
             _style.Color,
             _style.Gradient,
             _style.CornerRadius,
             _style.BorderThickness,
             _style.BorderColor,
+            _style.Border,
             _style.Texture,
             _style.HitTestBehavior,
             preferredSize,
@@ -69,7 +75,8 @@ public class Container : StatelessWidget
 
         if (_style.Width != null || _style.Height != null)
         {
-            current = new SizedBox(
+            current = new SizedBox
+            (
                 _style.Width,
                 _style.Height,
                 current
@@ -86,6 +93,7 @@ public class Container : StatelessWidget
 /// </summary>
 internal class BoxWidget : SingleChildWidget
 {
+    private readonly Border? _border;
     private readonly Vector4 _borderColor;
     private readonly float _borderThickness;
     private readonly ClipBehavior _clipBehavior;
@@ -97,12 +105,14 @@ internal class BoxWidget : SingleChildWidget
     private readonly BoxShadow[]? _shadows;
     private readonly SKBitmap? _texture;
 
-    public BoxWidget(
+    public BoxWidget
+    (
         Vector4 color,
         Gradient? gradient,
         Vector4 cornerRadii,
         float borderThickness,
         Vector4 borderColor,
+        Border? border,
         SKBitmap? texture,
         HitTestBehavior hitTestBehavior,
         Vector2? preferredSize = null,
@@ -116,6 +126,7 @@ internal class BoxWidget : SingleChildWidget
         _cornerRadii = cornerRadii;
         _borderThickness = borderThickness;
         _borderColor = borderColor;
+        _border = border;
         _texture = texture;
         _hitTestBehavior = hitTestBehavior;
         _preferredSize = preferredSize;
@@ -125,7 +136,8 @@ internal class BoxWidget : SingleChildWidget
 
     public override RenderObject CreateRenderObject() => new RenderBox();
 
-    public override void UpdateRenderObject(
+    public override void UpdateRenderObject
+    (
         RenderObject renderObject
     )
     {
@@ -135,6 +147,7 @@ internal class BoxWidget : SingleChildWidget
         ro.CornerRadii = _cornerRadii;
         ro.BorderThickness = _borderThickness;
         ro.BorderColor = _borderColor;
+        ro.Border = _border;
         ro.Texture = _texture;
         ro.HitTestBehavior = _hitTestBehavior;
         ro.PreferredSize = _preferredSize;

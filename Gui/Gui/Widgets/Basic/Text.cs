@@ -1,23 +1,42 @@
 using Gui.Core.Basic;
 using Gui.Core.Framework;
 using Gui.Rendering.Text;
+using Gui.Widgets.Basic.Theming;
 using Gui.Widgets.Framework;
 
 namespace Gui.Widgets.Basic;
 
-/// <summary>
-///     A widget that displays text using direct Skia rendering.
-/// </summary>
-public class Text : RenderObjectWidget
+public class Text : StatelessWidget
 {
-    public Text(
+    public Text
+    (
         string content,
         TextStyle? style = null,
         Framework.Key? key = null
     ) : base(key)
     {
         Content = content;
-        Style = style ?? new TextStyle();
+        StyleOverride = style;
+    }
+
+    public string Content { get; }
+    public TextStyle? StyleOverride { get; }
+    public TextStyle Style => StyleOverride ?? new TextStyle();
+
+    public override Widget Build(BuildContext context)
+    {
+        var inherited = DefaultTextStyle.Of(context);
+        var effectiveStyle = StyleOverride?.Merge(inherited) ?? inherited;
+        return new _RawText(Content, effectiveStyle);
+    }
+}
+
+internal class _RawText : RenderObjectWidget
+{
+    public _RawText(string content, TextStyle style)
+    {
+        Content = content;
+        Style = style;
     }
 
     public string Content { get; }
@@ -25,9 +44,7 @@ public class Text : RenderObjectWidget
 
     public override RenderObject CreateRenderObject() => new RenderText();
 
-    public override void UpdateRenderObject(
-        RenderObject renderObject
-    )
+    public override void UpdateRenderObject(RenderObject renderObject)
     {
         var ro = (RenderText)renderObject;
         ro.Text = Content;

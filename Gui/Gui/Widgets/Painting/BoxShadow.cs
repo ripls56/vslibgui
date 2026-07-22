@@ -89,4 +89,18 @@ public readonly record struct BoxShadow(
             )
         );
     }
+
+    /// <summary>
+    ///     Linearly interpolates between two shadows.
+    /// </summary>
+    public static BoxShadow Lerp(BoxShadow a, BoxShadow b, float t)
+    {
+        return new BoxShadow(
+            a.Color + (b.Color - a.Color) * t,
+            a.Offset + (b.Offset - a.Offset) * t,
+            a.BlurRadius + (b.BlurRadius - a.BlurRadius) * t,
+            a.SpreadRadius + (b.SpreadRadius - a.SpreadRadius) * t,
+            t < 0.5f ? a.Inset : b.Inset
+        );
+    }
 }

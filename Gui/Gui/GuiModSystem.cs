@@ -1,9 +1,12 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using Gui.Debugging;
 using Gui.Example;
 using Gui.Rendering;
 using Gui.Rendering.Text;
+using Gui.Settings;
+using Gui.Theming;
 using Gui.Widgets.Framework;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
@@ -18,7 +21,9 @@ public class GuiModSystem : ModSystem
     private DebugWindow? _debugWindow;
     private ExampleGui? _exampleGui;
     private GuiGlobalOverlay? _globalOverlay;
+    private bool _onboarded;
     private PostSkiaPipeline? _postSkiaPipeline;
+    private SettingsDialog? _settingsDialog;
 
     public static GuiModSystem? Instance { get; private set; }
 
@@ -50,7 +55,8 @@ public class GuiModSystem : ModSystem
 
     public PerformanceMetrics? PerformanceMetrics => ActiveWindow?.PerformanceMetrics;
 
-    public void RegisterWindow(
+    public void RegisterWindow
+    (
         GuiBase window
     )
     {
@@ -62,7 +68,8 @@ public class GuiModSystem : ModSystem
         ActiveWindow ??= window;
     }
 
-    public void UnregisterWindow(
+    public void UnregisterWindow
+    (
         GuiBase window
     )
     {
@@ -75,7 +82,8 @@ public class GuiModSystem : ModSystem
         }
     }
 
-    public override void StartClientSide(
+    public override void StartClientSide
+    (
         ICoreClientAPI api
     )
     {
@@ -94,14 +102,30 @@ public class GuiModSystem : ModSystem
         _debugCommandProcessor = new DebugCommandProcessor(DebugSettings);
         _debugWindow = new DebugWindow(api, DebugSettings);
 
-        api.Assets.AddModOrigin(
+        api.Assets.AddModOrigin
+        (
             "gui",
             "fonts"
         );
-        api.Assets.Reload(
-            new AssetLocation(
+        api.Assets.Reload
+        (
+            new AssetLocation
+            (
                 "gui",
                 "fonts"
+            )
+        );
+        api.Assets.AddModOrigin
+        (
+            "gui",
+            "themes"
+        );
+        api.Assets.Reload
+        (
+            new AssetLocation
+            (
+                "gui",
+                "themes"
             )
         );
         LoadFonts(SkiaAssetLoader);
@@ -112,6 +136,18 @@ public class GuiModSystem : ModSystem
         SetupConfigWatcher();
         _globalOverlay = new GuiGlobalOverlay(api);
         _globalOverlay.TryOpen(false);
+
+        if (!_onboarded)
+        {
+            _onboarded = true;
+            PersistConfig(BuildCurrentConfig(onboarded: true));
+            _settingsDialog = BuildSettingsDialog(isFirstRun: true);
+            api.Event.EnqueueMainThreadTask
+            (
+                () => _settingsDialog.TryOpen(),
+                "libgui-first-run-settings"
+            );
+        }
     }
 
     private static void LoadFonts(SkiaAssetLoader loader)
@@ -141,25 +177,37 @@ public class GuiModSystem : ModSystem
         }
     }
 
-    private void RegisterDebugCommands(
+    private void RegisterDebugCommands
+    (
         ICoreClientAPI capi
     )
     {
         var cmd = capi.ChatCommands.Create("ui")
-            .WithDescription("UI Debugging")
-            .HandleWith(args =>
-                TextCommandResult.Success(
-                    "Try /ui tree, bounds, paint, hud, redraw, recreate, debugall"));
+            .WithDescription("UI settings and debugging")
+            .HandleWith
+            (args =>
+                TextCommandResult.Success
+                (
+                    "Settings: /ui settings — open the theme/settings window.\nDebug: /ui tree | bounds | paint | hud | redraw | recreate | prof | debugall"
+                )
+            );
 
         // Simple toggle subcommands
         foreach (var sub in new[]
                  {
-                     "tree", "bounds", "paint", "hud", "window", "violations", "heatmap",
+                     "tree",
+                     "bounds",
+                     "paint",
+                     "hud",
+                     "window",
+                     "violations",
+                     "heatmap",
                      "debugall"
                  })
         {
             cmd.BeginSubCommand(sub)
-                .HandleWith(args =>
+                .HandleWith
+                (args =>
                     {
                         var result = _debugCommandProcessor?.Process(sub) ?? "Error";
                         SyncDebugWindow();
@@ -171,7 +219,8 @@ public class GuiModSystem : ModSystem
 
         // redraw — force-rebuild all open window widget trees
         cmd.BeginSubCommand("redraw")
-            .HandleWith(args =>
+            .HandleWith
+            (args =>
                 {
                     var count = 0;
                     foreach (var window in _openWindows)
@@ -187,7 +236,8 @@ public class GuiModSystem : ModSystem
 
         // recreate — fully dispose and reopen all windows
         cmd.BeginSubCommand("recreate")
-            .HandleWith(args =>
+            .HandleWith
+            (args =>
                 {
                     var snapshot = new List<GuiBase>(_openWindows);
                     foreach (var window in snapshot)
@@ -202,7 +252,8 @@ public class GuiModSystem : ModSystem
                         count++;
                     }
 
-                    return TextCommandResult.Success(
+                    return TextCommandResult.Success
+                    (
                         $"Recreated {count} window(s)."
                     );
                 }
@@ -211,7 +262,8 @@ public class GuiModSystem : ModSystem
 
         // showcase — interactive widget documentation
         cmd.BeginSubCommand("showcase")
-            .HandleWith(args =>
+            .HandleWith
+            (args =>
                 {
                     if (_exampleGui != null && _exampleGui.IsOpened())
                     {
@@ -231,18 +283,22 @@ public class GuiModSystem : ModSystem
 
         // flash <ms> — configures the repaint flash duration
         cmd.BeginSubCommand("flash")
-            .WithArgs(
-                new StringArgParser(
+            .WithArgs
+            (
+                new StringArgParser
+                (
                     "ms",
                     false
                 )
             )
-            .HandleWith(args =>
+            .HandleWith
+            (args =>
                 {
                     var msArg = args.Parsers?.Count > 0
                         ? args.Parsers[0].GetValue()?.ToString()
                         : null;
-                    var result = _debugCommandProcessor?.Process(
+                    var result = _debugCommandProcessor?.Process
+                    (
                         "flash",
                         msArg
                     ) ?? "Error";
@@ -250,6 +306,94 @@ public class GuiModSystem : ModSystem
                 }
             )
             .EndSubCommand();
+
+        cmd.BeginSubCommand("prof")
+            .WithDescription("Frametime profiler: on | off | reset | dump")
+            .WithArgs
+            (
+                new StringArgParser
+                (
+                    "action",
+                    false
+                )
+            )
+            .HandleWith
+            (args =>
+                {
+                    var action = (args.Parsers?.Count > 0
+                        ? args.Parsers[0].GetValue()?.ToString()
+                        : null)?.ToLowerInvariant() ?? "dump";
+
+                    return TextCommandResult.Success(HandleProfilerCommand(action));
+                }
+            )
+            .EndSubCommand();
+
+        cmd.BeginSubCommand("settings")
+            .WithDescription("Open the theme/settings window")
+            .HandleWith
+            (args =>
+                {
+                    _settingsDialog ??= BuildSettingsDialog(isFirstRun: false);
+                    _settingsDialog.TryOpen();
+                    return TextCommandResult.Success("Opened settings.");
+                }
+            )
+            .EndSubCommand();
+    }
+
+    private string HandleProfilerCommand
+    (
+        string action
+    )
+    {
+        switch (action)
+        {
+            case "on":
+                GuiProfiler.Enabled = true;
+                DebugSettings.ShowProfiler = true;
+                SyncDebugWindow();
+                return "Profiler enabled.";
+            case "off":
+                GuiProfiler.Enabled = false;
+                DebugSettings.ShowProfiler = false;
+                SyncDebugWindow();
+                return "Profiler disabled.";
+            case "reset":
+                foreach (var window in _openWindows)
+                {
+                    window.Profiler.Reset();
+                }
+
+                return "Profiler reset.";
+            case "dump":
+                if (_openWindows.Count == 0)
+                {
+                    return "No open windows.";
+                }
+
+                var sb = new StringBuilder();
+                foreach (var window in _openWindows)
+                {
+                    var title = window == ActiveWindow
+                        ? $"{window.GetType().Name} (active)"
+                        : window.GetType().Name;
+                    sb.Append
+                    (
+                        ProfilerReport.BuildWindow
+                        (
+                            title,
+                            window.PerformanceMetrics,
+                            window.Profiler,
+                            5
+                        )
+                    );
+                }
+
+                return sb.ToString();
+            default:
+                return "Usage: /ui prof on | off | reset | dump";
+        }
     }
 
     private void LoadThemeConfig()
@@ -266,14 +410,19 @@ public class GuiModSystem : ModSystem
 
         if (config == null)
         {
-            Capi.StoreModConfig(
-                new GuiConfig { Theme = ThemeSection.FromColorScheme(ColorScheme.Default()) },
+            Capi.StoreModConfig
+            (
+                new GuiConfig
+                {
+                    Theme = ThemeSection.FromColorScheme(ColorScheme.Default())
+                },
                 "libgui.json"
             );
             ThemeData.Default = new ThemeData();
             return;
         }
 
+        _onboarded = config.Onboarded;
         ThemeData.Default = config.Theme != null
             ? new ThemeData(config.Theme.ToColorScheme(ColorScheme.Default()))
             : new ThemeData();
@@ -307,6 +456,41 @@ public class GuiModSystem : ModSystem
 
     private void OnConfigChanged() =>
         Capi!.Event.EnqueueMainThreadTask(LoadThemeConfig, "libgui-theme-reload");
+
+    private ThemeSection? LoadPresetSection(string id)
+    {
+        var asset = Capi!.Assets.TryGet(new AssetLocation("gui", $"themes/{id}.json"));
+        if (asset == null)
+        {
+            return null;
+        }
+
+        var json = Encoding.UTF8.GetString(asset.Data);
+        return JsonUtil.FromString<GuiConfig>(json)?.Theme;
+    }
+
+    private SettingsDialog BuildSettingsDialog(bool isFirstRun)
+    {
+        var presets = ThemePresetRegistry.LoadAll(LoadPresetSection);
+        return new SettingsDialog
+        (
+            Capi!, presets, isFirstRun, preset =>
+            {
+                ThemeApplier.Apply(preset);
+                PersistConfig(ThemeApplier.BuildPersistedConfig(preset, onboarded: true));
+            }
+        );
+    }
+
+    private void PersistConfig(GuiConfig config) => Capi!.StoreModConfig(config, "libgui.json");
+
+    private GuiConfig BuildCurrentConfig(bool onboarded) =>
+        new()
+        {
+            Theme = ThemeSection.FromColorScheme
+                (ThemeData.Default.ColorScheme),
+            Onboarded = onboarded
+        };
 
     private void SyncDebugWindow()
     {

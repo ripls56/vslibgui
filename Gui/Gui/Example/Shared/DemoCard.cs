@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Gui.Rendering;
-using Gui.Rendering.Text;
 using Gui.Widgets.Basic;
 using Gui.Widgets.Framework;
 using Gui.Widgets.Layout;
@@ -12,7 +11,8 @@ namespace Gui.Example.Shared;
 
 internal class DemoCard : StatelessWidget
 {
-    public DemoCard(
+    public DemoCard
+    (
         string title,
         Widget demo,
         string code,
@@ -35,28 +35,23 @@ internal class DemoCard : StatelessWidget
 
     public override Widget Build(BuildContext context)
     {
-        var colors = Theme.Of(context).ColorScheme;
+        var theme = Theme.Of(context);
+        var colors = theme.ColorScheme;
         var children = new List<Widget>
         {
-            new Text(Title,
-                new TextStyle { FontSize = 15, Weight = FontWeight.Bold, Color = colors.OnSurface })
+            new Text(Title, theme.TextTheme.Title)
         };
 
         if (Description != null)
         {
-            children.Add(new Text(Description,
-                new TextStyle
-                {
-                    FontSize = 12,
-                    Color = new Vector4(colors.OnSurface.X, colors.OnSurface.Y,
-                        colors.OnSurface.Z, 0.6f)
-                }));
+            children.Add(new Text(Description, theme.TextTheme.Caption));
         }
 
         children.Add(new Padding(EdgeInsets.Symmetric(8), Demo));
         children.Add(new CodeSnippet(Code, Capi));
 
-        return new Container(
+        return new Container
+        (
             new BoxStyle
             {
                 Color = colors.Surface,
@@ -65,7 +60,8 @@ internal class DemoCard : StatelessWidget
                 BorderColor = colors.Border,
                 Padding = EdgeInsets.All(16)
             },
-            new Column(
+            new Column
+            (
                 crossAxisAlignment: CrossAxisAlignment.Stretch,
                 spacing: 10,
                 children: children

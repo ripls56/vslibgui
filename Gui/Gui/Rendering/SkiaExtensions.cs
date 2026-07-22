@@ -49,6 +49,18 @@ public static class SkiaExtensions
         );
     }
 
+    /// <summary>Converts a 0..1 RGBA color to a hex string (#RRGGBB, or #RRGGBBAA when alpha is not opaque).</summary>
+    public static string ToHex(
+        this Vector4 c
+    )
+    {
+        var r = (int)MathF.Round(c.X * 255);
+        var g = (int)MathF.Round(c.Y * 255);
+        var b = (int)MathF.Round(c.Z * 255);
+        var a = (int)MathF.Round(c.W * 255);
+        return a == 255 ? $"#{r:X2}{g:X2}{b:X2}" : $"#{r:X2}{g:X2}{b:X2}{a:X2}";
+    }
+
     public static SKColor ToSkColor(
         this Vector4 color
     )

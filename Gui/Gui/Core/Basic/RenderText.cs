@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Gui.Core.Framework;
 using Gui.Rendering;
 using Gui.Rendering.Text;
+using Gui.Widgets.Layout;
 using OpenTK.Mathematics;
 
 namespace Gui.Core.Basic;
@@ -268,6 +269,31 @@ public class RenderText : RenderBox
         float width
     ) =>
         GetMinIntrinsicHeight(width);
+
+    /// <inheritdoc />
+    public override float? GetDistanceToBaseline(
+        TextBaseline baseline
+    )
+    {
+        if (string.IsNullOrEmpty(_text))
+        {
+            return null;
+        }
+
+        var font = TextLayoutHelper.GetFont(
+            _style.FontFamily,
+            _style.FontSize,
+            _style.Weight
+        );
+        font.GetFontMetrics(out var metrics);
+
+        if (baseline == TextBaseline.Ideographic && metrics.CapHeight != 0)
+        {
+            return -metrics.CapHeight;
+        }
+
+        return -metrics.Ascent;
+    }
 
     protected override void PaintInternal(
         PaintingContext context

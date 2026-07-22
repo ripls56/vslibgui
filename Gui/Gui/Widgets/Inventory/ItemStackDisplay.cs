@@ -7,7 +7,7 @@ namespace Gui.Widgets.Inventory;
 
 /// <summary>
 ///     A leaf widget that displays an <see cref="ItemStack" /> icon. The icon is
-///     rendered via <see cref="ItemStackRenderer" /> (offscreen GL → cached SKBitmap).
+///     rendered via <see cref="Gui.Rendering.ItemStackRenderer" /> (offscreen GL → cached SKBitmap).
 ///     <para>
 ///         Use this widget directly when you just need to display an item icon. For a
 ///         full interactive inventory slot (background, hover, click, stack size), use

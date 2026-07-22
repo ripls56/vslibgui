@@ -120,8 +120,10 @@ public class Transform : SingleChildWidget
         );
     }
 
-    public override RenderObject CreateRenderObject() =>
-        new RenderTransform { Matrix = Matrix, Alignment = Alignment };
+    public override RenderObject CreateRenderObject()
+    {
+        return new RenderTransform { Matrix = Matrix, Alignment = Alignment };
+    }
 
     public override void UpdateRenderObject(
         RenderObject renderObject

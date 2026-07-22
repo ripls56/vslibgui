@@ -45,6 +45,13 @@ public sealed class GuiGlobalOverlay : GuiBase
     /// <summary>Never intercepts mouse events.</summary>
     public override bool ShouldReceiveMouseEvents() => false;
 
+    /// <summary>
+    ///     Pass-through overlay: never register a hit-bounds composer. A full-screen
+    ///     composer would make the VS engine treat the entire screen as "inside a dialog",
+    ///     defeating HudDropItem's drop-on-click-outside (cursor items would never drop).
+    /// </summary>
+    protected override bool RegistersHitBounds => false;
+
     /// <inheritdoc />
     protected override WindowConfig CreateWindowConfig()
     {

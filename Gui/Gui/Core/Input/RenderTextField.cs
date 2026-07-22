@@ -16,7 +16,8 @@ internal class RenderTextField : RenderConstrainedBox
     public string Text
     {
         get;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref field,
             value,
             true
@@ -26,7 +27,8 @@ internal class RenderTextField : RenderConstrainedBox
     public int CursorPosition
     {
         get;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref field,
             value,
             true
@@ -36,7 +38,8 @@ internal class RenderTextField : RenderConstrainedBox
     public int SelectionStart
     {
         get;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref field,
             value,
             true
@@ -46,7 +49,8 @@ internal class RenderTextField : RenderConstrainedBox
     public int SelectionEnd
     {
         get;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref field,
             value,
             true
@@ -56,17 +60,19 @@ internal class RenderTextField : RenderConstrainedBox
     public Vector4 SelectionColor
     {
         get;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref field,
             value,
             true
         );
     }
 
-    public bool HasFocus
+    public bool IsFocused
     {
         get;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref field,
             value,
             true
@@ -82,7 +88,8 @@ internal class RenderTextField : RenderConstrainedBox
     public float ScrollOffset
     {
         get;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref field,
             value,
             true
@@ -92,7 +99,8 @@ internal class RenderTextField : RenderConstrainedBox
     public bool CursorVisible
     {
         get;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref field,
             value,
             true
@@ -101,7 +109,8 @@ internal class RenderTextField : RenderConstrainedBox
 
     public override bool IsHitTestTarget => true;
 
-    protected override void PaintInternal(
+    protected override void PaintInternal
+    (
         PaintingContext context
     )
     {
@@ -111,7 +120,8 @@ internal class RenderTextField : RenderConstrainedBox
             return;
         }
 
-        var font = TextLayoutHelper.GetFont(
+        var font = TextLayoutHelper.GetFont
+        (
             TextStyle.FontFamily,
             TextStyle.FontSize,
             TextStyle.Weight
@@ -120,7 +130,8 @@ internal class RenderTextField : RenderConstrainedBox
         var metrics = font.Metrics;
 
         float horizontalPadding = 10;
-        var clipRect = new SKRect(
+        var clipRect = new SKRect
+        (
             horizontalPadding,
             0,
             Size.X - horizontalPadding,
@@ -129,50 +140,61 @@ internal class RenderTextField : RenderConstrainedBox
 
         context.Canvas.Save();
         context.Canvas.ClipRect(clipRect);
-        context.Canvas.Translate(
+        context.Canvas.Translate
+        (
             horizontalPadding - ScrollOffset,
             0
         );
 
-        var textY = TextLayoutHelper.GetVerticalOffset(
+        var textY = TextLayoutHelper.GetVerticalOffset
+        (
             metrics,
             Size.Y
         );
         var lineTop = textY + metrics.Ascent;
         var lineHeight = metrics.Descent - metrics.Ascent;
 
-        if (HasFocus && SelectionStart != SelectionEnd)
+        if (IsFocused && SelectionStart != SelectionEnd)
         {
-            var clampedStart = Math.Clamp(
+            var clampedStart = Math.Clamp
+            (
                 SelectionStart,
                 0,
                 Text.Length
             );
-            var clampedEnd = Math.Clamp(
+            var clampedEnd = Math.Clamp
+            (
                 SelectionEnd,
                 0,
                 Text.Length
             );
             var selX1 = clampedStart > 0
-                ? font.MeasureText(
-                    Text.AsSpan(
+                ? font.MeasureText
+                (
+                    Text.AsSpan
+                    (
                         0,
                         clampedStart
                     )
                 )
                 : 0;
-            var selX2 = font.MeasureText(
-                Text.AsSpan(
+            var selX2 = font.MeasureText
+            (
+                Text.AsSpan
+                (
                     0,
                     clampedEnd
                 )
             );
-            context.DrawBox(
-                new Vector2(
+            context.DrawBox
+            (
+                new Vector2
+                (
                     selX1,
                     lineTop
                 ),
-                new Vector2(
+                new Vector2
+                (
                     selX2 - selX1,
                     lineHeight
                 ),
@@ -183,9 +205,11 @@ internal class RenderTextField : RenderConstrainedBox
             );
         }
 
-        context.DrawText(
+        context.DrawText
+        (
             Text,
-            new Vector2(
+            new Vector2
+            (
                 0,
                 textY
             ),
@@ -195,25 +219,31 @@ internal class RenderTextField : RenderConstrainedBox
         );
 
         var hasSelection = SelectionStart != SelectionEnd;
-        var showCursor = HasFocus && (hasSelection || CursorVisible);
+        var showCursor = IsFocused && (hasSelection || CursorVisible);
         if (showCursor)
         {
-            var cursorX = font.MeasureText(
-                Text.AsSpan(
+            var cursorX = font.MeasureText
+            (
+                Text.AsSpan
+                (
                     0,
-                    Math.Clamp(
+                    Math.Clamp
+                    (
                         CursorPosition,
                         0,
                         Text.Length
                     )
                 )
             );
-            context.DrawBox(
-                new Vector2(
+            context.DrawBox
+            (
+                new Vector2
+                (
                     cursorX,
                     lineTop
                 ),
-                new Vector2(
+                new Vector2
+                (
                     2,
                     lineHeight
                 ),

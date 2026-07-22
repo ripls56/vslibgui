@@ -1,6 +1,7 @@
 using System;
 using Gui.Widgets.Animations;
 using Gui.Widgets.Basic;
+using Gui.Widgets.Events;
 using Gui.Widgets.Framework;
 using Gui.Widgets.Layout;
 using Gui.Widgets.Painting;
@@ -11,7 +12,8 @@ namespace Gui.Widgets.Input;
 
 public class Checkbox : StatefulWidget
 {
-    public Checkbox(
+    public Checkbox
+    (
         bool value,
         Action<bool>? onChanged = null,
         string? label = null,
@@ -40,40 +42,54 @@ public class Checkbox : StatefulWidget
     public override State CreateState() => new CheckboxState();
 }
 
-internal class CheckboxState : State<Checkbox>
+internal class CheckboxState : FocusableState<Checkbox>, IActivatable
 {
     private SKBitmap? _backgroundTexture;
+    private bool _hovered;
+    private bool _pressed;
+
+    /// <inheritdoc />
+    public void Activate() => Widget.OnChanged?.Invoke(!Widget.Value);
 
     public override void InitState()
     {
         base.InitState();
-        _backgroundTexture = GuiModSystem.Instance?.SkiaAssetLoader?.LoadBitmap(
+        _backgroundTexture = GuiModSystem.Instance?.SkiaAssetLoader?.LoadBitmap
+        (
             "game",
             "textures/gui/gui-parchment.png"
         );
     }
 
-    public override Widget Build(
+    public override Widget Build
+    (
         BuildContext context
     )
     {
         var theme = Theme.Of(context);
         var style = Widget.Style ?? theme.CheckboxStyle;
 
-        var checkMark = new AnimatedOpacity(
-            Widget.Value
-                ? 1f
-                : 0f,
+        var checkMarkValue = (Widget.Value, _hovered, _pressed) switch
+        {
+            (true, _, _) => 1f,
+            (false, true, false) => 0.75f,
+            (false, _, true) => 0.9f,
+            _ => 0
+        };
+        var checkMark = new AnimatedOpacity
+        (
+            checkMarkValue,
             TimeSpan.FromMilliseconds(150),
             Curves.EaseOut,
-            child: new AnimatedScale(
-                Widget.Value
-                    ? 1f
-                    : 0f,
+            child: new AnimatedScale
+            (
+                checkMarkValue,
                 TimeSpan.FromMilliseconds(150),
                 Curves.EaseOut,
-                child: new Center(
-                    new Container(
+                child: new Center
+                (
+                    new Container
+                    (
                         new BoxStyle
                         {
                             Width = Widget.Size * 0.6f,
@@ -86,7 +102,10 @@ internal class CheckboxState : State<Checkbox>
             )
         );
 
-        var box = new Container(
+        var focused = FocusNode.ShowsFocusIndicator;
+
+        var box = new Container
+        (
             new BoxStyle
             {
                 Width = Widget.Size,
@@ -95,16 +114,22 @@ internal class CheckboxState : State<Checkbox>
                     ? style.BackgroundColor
                     : Vector4.One,
                 Texture = _backgroundTexture,
-                BorderThickness = style.BorderThickness,
-                BorderColor = style.BorderColor,
+                BorderThickness = focused
+                    ? theme.FocusOutlineWidth
+                    : style.BorderThickness,
+                BorderColor = focused
+                    ? theme.FocusOutlineColor
+                    : style.BorderColor,
                 CornerRadius = new Vector4(style.CornerRadius)
             },
             checkMark
         );
 
+
         var content = Widget.Label == null
             ? (Widget)box
-            : new Row(
+            : new Row
+            (
                 mainAxisAlignment: MainAxisAlignment.Start,
                 crossAxisAlignment: CrossAxisAlignment.Center,
                 children:
@@ -115,9 +140,34 @@ internal class CheckboxState : State<Checkbox>
                 ]
             );
 
-        return new GestureDetector(
-            onTap: e => { Widget.OnChanged?.Invoke(!Widget.Value); },
+        var bodyScale = (_hovered, _pressed) switch
+        {
+            (true, true) => 1.005f,
+            (true, false) => 1.01f,
+            _ => 1f
+        };
+        var body = new AnimatedScale
+        (
+            bodyScale,
+            TimeSpan.FromMilliseconds(140),
+            Curves.EaseOut,
             child: content
+        );
+
+        return new GestureDetector
+        (
+            onTap: e => { Widget.OnChanged?.Invoke(!Widget.Value); },
+            onEnter: _ => SetState(() => _hovered = true),
+            onExit: _ => SetState
+            (() =>
+                {
+                    _hovered = false;
+                    _pressed = false;
+                }
+            ),
+            onPress: _ => SetState(() => _pressed = true),
+            onRelease: _ => SetState(() => _pressed = false),
+            child: body
         );
     }
 

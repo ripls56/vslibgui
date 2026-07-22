@@ -72,12 +72,66 @@ public static class DebugPainter
     public static Vector2? LastPointerPos { get; set; }
     public static bool IsPointerOverInteractive { get; set; }
 
+    /// <summary>
+    ///     Paints all active debug overlays onto <paramref name="context" /> for the given
+    ///     render-object subtree. Call once per frame from <c>FramePipeline</c>. This
+    ///     overload draws no profiler panel; use the overload taking
+    ///     <see cref="PerformanceMetrics" /> and <see cref="GuiProfiler" /> for that.
+    /// </summary>
+    /// <param name="ro">Root render-object to paint debug info for.</param>
+    /// <param name="context">Painting context targeting the active Skia canvas.</param>
+    /// <param name="settings">Debug overlay flags controlling what is drawn.</param>
+    /// <param name="currentTime">Accumulated elapsed time in ms used for flash fade-outs.</param>
+    /// <param name="isActiveWindow">
+    ///     <see langword="true" /> when this window is the topmost focused window; gates
+    ///     the pointer-cursor draw so only one cursor appears.
+    /// </param>
     public static void PaintDebugInfo(
         RenderObject ro,
         PaintingContext context,
         DebugSettings settings,
         double currentTime,
         bool isActiveWindow = false
+    ) =>
+        PaintDebugInfo(
+            ro,
+            context,
+            settings,
+            currentTime,
+            isActiveWindow,
+            null,
+            null
+        );
+
+    /// <summary>
+    ///     Paints all active debug overlays, including the frametime profiler panel at the
+    ///     root when <see cref="DebugSettings.ShowProfiler" /> is set and both
+    ///     <paramref name="metrics" /> and <paramref name="profiler" /> are supplied.
+    /// </summary>
+    /// <param name="ro">Root render-object to paint debug info for.</param>
+    /// <param name="context">Painting context targeting the active Skia canvas.</param>
+    /// <param name="settings">Debug overlay flags controlling what is drawn.</param>
+    /// <param name="currentTime">Accumulated elapsed time in ms used for flash fade-outs.</param>
+    /// <param name="isActiveWindow">
+    ///     <see langword="true" /> when this window is the topmost focused window; gates
+    ///     the pointer-cursor draw so only one cursor appears.
+    /// </param>
+    /// <param name="metrics">
+    ///     Stage-timing data. When non-<see langword="null" /> together with
+    ///     <paramref name="profiler" /> and <see cref="DebugSettings.ShowProfiler" />,
+    ///     the profiler panel is drawn at the root.
+    /// </param>
+    /// <param name="profiler">
+    ///     Per-window profiler. See <paramref name="metrics" /> for draw conditions.
+    /// </param>
+    public static void PaintDebugInfo(
+        RenderObject ro,
+        PaintingContext context,
+        DebugSettings settings,
+        double currentTime,
+        bool isActiveWindow,
+        PerformanceMetrics? metrics,
+        GuiProfiler? profiler
     )
     {
         if (context.Canvas == null)
@@ -116,6 +170,15 @@ public static class DebugPainter
                 Vector4.Zero,
                 2.0f,
                 pointerColor
+            );
+        }
+
+        if (ro.Parent == null && settings.ShowProfiler && metrics != null && profiler != null)
+        {
+            PaintProfilerPanel(
+                context,
+                metrics,
+                profiler
             );
         }
 
@@ -162,7 +225,9 @@ public static class DebugPainter
                 context,
                 settings,
                 currentTime,
-                isActiveWindow
+                isActiveWindow,
+                metrics,
+                profiler
             );
             context.Canvas.Restore();
         }
@@ -197,6 +262,64 @@ public static class DebugPainter
             thickness,
             color
         );
+    }
+
+    private static void PaintProfilerPanel(
+        PaintingContext context,
+        PerformanceMetrics metrics,
+        GuiProfiler profiler
+    )
+    {
+        var lines = ProfilerOverlay.BuildLines(
+            metrics,
+            profiler,
+            5
+        );
+
+        const float lineHeight = 12f;
+        const float padding = 4f;
+        var height = lines.Count * lineHeight + padding * 2f;
+
+        context.DrawBox(
+            new Vector2(
+                4,
+                4
+            ),
+            new Vector2(
+                240,
+                height
+            ),
+            new Vector4(
+                0,
+                0,
+                0,
+                0.6f
+            ),
+            Vector4.Zero,
+            0f,
+            Vector4.Zero
+        );
+
+        var y = 4 + padding + 9f;
+        foreach (var line in lines)
+        {
+            context.DrawText(
+                line,
+                new Vector2(
+                    8,
+                    y
+                ),
+                9f,
+                new Vector4(
+                    1,
+                    1,
+                    1,
+                    0.95f
+                ),
+                "monospace"
+            );
+            y += lineHeight;
+        }
     }
 
     private static void PaintRepaintOverlay(

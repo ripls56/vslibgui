@@ -17,8 +17,10 @@ public class ItemStackTemperatureBucketTests
     }
 
     [Test]
-    public void NaNTemperature_ResolvesToColdBucket() =>
+    public void NaNTemperature_ResolvesToColdBucket()
+    {
         Assert.That(ItemStackRenderer.TemperatureToBucket(float.NaN), Is.EqualTo(0));
+    }
 
     [Test]
     public void GlowStart_IsFirstGlowingBucket()

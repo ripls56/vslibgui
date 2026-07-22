@@ -26,15 +26,6 @@ namespace Gui.Rendering;
 /// </summary>
 public class ItemStackRenderer : IPreSkiaRenderer, IDisposable
 {
-    /// <summary>
-    ///     Maps an item stack's continuously-varying visual state to a discrete bucket so that
-    ///     micro-changes share one cached render while distinct visual stages still get their own.
-    /// </summary>
-    /// <param name="world">World accessor, for values derived from game time (e.g. temperature decay).</param>
-    /// <param name="stack">The stack being cached.</param>
-    /// <returns>A bucket id folded into the cache key together with every other provider.</returns>
-    public delegate int VisualBucketProvider(IWorldAccessor world, ItemStack stack);
-
     private const int MaxCacheEntries = 8192;
 
     /// <summary>Per-bucket cap to stop spammy items from evicting unrelated cache entries via global LRU.</summary>
@@ -66,16 +57,23 @@ public class ItemStackRenderer : IPreSkiaRenderer, IDisposable
 
     private static readonly List<VisualBucketProvider> VisualBucketProviders = new();
 
+    static ItemStackRenderer()
+    {
+        IgnoreAttribute("topCrustType");
+        RegisterVisualBucket("transitionstate", static (_, stack) => ComputeTransitionBucket(stack));
+        RegisterVisualBucket("temperature", ComputeTemperatureBucket);
+    }
+
     private readonly Dictionary<ItemCacheKey, List<AttributedEntry>> _cache = new();
     private readonly ICoreClientAPI _capi;
     private readonly DummySlot _dummySlot = new();
     private readonly ClientMain _game;
-
-    private readonly Dictionary<RenderItemStack, int> _glowingSlots = new();
-    private readonly List<RenderItemStack> _glowScratch = [];
     private readonly Queue<(ItemCacheKey Key, AttributedEntry Entry)> _idleEvictionQueue = new();
     private readonly Dictionary<ItemCacheKey, List<RenderRequest>> _pendingByKey = new();
     private readonly List<RenderItemStack> _pendingListeners = [];
+
+    private readonly Dictionary<RenderItemStack, int> _glowingSlots = new();
+    private readonly List<RenderItemStack> _glowScratch = [];
 
     private readonly List<(RenderRequest Req, List<RenderRequest> Bucket, int Index)>
         _pendingSnapshot = new();
@@ -86,14 +84,6 @@ public class ItemStackRenderer : IPreSkiaRenderer, IDisposable
     private long _idleEvictionQueueRebuiltFrame = -1;
     private int _pendingCount;
     private int _totalCacheCount;
-
-    static ItemStackRenderer()
-    {
-        IgnoreAttribute("topCrustType");
-        RegisterVisualBucket("transitionstate",
-            static (_, stack) => ComputeTransitionBucket(stack));
-        RegisterVisualBucket("temperature", ComputeTemperatureBucket);
-    }
 
     public ItemStackRenderer(
         ICoreClientAPI capi
@@ -274,6 +264,15 @@ public class ItemStackRenderer : IPreSkiaRenderer, IDisposable
         IgnoredAttributesSet.CopyTo(arr);
         _ignoredAttributes = arr;
     }
+
+    /// <summary>
+    ///     Maps an item stack's continuously-varying visual state to a discrete bucket so that
+    ///     micro-changes share one cached render while distinct visual stages still get their own.
+    /// </summary>
+    /// <param name="world">World accessor, for values derived from game time (e.g. temperature decay).</param>
+    /// <param name="stack">The stack being cached.</param>
+    /// <returns>A bucket id folded into the cache key together with every other provider.</returns>
+    public delegate int VisualBucketProvider(IWorldAccessor world, ItemStack stack);
 
     /// <summary>
     ///     Registers a quantizer for a continuously-varying visual attribute. Stacks whose quantized

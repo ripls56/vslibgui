@@ -41,6 +41,6 @@ public class SlideshowCrossfade : StatelessWidget
     public override Widget Build(BuildContext context) =>
         new Stack([
             new Opacity(1f - T, new ItemStackDisplay(Outgoing, Size, Size, (int)(Size * 2))),
-            new Opacity(T, new ItemStackDisplay(Incoming, Size, Size, (int)(Size * 2)))
+            new Opacity(T, new ItemStackDisplay(Incoming, Size, Size, (int)(Size * 2))),
         ]);
 }

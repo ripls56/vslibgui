@@ -1,6 +1,4 @@
 using System;
-using Gui.Core.Framework;
-using Gui.Core.Overlay;
 using Gui.Core.Painting;
 using Gui.Rendering;
 using Gui.Widgets.Animations;
@@ -18,9 +16,9 @@ namespace Gui.Widgets.Overlay;
 ///     widget above it after the pointer has hovered for <see cref="WaitDuration" />.
 ///     The tooltip fades in and out over <see cref="FadeDuration" />.
 ///     <para>
-///         Uses <see cref="CompositedTransformTarget" />/<see cref="CompositedTransformFollower" />
-///         so the tooltip tracks the trigger's position during scrolling.
-///         Requires an <see cref="Overlay" /> ancestor (provided by <c>GuiBase</c>).
+///         Uses <see cref="AnchoredOverlay" /> to track a <see cref="CompositedTransformTarget" />
+///         via <see cref="LayerLink" /> during scrolling, automatically flipping/clamping
+///         the content to stay on screen. Requires an <see cref="Overlay" /> ancestor.
 ///     </para>
 ///     <code>
 /// new Tooltip(
@@ -261,56 +259,43 @@ internal class TooltipState : State<Tooltip>
         var size = ro?.Size ?? Vector2.Zero;
         var anchorX = Widget.AnchorX ?? size.X / 2f;
 
-        // Flip tooltip below the trigger when there is not enough room above.
         // When using the global overlay the tooltip lives in a different window,
-        // so we need screen-absolute coordinates for clamping / flip logic.
+        // so we need screen-absolute coordinates for placement.
         var globalPos = ro?.LocalToGlobal(Vector2.Zero) ?? Vector2.Zero;
         if (Widget.UseGlobalOverlay && ro != null)
         {
             globalPos += ro.GetScreenOffset();
         }
 
-        var showBelow = globalPos.Y < 200f;
-
-        var offsetY = showBelow
-            ? size.Y + Widget.VerticalGap
-            : -Widget.VerticalGap;
-        var fracY = showBelow
-            ? 0f
-            : -1f;
-
         var t = (float)Curves.EaseOut.Transform(_anim.Value);
-        var animatedOffsetY = offsetY + (showBelow ? -1f : 1f) * (1f - t) * 6f;
 
         // Read theme from the tooltip's own element context
         var theme = Element.DependOnInheritedWidgetOfExactType<Theme>();
         var colors = theme?.Data.ColorScheme ?? ThemeData.Default.ColorScheme;
 
-        return new CompositedTransformFollower(
-            _link,
-            new Vector2(
-                anchorX,
-                animatedOffsetY
-            ),
-            new ClampedTranslation(
-                globalPos.X + anchorX,
-                fracY,
-                new Opacity(
-                    t,
-                    new Container(
-                        new BoxStyle
-                        {
-                            Color = colors.Background,
-                            BorderThickness = 1f,
-                            BorderColor = colors.Border,
-                            CornerRadius = new Vector4(4f),
-                            Padding = EdgeInsets.Symmetric(
-                                5f,
-                                10f
-                            )
-                        },
-                        Widget.Content
-                    )
+        return new AnchoredOverlay(
+            globalPos.X + anchorX,
+            globalPos.Y,
+            size.Y,
+            Widget.VerticalGap,
+            OverlaySide.Top,
+            HorizontalAnchor.Center,
+            link: _link,
+            child: new Opacity(
+                t,
+                new Container(
+                    new BoxStyle
+                    {
+                        Color = colors.Background,
+                        BorderThickness = 1f,
+                        BorderColor = colors.Border,
+                        CornerRadius = new Vector4(4f),
+                        Padding = EdgeInsets.Symmetric(
+                            5f,
+                            10f
+                        )
+                    },
+                    Widget.Content
                 )
             )
         );
@@ -328,47 +313,5 @@ internal class TooltipState : State<Tooltip>
                 child: Widget.Child
             )
         );
-    }
-}
-
-/// <summary>
-///     Like <see cref="FractionalTranslation" /> but clamps the horizontal
-///     position so the child stays within the overlay bounds.
-/// </summary>
-internal class ClampedTranslation : SingleChildWidget
-{
-    public ClampedTranslation(
-        float anchorX,
-        float fractionalY,
-        Widget? child = null,
-        Framework.Key? key = null
-    ) : base(
-        child,
-        key
-    )
-    {
-        AnchorX = anchorX;
-        FractionalY = fractionalY;
-    }
-
-    /// <summary>
-    ///     Anchor X position in global/stack coordinates (the
-    ///     point the tooltip is centered on).
-    /// </summary>
-    public float AnchorX { get; }
-
-    /// <summary>Vertical fractional shift (−1 = above, 0 = below).</summary>
-    public float FractionalY { get; }
-
-    public override RenderObject CreateRenderObject() =>
-        new RenderClampedTranslation { AnchorX = AnchorX, FractionalY = FractionalY };
-
-    public override void UpdateRenderObject(
-        RenderObject renderObject
-    )
-    {
-        var ro = (RenderClampedTranslation)renderObject;
-        ro.AnchorX = AnchorX;
-        ro.FractionalY = FractionalY;
     }
 }

@@ -1,4 +1,5 @@
 using Gui.Core.Framework;
+using Gui.Rendering;
 using Gui.Widgets.Animations;
 using Gui.Widgets.Basic;
 using Gui.Widgets.Framework;
@@ -59,6 +60,29 @@ public class ButtonStyleTests
                 rb.Color == color)
             {
                 result = rb;
+            }
+
+            el.VisitChildren(Visit);
+        }
+
+        Visit(root);
+        return result;
+    }
+
+    private static Padding? FindPadding(Element root)
+    {
+        Padding? result = null;
+
+        void Visit(Element el)
+        {
+            if (result != null)
+            {
+                return;
+            }
+
+            if (el is Element we && we.Widget is Padding p)
+            {
+                result = p;
             }
 
             el.VisitChildren(Visit);
@@ -176,5 +200,21 @@ public class ButtonStyleTests
             "Override color should be present");
         Assert.That(FindRenderBoxWithColor(root, themeColor), Is.Null,
             "Theme color should not appear");
+    }
+
+    [Test]
+    public void WithCustomPadding_UsesThemePadding()
+    {
+        var customPadding = EdgeInsets.All(25);
+        var themeStyle = ButtonStyle.Default(ColorScheme.Default()) with
+        {
+            Padding = customPadding
+        };
+        var theme = new ThemeData(buttonStyle: themeStyle);
+        var (_, root) = MountTree(new Theme(theme, new Button(new SizedBox())));
+
+        var paddingWidget = FindPadding(root);
+        Assert.That(paddingWidget, Is.Not.Null);
+        Assert.That(paddingWidget.EdgeInsets, Is.EqualTo(customPadding));
     }
 }

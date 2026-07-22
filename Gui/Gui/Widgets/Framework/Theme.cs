@@ -106,23 +106,71 @@ public readonly struct ColorScheme
 }
 
 /// <summary>
-///     A set of named text styles for common typographic roles.
+///     A set of named text styles for common typographic roles, ordered from the largest
+///     (<see cref="Display" />) to the smallest (<see cref="Caption" />).
 /// </summary>
 public readonly struct TextTheme
 {
+    /// <summary>Largest style; reserved for hero / splash screen titles.</summary>
+    public TextStyle Display { get; init; }
+
+    /// <summary>Top-level screen and dialog headers.</summary>
     public TextStyle Headline { get; init; }
+
+    /// <summary>Section and card titles.</summary>
+    public TextStyle Title { get; init; }
+
+    /// <summary>Secondary headings directly beneath a title.</summary>
+    public TextStyle Subtitle { get; init; }
+
+    /// <summary>Default running text.</summary>
     public TextStyle Body { get; init; }
+
+    /// <summary>Compact text for captions, badges, and form fields.</summary>
     public TextStyle Label { get; init; }
 
+    /// <summary>Smallest, low-emphasis text for hints and metadata.</summary>
+    public TextStyle Caption { get; init; }
+
+    /// <summary>
+    ///     Builds a full typographic scale derived from <paramref name="colors" />.
+    /// </summary>
     public static TextTheme Default(ColorScheme? colors = null)
     {
         var c = colors ?? ColorScheme.Default();
         return new TextTheme
         {
+            Display =
+                new TextStyle
+                {
+                    FontSize = 30, Weight = FontWeight.Bold, Color = c.OnBackground
+                },
             Headline =
-                new TextStyle { FontSize = 24, Weight = FontWeight.Bold, Color = c.OnBackground },
-            Body = new TextStyle { FontSize = 14, Color = c.OnBackground },
-            Label = new TextStyle { FontSize = 12, Color = c.OnBackground }
+                new TextStyle
+                {
+                    FontSize = 24, Weight = FontWeight.Bold, Color = c.OnBackground
+                },
+            Title =
+                new TextStyle
+                {
+                    FontSize = 18, Weight = FontWeight.SemiBold, Color = c.OnBackground
+                },
+            Subtitle = new TextStyle
+            {
+                FontSize = 16, Color = c.OnBackground
+            },
+            Body = new TextStyle
+            {
+                FontSize = 14, Color = c.OnBackground
+            },
+            Label = new TextStyle
+            {
+                FontSize = 12, Color = c.OnBackground
+            },
+            Caption = new TextStyle
+            {
+                FontSize = 11, Color = c.OnSurfaceVariant
+            }
         };
     }
 }
@@ -163,7 +211,8 @@ public readonly struct ProgressBarStyle
     /// <summary>
     ///     Creates a default style derived from the given <paramref name="colors" />.
     /// </summary>
-    public static ProgressBarStyle Default(
+    public static ProgressBarStyle Default
+    (
         ColorScheme colors
     )
     {
@@ -254,7 +303,8 @@ public readonly struct DropdownStyle
     ///     Creates a default style derived from the given <paramref name="colors" />
     ///     and <paramref name="text" />.
     /// </summary>
-    public static DropdownStyle Default(
+    public static DropdownStyle Default
+    (
         ColorScheme colors,
         TextTheme text
     )
@@ -270,7 +320,8 @@ public readonly struct DropdownStyle
             MenuMinWidth = 150,
             VisibleItemCount = 5,
             ItemSpacing = 2,
-            MenuColor = new Vector4(
+            MenuColor = new Vector4
+            (
                 colors.SurfaceHigh.X,
                 colors.SurfaceHigh.Y,
                 colors.SurfaceHigh.Z,
@@ -278,14 +329,18 @@ public readonly struct DropdownStyle
             ),
             MenuCornerRadius = 6,
             MenuPadding = EdgeInsets.All(5),
-            ItemPadding = EdgeInsets.Symmetric(
+            ItemPadding = EdgeInsets.Symmetric
+            (
                 4,
                 8
             ),
             ItemCornerRadius = 4,
             SelectionColor = colors.StateSelected,
             HoverColor = colors.StateHover,
-            TextStyle = new TextStyle { FontSize = text.Body.FontSize, Color = colors.OnSurface },
+            TextStyle = new TextStyle
+            {
+                FontSize = text.Body.FontSize, Color = colors.OnSurface
+            },
             ChevronColor = colors.OnSurfaceVariant,
             MenuGap = 4,
             SelectionAccentColor = colors.Primary
@@ -331,7 +386,10 @@ public readonly struct CheckboxStyle
             BorderThickness = 1.5f,
             CornerRadius = 2f,
             LabelStyle =
-                new TextStyle { FontSize = text.Body.FontSize, Color = colors.OnSurface }
+                new TextStyle
+                {
+                    FontSize = text.Body.FontSize, Color = colors.OnSurface
+                }
         };
     }
 }
@@ -370,7 +428,10 @@ public readonly struct RadioButtonStyle
             BorderColor = colors.Border,
             BorderThickness = 1.5f,
             LabelStyle =
-                new TextStyle { FontSize = text.Body.FontSize, Color = colors.OnSurface }
+                new TextStyle
+                {
+                    FontSize = text.Body.FontSize, Color = colors.OnSurface
+                }
         };
     }
 }
@@ -498,7 +559,7 @@ public readonly struct ButtonStyle
     {
         return new ButtonStyle
         {
-            Padding = EdgeInsets.Symmetric(10, 20),
+            Padding = EdgeInsets.Symmetric(6, 14),
             Primary = new ButtonVariantStyle
             {
                 BackgroundColor = colors.Primary,
@@ -512,7 +573,8 @@ public readonly struct ButtonStyle
             {
                 BackgroundColor = new Vector4(0f, 0f, 0f, 0f),
                 HoverBackgroundColor = colors.StateSelected,
-                PressBackgroundColor = new Vector4(
+                PressBackgroundColor = new Vector4
+                (
                     colors.Primary.X, colors.Primary.Y, colors.Primary.Z, 0.2f
                 ),
                 BorderColor = colors.Border,
@@ -532,7 +594,8 @@ public readonly struct ButtonStyle
             {
                 BackgroundColor = new Vector4(0f, 0f, 0f, 0f),
                 HoverBackgroundColor = colors.StateHover,
-                PressBackgroundColor = new Vector4(
+                PressBackgroundColor = new Vector4
+                (
                     colors.OnSurface.X, colors.OnSurface.Y, colors.OnSurface.Z, 0.15f
                 ),
                 BorderColor = Vector4.Zero,
@@ -543,13 +606,169 @@ public readonly struct ButtonStyle
     }
 }
 
+/// <summary>Style tokens for <see cref="IconButton" />.</summary>
+public readonly struct IconButtonStyle
+{
+    /// <summary>Width and height of the button.</summary>
+    public float Size { get; init; }
+
+    /// <summary>Style tokens for <see cref="ButtonVariant.Primary" />.</summary>
+    public ButtonVariantStyle Primary { get; init; }
+
+    /// <summary>Style tokens for <see cref="ButtonVariant.Secondary" />.</summary>
+    public ButtonVariantStyle Secondary { get; init; }
+
+    /// <summary>Style tokens for <see cref="ButtonVariant.Danger" />.</summary>
+    public ButtonVariantStyle Danger { get; init; }
+
+    /// <summary>Style tokens for <see cref="ButtonVariant.Ghost" />.</summary>
+    public ButtonVariantStyle Ghost { get; init; }
+
+    /// <summary>Returns the style tokens for <paramref name="variant" />.</summary>
+    public ButtonVariantStyle this[ButtonVariant variant] => variant switch
+    {
+        ButtonVariant.Primary => Primary,
+        ButtonVariant.Secondary => Secondary,
+        ButtonVariant.Danger => Danger,
+        ButtonVariant.Ghost => Ghost,
+        _ => Primary
+    };
+
+    /// <summary>Creates the default icon-button style from <paramref name="colors" />.</summary>
+    public static IconButtonStyle Default(ColorScheme colors)
+    {
+        var buttons = ButtonStyle.Default(colors);
+
+        return new IconButtonStyle
+        {
+            Size = 40f,
+            Primary = buttons.Primary with { CornerRadius = 20f },
+            Secondary = buttons.Secondary with { CornerRadius = 20f },
+            Danger = buttons.Danger with { CornerRadius = 20f },
+            Ghost = buttons.Ghost with { CornerRadius = 20f }
+        };
+    }
+}
+
+/// <summary>
+///     Style tokens for <see cref="TextField" />: fill / border colors, dimensions,
+///     the content text style, and the text-selection highlight color.
+/// </summary>
+public readonly struct TextFieldStyle
+{
+    /// <summary>Creates a usable style from the default color scheme and text theme.</summary>
+    public TextFieldStyle() : this(ColorScheme.Default())
+    {
+    }
+
+    private TextFieldStyle(ColorScheme colors) : this(colors, TextTheme.Default(colors))
+    {
+    }
+
+    private TextFieldStyle(ColorScheme colors, TextTheme text)
+    {
+        var baseFill = new Vector4
+        (
+            colors.Background.X,
+            colors.Background.Y,
+            colors.Background.Z,
+            0.8f
+        );
+        var accentColor = colors.Primary;
+
+        FillColor = baseFill;
+        BorderColor = colors.Border;
+        BorderThickness = 1f;
+        HoverFillColor = baseFill + new Vector4(0.02f, 0.02f, 0.02f, 0f);
+        HoverBorderColor = Vector4.Lerp(colors.Border, accentColor, 0.5f);
+        FocusFillColor = baseFill + new Vector4(0.04f, 0.04f, 0.04f, 0f);
+        FocusBorderColor = accentColor;
+        DisabledFillColor = baseFill * 0.8f;
+        DisabledBorderColor = colors.Border * 0.5f;
+        DisabledTextColor = colors.OnSurfaceVariant;
+        ErrorBorderColor = colors.Error;
+        SuccessBorderColor = new Vector4(0.2f, 0.8f, 0.2f, 1f);
+        Height = 40f;
+        CornerRadius = new Vector4(4);
+        TextStyle = new TextStyle
+        {
+            FontSize = text.Body.FontSize,
+            Color = colors.OnSurface,
+            FontFamily = text.Body.FontFamily
+        };
+        SelectionColor = new Vector4(accentColor.X, accentColor.Y, accentColor.Z, 0.4f);
+        CursorColor = accentColor;
+    }
+
+    /// <summary>Fill (background) color of the field in its default state.</summary>
+    public Vector4 FillColor { get; init; }
+
+    /// <summary>Border color of the field when not focused or hovered.</summary>
+    public Vector4 BorderColor { get; init; }
+
+    /// <summary>Border thickness in pixels.</summary>
+    public float BorderThickness { get; init; }
+
+    /// <summary>Fill color when the pointer is hovering over the field.</summary>
+    public Vector4 HoverFillColor { get; init; }
+
+    /// <summary>Border color when the pointer is hovering over the field.</summary>
+    public Vector4 HoverBorderColor { get; init; }
+
+    /// <summary>Fill color when the field has keyboard focus.</summary>
+    public Vector4 FocusFillColor { get; init; }
+
+    /// <summary>Border color when the field has keyboard focus.</summary>
+    public Vector4 FocusBorderColor { get; init; }
+
+    /// <summary>Fill color when the field is disabled.</summary>
+    public Vector4 DisabledFillColor { get; init; }
+
+    /// <summary>Border color when the field is disabled.</summary>
+    public Vector4 DisabledBorderColor { get; init; }
+
+    /// <summary>Text color when the field is disabled.</summary>
+    public Vector4 DisabledTextColor { get; init; }
+
+    /// <summary>Border color when the field is in an error state.</summary>
+    public Vector4 ErrorBorderColor { get; init; }
+
+    /// <summary>Border color when the field is in a success state.</summary>
+    public Vector4 SuccessBorderColor { get; init; }
+
+    /// <summary>Fixed field height in pixels.</summary>
+    public float Height { get; init; }
+
+    /// <summary>Corner radius applied to the field box.</summary>
+    public Vector4 CornerRadius { get; init; }
+
+    /// <summary>Text style applied to the field's content.</summary>
+    public TextStyle TextStyle { get; init; }
+
+    /// <summary>Color of the text-selection highlight.</summary>
+    public Vector4 SelectionColor { get; init; }
+
+    /// <summary>Color of the blinking text cursor.</summary>
+    public Vector4 CursorColor { get; init; }
+
+    /// <summary>
+    ///     Creates a default style derived from the given <paramref name="colors" />
+    ///     and <paramref name="text" />.
+    /// </summary>
+    public static TextFieldStyle Default(ColorScheme colors, TextTheme text)
+    {
+        return new TextFieldStyle(colors, text);
+    }
+}
+
 /// <summary>
 ///     Immutable bundle of visual design tokens (colors and typography) that
 ///     can be provided to a widget subtree via <see cref="Theme" />.
 /// </summary>
 public class ThemeData
 {
-    public ThemeData(
+    public ThemeData
+    (
         ColorScheme? colorScheme = null,
         TextTheme? textTheme = null,
         ProgressBarStyle? progressBarStyle = null,
@@ -559,7 +778,9 @@ public class ThemeData
         CheckboxStyle? checkboxStyle = null,
         RadioButtonStyle? radioButtonStyle = null,
         SliderStyle? sliderStyle = null,
-        ButtonStyle? buttonStyle = null
+        ButtonStyle? buttonStyle = null,
+        TextFieldStyle? textFieldStyle = null,
+        IconButtonStyle? iconButtonStyle = null
     )
     {
         ColorScheme = colorScheme ?? ColorScheme.Default();
@@ -580,6 +801,10 @@ public class ThemeData
                       ?? SliderStyle.Default(ColorScheme);
         ButtonStyle = buttonStyle
                       ?? ButtonStyle.Default(ColorScheme);
+        TextFieldStyle = textFieldStyle
+                         ?? TextFieldStyle.Default(ColorScheme, TextTheme);
+        IconButtonStyle = iconButtonStyle
+                          ?? IconButtonStyle.Default(ColorScheme);
     }
 
     /// <summary>
@@ -616,6 +841,24 @@ public class ThemeData
     /// <summary>Style tokens for <see cref="Button" />.</summary>
     public ButtonStyle ButtonStyle { get; init; }
 
+    /// <summary>Style tokens for <see cref="IconButton" />.</summary>
+    public IconButtonStyle IconButtonStyle { get; init; }
+
+    /// <summary>Style tokens for <see cref="TextField" />.</summary>
+    public TextFieldStyle TextFieldStyle { get; init; }
+
+    /// <summary>Outline color applied to focused interactive widgets (buttons, toggles).</summary>
+    public Vector4 FocusOutlineColor { get; init; } = new Vector4
+    (
+        0.95f,
+        0.78f,
+        0.38f,
+        1f
+    );
+
+    /// <summary>Outline thickness applied to focused interactive widgets.</summary>
+    public float FocusOutlineWidth { get; init; } = 2f;
+
     /// <summary>
     ///     Convenience accessor for <see cref="DefaultNotifier" />.<c>Value</c>. Reassigning
     ///     <c>Default</c> publishes the new instance to all <see cref="ListenableBuilder" />
@@ -634,19 +877,26 @@ public class ThemeData
 ///     to its descendants. Use <see cref="Of" /> to read the current theme
 ///     from any <see cref="BuildContext" />.
 /// </summary>
-public class Theme(
+public class Theme
+(
     ThemeData data,
     Widget child,
-    Key? key = null) : InheritedWidget(child,
-    key)
+    Key? key = null
+) : InheritedWidget
+(
+    child,
+    key
+)
 {
     public ThemeData Data { get; } = data;
 
-    public override bool UpdateShouldNotify(
+    public override bool UpdateShouldNotify
+    (
         InheritedWidget oldWidget
     )
     {
-        return !ReferenceEquals(
+        return !ReferenceEquals
+        (
             Data,
             ((Theme)oldWidget).Data
         );
@@ -656,7 +906,8 @@ public class Theme(
     ///     Returns the <see cref="ThemeData" /> from the nearest <see cref="Theme" />
     ///     ancestor, or <see cref="ThemeData.Default" /> if none is found.
     /// </summary>
-    public static ThemeData Of(
+    public static ThemeData Of
+    (
         BuildContext context
     )
     {

@@ -12,6 +12,7 @@ public class DebugSettings : ChangeNotifier
     private bool _showHeatMap;
     private bool _showHud;
     private bool _showPaint;
+    private bool _showProfiler;
     private bool _showTree;
     private bool _showViolations;
     private bool _showWindow;
@@ -137,6 +138,25 @@ public class DebugSettings : ChangeNotifier
     }
 
     /// <summary>
+    ///     When enabled, draws the frametime profiler panel (stage breakdown,
+    ///     re-record frequency, top dirty initiators). Toggle with <c>/ui prof on</c>.
+    /// </summary>
+    public bool ShowProfiler
+    {
+        get => _showProfiler;
+        set
+        {
+            if (_showProfiler == value)
+            {
+                return;
+            }
+
+            _showProfiler = value;
+            NotifyListeners();
+        }
+    }
+
+    /// <summary>
     ///     Duration in milliseconds for the repaint flash overlay to fade out.
     ///     Default 500 ms. Set via <c>/ui flash &lt;ms&gt;</c>.
     /// </summary>
@@ -159,7 +179,7 @@ public class DebugSettings : ChangeNotifier
     /// <summary>Returns <see langword="true" /> if any debug flag is active.</summary>
     public bool IsAnyEnabled =>
         _showTree || _showBounds || _showPaint || _showHud || _showWindow || _showViolations ||
-        _showHeatMap;
+        _showHeatMap || _showProfiler;
 
     /// <summary>Turns off all debug flags and fires a single notification.</summary>
     public void DisableAll()
@@ -171,6 +191,7 @@ public class DebugSettings : ChangeNotifier
         _showWindow = false;
         _showViolations = false;
         _showHeatMap = false;
+        _showProfiler = false;
         NotifyListeners();
     }
 }

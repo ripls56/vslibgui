@@ -1,4 +1,5 @@
 using Gui.Core.Framework;
+using Gui.Rendering;
 
 namespace Gui.Core.Painting;
 
@@ -26,6 +27,18 @@ internal class RenderTarget : RenderProxyBox
                 _link.Target = this;
             }
         }
+    }
+
+    public override void Paint(
+        PaintingContext context
+    )
+    {
+        base.Paint(context);
+
+        // The owning window only repaints on scroll/animation, so pinging here
+        // nudges followers in other windows exactly when our position may have
+        // changed — keeping their repaint event-driven instead of per-frame.
+        _link?.NotifyMoved();
     }
 
     public override void Dispose()

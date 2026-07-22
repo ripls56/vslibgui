@@ -1,4 +1,5 @@
 using Gui.Rendering;
+using Gui.Widgets.Painting;
 using OpenTK.Mathematics;
 using SkiaSharp;
 
@@ -61,10 +62,12 @@ public class DrawingOperationsTests
         var buf = new SKPoint[4];
         paint.Style = SKPaintStyle.Fill;
 
-        DrawingOperations.DrawBorder(
+        DrawingOperations.DrawBorder
+        (
             surface.Canvas, new SKRect(0, 0, 50, 50),
             new Vector4(4), 0f, new Vector4(1, 0, 0, 1),
-            paint, rr, buf);
+            paint, rr, buf
+        );
 
         Assert.That(paint.Style, Is.EqualTo(SKPaintStyle.Fill));
     }
@@ -77,12 +80,106 @@ public class DrawingOperationsTests
         using var rr = new SKRoundRect();
         var buf = new SKPoint[4];
 
-        DrawingOperations.DrawBorder(
+        DrawingOperations.DrawBorder
+        (
             surface.Canvas, new SKRect(0, 0, 50, 50),
             new Vector4(4), 2f, new Vector4(1, 0, 0, 1),
-            paint, rr, buf);
+            paint, rr, buf
+        );
 
         Assert.That(paint.Style, Is.EqualTo(SKPaintStyle.Stroke));
         Assert.That(paint.StrokeWidth, Is.EqualTo(2f));
+    }
+
+    [Test]
+    public void DrawBorder_PerSide_PaintsEachSideColor()
+    {
+        using var bmp = new SKBitmap
+        (
+            60,
+            60,
+            SKColorType.Rgba8888,
+            SKAlphaType.Premul
+        );
+        using var canvas = new SKCanvas(bmp);
+        using var paint = new SKPaint();
+        using var outerRR = new SKRoundRect();
+        using var innerRR = new SKRoundRect();
+        var buf = new SKPoint[4];
+        canvas.Clear(SKColors.Transparent);
+
+        var border = new Border
+        (
+            Left: new BorderSide(4f, new Vector4(0, 0, 1, 1)),
+            Top: new BorderSide(4f, new Vector4(0, 1, 0, 1)),
+            Right: new BorderSide(4f, new Vector4(1, 0, 1, 1)),
+            Bottom: new BorderSide(4f, new Vector4(1, 1, 0, 1))
+        );
+
+        DrawingOperations.DrawBorder
+        (
+            canvas,
+            new SKRect(10, 10, 50, 50),
+            Vector4.Zero,
+            border,
+            paint,
+            outerRR,
+            innerRR,
+            buf
+        );
+
+        Assert.Multiple
+        (() =>
+            {
+                Assert.That(bmp.GetPixel(30, 11), Is.EqualTo(new SKColor(0, 255, 0, 255)));
+                Assert.That(bmp.GetPixel(48, 30), Is.EqualTo(new SKColor(255, 0, 255, 255)));
+                Assert.That(bmp.GetPixel(30, 48), Is.EqualTo(new SKColor(255, 255, 0, 255)));
+                Assert.That(bmp.GetPixel(11, 30), Is.EqualTo(new SKColor(0, 0, 255, 255)));
+            }
+        );
+    }
+
+    [Test]
+    public void DrawBorder_PerSide_ZeroWidthSideLeavesGap()
+    {
+        using var bmp = new SKBitmap
+        (
+            60,
+            60,
+            SKColorType.Rgba8888,
+            SKAlphaType.Premul
+        );
+        using var canvas = new SKCanvas(bmp);
+        using var paint = new SKPaint();
+        using var outerRR = new SKRoundRect();
+        using var innerRR = new SKRoundRect();
+        var buf = new SKPoint[4];
+        canvas.Clear(SKColors.Transparent);
+
+        var border = Border.Only
+        (
+            top: new BorderSide(4f, new Vector4(0, 1, 0, 1))
+        );
+
+        DrawingOperations.DrawBorder
+        (
+            canvas,
+            new SKRect(10, 10, 50, 50),
+            Vector4.Zero,
+            border,
+            paint,
+            outerRR,
+            innerRR,
+            buf
+        );
+
+        Assert.Multiple
+        (() =>
+            {
+                Assert.That(bmp.GetPixel(30, 11).Green, Is.EqualTo(255));
+                Assert.That(bmp.GetPixel(30, 48).Alpha, Is.EqualTo(0));
+                Assert.That(bmp.GetPixel(11, 30).Alpha, Is.EqualTo(0));
+            }
+        );
     }
 }

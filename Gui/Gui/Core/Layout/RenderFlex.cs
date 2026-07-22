@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Gui.Core.Framework;
 using Gui.Widgets.Framework;
 using Gui.Widgets.Layout;
@@ -23,45 +24,65 @@ public enum MainAxisSize
 
 public class RenderFlex : RenderBox
 {
+    /// <summary>The main axis direction of this flex container.</summary>
     public FlexDirection Direction
     {
         get;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref field,
             value,
             relayout: true
         );
     }
 
+    /// <summary>Gap in logical pixels between adjacent children along the main axis.</summary>
     public float Spacing
     {
         get;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref field,
             value,
             relayout: true
         );
     }
 
+    /// <summary>How children are distributed along the main axis.</summary>
     public MainAxisAlignment MainAxisAlignment
     {
         get;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref field,
             value,
             relayout: true
         );
     } = MainAxisAlignment.Start;
 
+    /// <summary>How children are aligned perpendicular to the main axis.</summary>
     public CrossAxisAlignment CrossAxisAlignment
     {
         get;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref field,
             value,
             relayout: true
         );
     } = CrossAxisAlignment.Center;
+
+    /// <summary>Baseline type used when <see cref="CrossAxisAlignment"/> is <see cref="CrossAxisAlignment.Baseline"/>.</summary>
+    public TextBaseline TextBaseline
+    {
+        get;
+        set => SetProperty
+        (
+            ref field,
+            value,
+            relayout: true
+        );
+    } = TextBaseline.Alphabetic;
 
     /// <summary>
     ///     Controls whether the flex container expands to fill available main-axis
@@ -71,14 +92,16 @@ public class RenderFlex : RenderBox
     public MainAxisSize MainAxisSize
     {
         get;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref field,
             value,
             relayout: true
         );
     } = MainAxisSize.Max;
 
-    private int GetFlex(
+    private int GetFlex
+    (
         RenderObject child
     )
     {
@@ -90,7 +113,8 @@ public class RenderFlex : RenderBox
         return 0;
     }
 
-    private FlexFit GetFlexFit(
+    private FlexFit GetFlexFit
+    (
         RenderObject child
     )
     {
@@ -109,7 +133,6 @@ public class RenderFlex : RenderBox
         float totalFixedMainSize = 0;
         float maxCrossSize = 0;
 
-        // 1. Identifying and laying out fixed children
         foreach (var child in Children)
         {
             var flex = GetFlex(child);
@@ -119,7 +142,8 @@ public class RenderFlex : RenderBox
             }
             else
             {
-                maxCrossSize = LayoutFixedChild(
+                maxCrossSize = LayoutFixedChild
+                (
                     child,
                     isHorizontal,
                     ref totalFixedMainSize,
@@ -128,7 +152,8 @@ public class RenderFlex : RenderBox
             }
         }
 
-        var totalSpacing = Spacing * Math.Max(
+        var totalSpacing = Spacing * Math.Max
+        (
             0,
             Children.Count - 1
         );
@@ -136,21 +161,24 @@ public class RenderFlex : RenderBox
         var availableMainSize = isHorizontal
             ? Constraints.MaxWidth
             : Constraints.MaxHeight;
-        var remainingMainSize = Math.Max(
+        var remainingMainSize = Math.Max
+        (
             0,
             availableMainSize - totalMainSizeUsed
         );
 
-        // 2. Layout flexible children
         if (totalFlex > 0)
         {
             if (float.IsPositiveInfinity(availableMainSize))
             {
-                throw new InvalidOperationException(
-                    $"RenderFlex children have non-zero flex but incoming {(isHorizontal ? "width" : "height")} constraints are unbounded.");
+                throw new InvalidOperationException
+                (
+                    $"RenderFlex children have non-zero flex but incoming {(isHorizontal ? "width" : "height")} constraints are unbounded."
+                );
             }
 
-            var actualFlexMainSize = LayoutFlexibleChildren(
+            var actualFlexMainSize = LayoutFlexibleChildren
+            (
                 isHorizontal,
                 totalFlex,
                 remainingMainSize,
@@ -159,28 +187,37 @@ public class RenderFlex : RenderBox
             totalMainSizeUsed += actualFlexMainSize;
         }
 
+        List<float>? baselines = null;
+        if (isHorizontal && CrossAxisAlignment == CrossAxisAlignment.Baseline)
+        {
+            baselines = CollectChildBaselines();
+            maxCrossSize = ComputeBaselineCrossSize(baselines);
+        }
+
         var containerMainSize = MainAxisSize == MainAxisSize.Max
                                 && !float.IsPositiveInfinity(availableMainSize)
             ? availableMainSize
             : totalMainSizeUsed;
         var finalSize = isHorizontal
-            ? new Vector2(
+            ? new Vector2
+            (
                 containerMainSize,
                 maxCrossSize
             )
-            : new Vector2(
+            : new Vector2
+            (
                 maxCrossSize,
                 containerMainSize
             );
 
         Size = Constraints.Constrain(finalSize);
 
-        // Check for overflow
         if (totalMainSizeUsed > availableMainSize + 0.001f &&
             !float.IsPositiveInfinity(availableMainSize))
         {
-            ReportLayoutViolation(
-                $"RenderFlex overflowed by {totalMainSizeUsed - availableMainSize:F1}px " +
+            ReportLayoutViolation
+            (
+                $"Widget {OwnerElement?.Widget} RenderFlex overflowed by {totalMainSizeUsed - availableMainSize:F1}px " +
                 $"on the {Direction} axis. " +
                 $"Available: {availableMainSize:F1}px, Used: {totalMainSizeUsed:F1}px. " +
                 $"Consider using Expanded, Flexible, or wrapping in a SingleChildScrollView."
@@ -195,14 +232,16 @@ public class RenderFlex : RenderBox
             actualRemainingMainSpace = 0;
         }
 
-        // 3. Position children
-        PositionChildren(
+        PositionChildren
+        (
             isHorizontal,
-            actualRemainingMainSpace
+            actualRemainingMainSpace,
+            baselines
         );
     }
 
-    private float LayoutFixedChild(
+    private float LayoutFixedChild
+    (
         RenderObject child,
         bool isHorizontal,
         ref float accumulatedMainSize,
@@ -220,7 +259,8 @@ public class RenderFlex : RenderBox
                 minCross = 0;
             }
 
-            childConstraints = new LayoutConstraints(
+            childConstraints = new LayoutConstraints
+            (
                 0,
                 Constraints.MaxWidth,
                 minCross,
@@ -237,7 +277,8 @@ public class RenderFlex : RenderBox
                 minCross = 0;
             }
 
-            childConstraints = new LayoutConstraints(
+            childConstraints = new LayoutConstraints
+            (
                 minCross,
                 Constraints.MaxWidth,
                 0,
@@ -249,7 +290,8 @@ public class RenderFlex : RenderBox
         accumulatedMainSize += isHorizontal
             ? child.Size.X
             : child.Size.Y;
-        return Math.Max(
+        return Math.Max
+        (
             maxCrossSize,
             isHorizontal
                 ? child.Size.Y
@@ -257,9 +299,8 @@ public class RenderFlex : RenderBox
         );
     }
 
-    // Returns the actual main-axis size consumed by all flex children combined.
-    // maxCrossSize is updated in place.
-    private float LayoutFlexibleChildren(
+    private float LayoutFlexibleChildren
+    (
         bool isHorizontal,
         float totalFlex,
         float remainingMainSize,
@@ -284,14 +325,17 @@ public class RenderFlex : RenderBox
                 if (fit == FlexFit.Tight)
                 {
                     childConstraints = CrossAxisAlignment == CrossAxisAlignment.Stretch
-                        ? LayoutConstraints.Tight(
+                        ? LayoutConstraints.Tight
+                        (
                             flexPixels,
                             Constraints.MaxHeight
                         )
                         : LayoutConstraints
                             .TightFor(flexPixels)
-                            .Enforce(
-                                LayoutConstraints.Loose(
+                            .Enforce
+                            (
+                                LayoutConstraints.Loose
+                                (
                                     flexPixels,
                                     Constraints.MaxHeight
                                 )
@@ -307,7 +351,8 @@ public class RenderFlex : RenderBox
                         crossMin = 0;
                     }
 
-                    childConstraints = new LayoutConstraints(
+                    childConstraints = new LayoutConstraints
+                    (
                         0,
                         flexPixels,
                         crossMin,
@@ -320,14 +365,17 @@ public class RenderFlex : RenderBox
                 if (fit == FlexFit.Tight)
                 {
                     childConstraints = CrossAxisAlignment == CrossAxisAlignment.Stretch
-                        ? LayoutConstraints.Tight(
+                        ? LayoutConstraints.Tight
+                        (
                             Constraints.MaxWidth,
                             flexPixels
                         )
                         : LayoutConstraints
                             .TightFor(height: flexPixels)
-                            .Enforce(
-                                LayoutConstraints.Loose(
+                            .Enforce
+                            (
+                                LayoutConstraints.Loose
+                                (
                                     Constraints.MaxWidth,
                                     flexPixels
                                 )
@@ -343,7 +391,8 @@ public class RenderFlex : RenderBox
                         crossMin = 0;
                     }
 
-                    childConstraints = new LayoutConstraints(
+                    childConstraints = new LayoutConstraints
+                    (
                         crossMin,
                         Constraints.MaxWidth,
                         0,
@@ -356,7 +405,8 @@ public class RenderFlex : RenderBox
             actualFlexMainSize += isHorizontal
                 ? child.Size.X
                 : child.Size.Y;
-            maxCrossSize = Math.Max(
+            maxCrossSize = Math.Max
+            (
                 maxCrossSize,
                 isHorizontal
                     ? child.Size.Y
@@ -367,13 +417,16 @@ public class RenderFlex : RenderBox
         return actualFlexMainSize;
     }
 
-    public override float GetMinIntrinsicWidth(
+    /// <inheritdoc />
+    public override float GetMinIntrinsicWidth
+    (
         float height
     )
     {
         if (Direction == FlexDirection.Horizontal)
         {
-            var total = Spacing * Math.Max(
+            var total = Spacing * Math.Max
+            (
                 0,
                 Children.Count - 1
             );
@@ -388,7 +441,8 @@ public class RenderFlex : RenderBox
         float max = 0;
         foreach (var child in Children)
         {
-            max = Math.Max(
+            max = Math.Max
+            (
                 max,
                 child.GetMinIntrinsicWidth(height)
             );
@@ -397,13 +451,16 @@ public class RenderFlex : RenderBox
         return max;
     }
 
-    public override float GetMaxIntrinsicWidth(
+    /// <inheritdoc />
+    public override float GetMaxIntrinsicWidth
+    (
         float height
     )
     {
         if (Direction == FlexDirection.Horizontal)
         {
-            var total = Spacing * Math.Max(
+            var total = Spacing * Math.Max
+            (
                 0,
                 Children.Count - 1
             );
@@ -418,7 +475,8 @@ public class RenderFlex : RenderBox
         float max = 0;
         foreach (var child in Children)
         {
-            max = Math.Max(
+            max = Math.Max
+            (
                 max,
                 child.GetMaxIntrinsicWidth(height)
             );
@@ -427,13 +485,16 @@ public class RenderFlex : RenderBox
         return max;
     }
 
-    public override float GetMinIntrinsicHeight(
+    /// <inheritdoc />
+    public override float GetMinIntrinsicHeight
+    (
         float width
     )
     {
         if (Direction == FlexDirection.Vertical)
         {
-            var total = Spacing * Math.Max(
+            var total = Spacing * Math.Max
+            (
                 0,
                 Children.Count - 1
             );
@@ -448,7 +509,8 @@ public class RenderFlex : RenderBox
         float max = 0;
         foreach (var child in Children)
         {
-            max = Math.Max(
+            max = Math.Max
+            (
                 max,
                 child.GetMinIntrinsicHeight(width)
             );
@@ -457,14 +519,18 @@ public class RenderFlex : RenderBox
         return max;
     }
 
-    public override float GetMaxIntrinsicHeight(
+    /// <inheritdoc />
+    public override float GetMaxIntrinsicHeight
+    (
         float width
     ) =>
         GetMinIntrinsicHeight(width);
 
-    private void PositionChildren(
+    private void PositionChildren
+    (
         bool isHorizontal,
-        float actualRemainingMainSpace
+        float actualRemainingMainSpace,
+        List<float>? baselines
     )
     {
         float currentPos = 0;
@@ -495,6 +561,17 @@ public class RenderFlex : RenderBox
                 break;
         }
 
+        if (isHorizontal && CrossAxisAlignment == CrossAxisAlignment.Baseline)
+        {
+            PositionChildrenBaseline
+            (
+                currentPos,
+                gap,
+                baselines!
+            );
+            return;
+        }
+
         foreach (var child in Children)
         {
             var freeCrossSpace = (isHorizontal
@@ -522,6 +599,67 @@ public class RenderFlex : RenderBox
                 child.Y = currentPos;
                 currentPos += child.Size.Y + gap;
             }
+        }
+    }
+
+    private float ComputeBaselineCrossSize(List<float> baselines)
+    {
+        float maxBaseline = 0;
+        float maxBelow = 0;
+        for (var i = 0; i < Children.Count; i++)
+        {
+            var b = baselines[i];
+            maxBaseline = Math.Max
+            (
+                maxBaseline,
+                b
+            );
+            maxBelow = Math.Max
+            (
+                maxBelow,
+                Children[i].Size.Y - b
+            );
+        }
+
+        return maxBaseline + maxBelow;
+    }
+
+    private List<float> CollectChildBaselines()
+    {
+        var baselines = new List<float>(Children.Count);
+        foreach (var child in Children)
+        {
+            var b = child.GetDistanceToBaseline(TextBaseline) ?? child.Size.Y;
+            baselines.Add(b);
+        }
+
+        return baselines;
+    }
+
+    private void PositionChildrenBaseline
+    (
+        float startPos,
+        float gap,
+        List<float> baselines
+    )
+    {
+        float maxBaseline = 0;
+        for (var i = 0; i < Children.Count; i++)
+        {
+            maxBaseline = Math.Max
+            (
+                maxBaseline,
+                baselines[i]
+            );
+        }
+
+        var currentPos = startPos;
+        for (var i = 0; i < Children.Count; i++)
+        {
+            var child = Children[i];
+            child.X = currentPos;
+            child.Y = maxBaseline - baselines[i];
+            currentPos += child.Size.X + gap;
         }
     }
 }

@@ -15,6 +15,18 @@ public class GuiConfig
     ///     omitted fields keep their default values.
     /// </summary>
     public ThemeSection? Theme { get; set; }
+
+    /// <summary>
+    ///     User-defined theme overrides layered on top of the selected preset.
+    ///     Null means no custom overrides (preset applies unchanged).
+    /// </summary>
+    public Gui.Theming.ThemeOverridesSection? Custom { get; set; }
+
+    /// <summary>
+    ///     True once the player has completed first-run onboarding. When false, the settings
+    ///     window is opened automatically on world entry.
+    /// </summary>
+    public bool Onboarded { get; set; }
 }
 
 /// <summary>

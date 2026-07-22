@@ -17,6 +17,7 @@ public class BuildOwner
 {
     private readonly List<Element> _buildBuffer = [];
     private readonly HashSet<Element> _dirtyElements = [];
+    private readonly List<(Element Element, Exception Ex)> _pendingErrors = [];
     private readonly Dictionary<GlobalKey, Element> _globalKeys = new();
     private IClipboard? _clipboard;
     private ISoundPlayer? _soundPlayer;
@@ -164,14 +165,46 @@ public class BuildOwner
                     }
                     catch (Exception ex)
                     {
-                        OnError?.Invoke(
-                            element,
-                            ex
-                        );
+                        OnError?.Invoke(element, ex);
+                        _pendingErrors.Add((element, ex));
                     }
                 }
             }
+
+            foreach (var (failedEl, ex) in _pendingErrors)
+            {
+                var boundary = FindErrorBoundaryAncestor(failedEl);
+                if (boundary != null)
+                {
+                    ((ErrorBoundaryState)boundary.State).MarkError(ex);
+                }
+                else
+                {
+                    failedEl.PendingError = ex;
+                    failedEl.MarkNeedsBuild();
+                }
+            }
+
+            _pendingErrors.Clear();
         }
+    }
+
+    private static StatefulElement? FindErrorBoundaryAncestor(
+        Element element
+    )
+    {
+        var ancestor = element.Parent;
+        while (ancestor != null)
+        {
+            if (ancestor is StatefulElement se && se.State is ErrorBoundaryState)
+            {
+                return se;
+            }
+
+            ancestor = ancestor.Parent;
+        }
+
+        return null;
     }
 }
 

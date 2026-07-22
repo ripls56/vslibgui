@@ -6,8 +6,10 @@ namespace Gui.Tests.Widgets.Inventory;
 public class SlideshowIndexTests
 {
     [Test]
-    public void At_SingleElement_ReturnsZero() =>
+    public void At_SingleElement_ReturnsZero()
+    {
         Assert.That(SlideshowIndex.At(5000, 1), Is.EqualTo(0));
+    }
 
     [Test]
     public void At_CyclesOncePerSecond()

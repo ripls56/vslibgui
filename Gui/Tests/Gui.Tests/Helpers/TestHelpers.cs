@@ -17,6 +17,43 @@ internal static class TestHelpers
         return owner;
     }
 
+    /// <summary>Mounts a widget and flushes its initial build.</summary>
+    internal static Element Mount(Widget widget, ThemeData? theme = null)
+    {
+        widget = theme == null ? widget : new Theme(theme, widget);
+        var owner = NewBuildOwner();
+        var root = widget.CreateElement();
+        root.AssignOwner(owner);
+        root.Mount(null);
+        owner.BuildDirtyElements();
+        return root;
+    }
+
+    /// <summary>Finds the first widget of type <typeparamref name="T"/>.</summary>
+    internal static T? FindWidget<T>(Element root) where T : Widget
+    {
+        return FindElement<T>(root)?.Widget as T;
+    }
+
+    /// <summary>Finds the first element whose widget has type <typeparamref name="T"/>.</summary>
+    internal static Element? FindElement<T>(Element root) where T : Widget
+    {
+        if (root.Widget is T)
+        {
+            return root;
+        }
+
+        Element? found = null;
+        root.VisitChildren(child =>
+        {
+            if (found == null)
+            {
+                found = FindElement<T>(child);
+            }
+        });
+        return found;
+    }
+
     /// <summary>
     ///     Walks the element tree depth-first and returns the first
     ///     <see cref="RenderRichText" /> render object found, or null.

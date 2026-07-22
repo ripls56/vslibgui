@@ -4,6 +4,7 @@ using Gui.Core.Painting;
 using Gui.Rendering.Text;
 using Gui.Widgets.Animations;
 using Gui.Widgets.Basic;
+using Gui.Widgets.Events;
 using Gui.Widgets.Framework;
 using Gui.Widgets.Gestures;
 using Gui.Widgets.Layout;
@@ -27,7 +28,8 @@ public class DropdownItem<T>
 /// </summary>
 public class Dropdown<T> : StatefulWidget
 {
-    public Dropdown(
+    public Dropdown
+    (
         T value,
         List<DropdownItem<T>> items,
         Action<T>? onChanged = null,
@@ -62,14 +64,14 @@ public class Dropdown<T> : StatefulWidget
     public int? VisibleItemCount { get; }
 
     /// <summary>
-    ///     Per-widget style override. Falls back to <see cref="Theme.DropdownStyle" /> when null.
+    ///     Per-widget style override. Falls back to <see cref="ThemeData.DropdownStyle" /> when null.
     /// </summary>
     public DropdownStyle? Style { get; }
 
     public override State CreateState() => new DropdownState<T>();
 }
 
-internal class DropdownState<T> : State<Dropdown<T>>
+internal class DropdownState<T> : FocusableState<Dropdown<T>>, IActivatable
 {
     private readonly LayerLink _link = new();
     private readonly ScrollController _scrollController = new();
@@ -77,10 +79,13 @@ internal class DropdownState<T> : State<Dropdown<T>>
     private bool _isOpen;
     private OverlayEntry? _overlayEntry;
 
+    /// <inheritdoc />
+    public void Activate() => Toggle(new BuildContext(Widget, Element));
+
     private DropdownStyle _getStyle(BuildContext context) =>
         Widget.Style ?? Theme.Of(context).DropdownStyle;
 
-    private float _menuMaxHeight(DropdownStyle style)
+    private float MenuMaxHeight(DropdownStyle style)
     {
         var visibleCount = Widget.VisibleItemCount ?? style.VisibleItemCount;
         var count = Math.Min(Widget.Items.Count, visibleCount);
@@ -92,12 +97,13 @@ internal class DropdownState<T> : State<Dropdown<T>>
         var itemHeight = style.ItemPadding.Vertical + style.TextStyle.FontSize;
         return count * itemHeight
                + (count - 1) * style.ItemSpacing
-               + style.MenuPadding.Vertical;
+               + style.MenuPadding.Vertical + style.MenuPadding.Vertical / 2;
     }
 
-    private Widget _buildMenu(DropdownStyle style)
+    private Container BuildMenu(DropdownStyle style)
     {
-        return new Container(
+        return new Container
+        (
             new BoxStyle
             {
                 Color = style.MenuColor,
@@ -106,22 +112,27 @@ internal class DropdownState<T> : State<Dropdown<T>>
                 CornerRadius = new Vector4(style.MenuCornerRadius),
                 Padding = style.MenuPadding
             },
-            new ConstrainedBox(
-                new LayoutConstraints(maxHeight: _menuMaxHeight(style)),
-                new SingleChildScrollView(
+            new ConstrainedBox
+            (
+                new LayoutConstraints(maxHeight: MenuMaxHeight(style)),
+                new SingleChildScrollView
+                (
                     controller: _scrollController,
-                    child: new Column(
+                    child: new Column
+                    (
                         style.ItemSpacing,
                         crossAxisAlignment: CrossAxisAlignment.Stretch,
-                        children: Widget.Items.ConvertAll(item =>
-                            (Widget)new DropdownItemTile<T>(
+                        children: Widget.Items.ConvertAll
+                        (item =>
+                            (Widget)new DropdownItemTile<T>
+                            (
                                 item,
                                 item.Value!.Equals(Widget.Value),
                                 style,
                                 () =>
                                 {
                                     Widget.OnChanged?.Invoke(item.Value);
-                                    _close();
+                                    Close();
                                 }
                             )
                         )
@@ -131,19 +142,19 @@ internal class DropdownState<T> : State<Dropdown<T>>
         );
     }
 
-    private void _toggle(BuildContext context)
+    private void Toggle(BuildContext context)
     {
         if (_isOpen)
         {
-            _close();
+            Close();
         }
         else
         {
-            _open(context);
+            Open(context);
         }
     }
 
-    private void _open(BuildContext context)
+    private void Open(BuildContext context)
     {
         if (_isOpen)
         {
@@ -157,22 +168,32 @@ internal class DropdownState<T> : State<Dropdown<T>>
         }
 
         var style = _getStyle(context);
-        var size = Element.RenderObject!.Size;
+        var ro = Element.RenderObject!;
+        var size = ro.Size;
+        var globalPos = ro.LocalToGlobal(Vector2.Zero) + ro.GetScreenOffset();
 
-        _scrollToSelected(style);
+        ScrollToSelected(style);
 
-        Widget menu = new SizedBox(
+        Widget menu = new SizedBox
+        (
             Widget.Width ?? size.X,
-            child: new DropdownMenu(_buildMenu(style))
+            child: new DropdownMenu(BuildMenu(style))
         );
 
-        _barrierEntry = new OverlayEntry(_buildBarrier());
+        _barrierEntry = new OverlayEntry(BuildBarrier());
 
-        _overlayEntry = new OverlayEntry(
-            new CompositedTransformFollower(
-                _link,
-                new Vector2(0, size.Y + style.MenuGap),
-                menu
+        _overlayEntry = new OverlayEntry
+        (
+            new AnchoredOverlay
+            (
+                globalPos.X,
+                globalPos.Y,
+                size.Y,
+                style.MenuGap,
+                OverlaySide.Bottom,
+                HorizontalAnchor.Start,
+                link: _link,
+                child: menu
             )
         );
 
@@ -181,21 +202,29 @@ internal class DropdownState<T> : State<Dropdown<T>>
         SetState(() => _isOpen = true);
     }
 
-    private Widget _buildBarrier()
+    private Positioned BuildBarrier()
     {
-        return new Positioned(
+        return new Positioned
+        (
             0,
             0,
             0,
             0,
-            child: new GestureDetector(
-                onTap: _ => _close(),
-                child: new Container(new BoxStyle { HitTestBehavior = HitTestBehavior.Opaque })
+            child: new GestureDetector
+            (
+                onTap: _ => Close(),
+                child: new Container
+                (
+                    new BoxStyle
+                    {
+                        HitTestBehavior = HitTestBehavior.Opaque
+                    }
+                )
             )
         );
     }
 
-    private void _scrollToSelected(DropdownStyle style)
+    private void ScrollToSelected(DropdownStyle style)
     {
         var idx = Widget.Items.FindIndex(i => i.Value!.Equals(Widget.Value));
         if (idx < 0)
@@ -205,7 +234,7 @@ internal class DropdownState<T> : State<Dropdown<T>>
 
         var itemHeight = style.ItemPadding.Vertical + style.TextStyle.FontSize;
         var itemOffset = idx * (itemHeight + style.ItemSpacing);
-        var menuInnerHeight = _menuMaxHeight(style) - style.MenuPadding.Vertical;
+        var menuInnerHeight = MenuMaxHeight(style) - style.MenuPadding.Vertical;
 
         var viewStart = _scrollController.Offset;
         var viewEnd = viewStart + menuInnerHeight;
@@ -228,7 +257,7 @@ internal class DropdownState<T> : State<Dropdown<T>>
         _scrollController.JumpTo(Math.Max(0, scrollTo));
     }
 
-    private void _close()
+    private void Close()
     {
         if (!_isOpen)
         {
@@ -244,40 +273,57 @@ internal class DropdownState<T> : State<Dropdown<T>>
 
     public override Widget Build(BuildContext context)
     {
+        var theme = Theme.Of(context);
         var style = _getStyle(context);
+        var focused = FocusNode.ShowsFocusIndicator;
         var label = Widget.Items.Find(i => i.Value!.Equals(Widget.Value))?.Label ?? "Select...";
 
-        return new CompositedTransformTarget(
+        return new CompositedTransformTarget
+        (
             _link,
-            new GestureDetector(
-                onTap: e => _toggle(context),
-                child: new Container(
+            new GestureDetector
+            (
+                onTap: e => Toggle(context),
+                child: new Container
+                (
                     new BoxStyle
                     {
                         Width = Widget.Width,
                         Height = style.ButtonHeight,
                         Color = style.ButtonColor,
-                        BorderThickness = style.BorderThickness,
-                        BorderColor = style.BorderColor,
+                        BorderThickness = focused
+                            ? theme.FocusOutlineWidth
+                            : style.BorderThickness,
+                        BorderColor = focused
+                            ? theme.FocusOutlineColor
+                            : style.BorderColor,
                         CornerRadius = new Vector4(style.ButtonCornerRadius),
                         Padding = style.ButtonPadding
                     },
-                    new Center(
-                        new Row(
+                    new Center
+                    (
+                        new Row
+                        (
                             mainAxisAlignment: MainAxisAlignment.SpaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.Center,
                             children:
                             [
-                                new Expanded(
+                                new Expanded
+                                (
                                     new Text(label, style.TextStyle)
                                 ),
-                                new AnimatedRotation(
+                                new AnimatedRotation
+                                (
                                     _isOpen ? MathF.PI : 0f,
                                     TimeSpan.FromMilliseconds(150),
                                     Curves.EaseOut,
-                                    child: new Text(
+                                    child: new Text
+                                    (
                                         "▼",
-                                        style.TextStyle with { Color = style.ChevronColor }
+                                        style.TextStyle with
+                                        {
+                                            Color = style.ChevronColor
+                                        }
                                     )
                                 )
                             ]
@@ -290,7 +336,7 @@ internal class DropdownState<T> : State<Dropdown<T>>
 
     public override void Dispose()
     {
-        _close();
+        Close();
         _scrollController.Dispose();
         base.Dispose();
     }
@@ -298,7 +344,8 @@ internal class DropdownState<T> : State<Dropdown<T>>
 
 internal class DropdownItemTile<T> : StatefulWidget
 {
-    public DropdownItemTile(
+    public DropdownItemTile
+    (
         DropdownItem<T> item,
         bool isSelected,
         DropdownStyle style,
@@ -336,11 +383,13 @@ internal class DropdownItemTileState<T> : State<DropdownItemTile<T>>
             ? style.SelectionAccentColor
             : style.TextStyle.Color;
 
-        return new GestureDetector(
+        return new GestureDetector
+        (
             onTap: _ => Widget.OnTap(),
             onEnter: _ => SetState(() => _isHovered = true),
             onExit: _ => SetState(() => _isHovered = false),
-            child: new AnimatedContainer(
+            child: new AnimatedContainer
+            (
                 duration: TimeSpan.FromMilliseconds(150),
                 curve: Curves.EaseOut,
                 style: new BoxStyle
@@ -349,7 +398,8 @@ internal class DropdownItemTileState<T> : State<DropdownItemTile<T>>
                     Padding = style.ItemPadding,
                     CornerRadius = new Vector4(style.ItemCornerRadius)
                 },
-                child: new Text(
+                child: new Text
+                (
                     Widget.Item.Label,
                     style.TextStyle with
                     {
@@ -367,7 +417,8 @@ internal class DropdownItemTileState<T> : State<DropdownItemTile<T>>
 /// </summary>
 internal class DropdownMenu : StatefulWidget
 {
-    public DropdownMenu(
+    public DropdownMenu
+    (
         Widget child
     )
     {
@@ -386,7 +437,8 @@ internal class DropdownMenuState : State<DropdownMenu>
     public override void InitState()
     {
         base.InitState();
-        _anim = new AnimationController(
+        _anim = new AnimationController
+        (
             TimeSpan.FromMilliseconds(140),
             Element.Owner!.GetTickerProvider()
         );
@@ -401,19 +453,23 @@ internal class DropdownMenuState : State<DropdownMenu>
         base.Dispose();
     }
 
-    private void _onTick(
+    private void _onTick
+    (
         double value
     ) =>
         SetState(() => { });
 
-    public override Widget Build(
+    public override Widget Build
+    (
         BuildContext context
     )
     {
         var t = (float)Curves.EaseOut.Transform(_anim.Value);
-        return new Opacity(
+        return new Opacity
+        (
             t,
-            Transform.ScaleXy(
+            Transform.ScaleXy
+            (
                 Widget.Child,
                 1f,
                 0.85f + 0.15f * t,

@@ -38,7 +38,7 @@ public enum TextDecoration
 }
 
 /// <summary>
-///     Immutable description of text appearance passed to <see cref="Gui.Widgets.RichText" />
+///     Immutable description of text appearance passed to <see cref="Gui.Widgets.Basic.RichText" />
 ///     and related text-rendering widgets.
 /// </summary>
 public struct TextStyle : IEquatable<TextStyle>
@@ -168,4 +168,33 @@ public struct TextStyle : IEquatable<TextStyle>
 
     /// <summary>Returns <see langword="true" /> if the styles differ.</summary>
     public static bool operator !=(TextStyle left, TextStyle right) => !left.Equals(right);
+
+    /// <summary>
+    ///     Creates a new <see cref="TextStyle" /> by merging this style with
+    ///     <paramref name="other" />. Fields in this style that differ from
+    ///     their default values take precedence over <paramref name="other" />.
+    /// </summary>
+    public TextStyle Merge(TextStyle other)
+    {
+        var defaults = new TextStyle();
+        return new TextStyle
+        {
+            FontFamily = FontFamily != defaults.FontFamily ? FontFamily : other.FontFamily,
+            FontSize = !FontSize.Equals(defaults.FontSize) ? FontSize : other.FontSize,
+            Color = Color != defaults.Color ? Color : other.Color,
+            Weight = Weight != defaults.Weight ? Weight : other.Weight,
+            Align = Align != defaults.Align ? Align : other.Align,
+            Overflow = Overflow != defaults.Overflow ? Overflow : other.Overflow,
+            OutlineWidth =
+                !OutlineWidth.Equals(defaults.OutlineWidth) ? OutlineWidth : other.OutlineWidth,
+            OutlineColor =
+                OutlineColor != defaults.OutlineColor ? OutlineColor : other.OutlineColor,
+            GlowWidth = !GlowWidth.Equals(defaults.GlowWidth) ? GlowWidth : other.GlowWidth,
+            GlowColor = GlowColor != defaults.GlowColor ? GlowColor : other.GlowColor,
+            Boldness = !Boldness.Equals(defaults.Boldness) ? Boldness : other.Boldness,
+            SoftWrap = SoftWrap != defaults.SoftWrap ? SoftWrap : other.SoftWrap,
+            Decoration = Decoration != defaults.Decoration ? Decoration : other.Decoration,
+            MaxLines = MaxLines != defaults.MaxLines ? MaxLines : other.MaxLines
+        };
+    }
 }

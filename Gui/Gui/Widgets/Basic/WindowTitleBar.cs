@@ -26,7 +26,7 @@ namespace Gui.Widgets.Basic;
 /// </code>
 ///     </para>
 ///     <para>
-///         The minimize button toggles <see cref="IsMinimized" /> state, hiding
+///         The minimize button toggles <c>_isMinimized</c> state, hiding
 ///         the sibling content. Use <see cref="WindowTitleBar" /> inside a
 ///         <see cref="WindowFrame" /> for automatic minimize support, or manage
 ///         visibility yourself based on the <paramref name="onMinimizeChanged" /> callback.

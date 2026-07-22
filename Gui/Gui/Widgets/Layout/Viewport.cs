@@ -23,8 +23,10 @@ public class Viewport : SingleChildWidget
     /// <summary>The axis along which this viewport scrolls.</summary>
     public Axis ScrollDirection { get; }
 
-    public override RenderObject CreateRenderObject() =>
-        new RenderViewport { Offset = Offset, ScrollDirection = ScrollDirection };
+    public override RenderObject CreateRenderObject()
+    {
+        return new RenderViewport { Offset = Offset, ScrollDirection = ScrollDirection };
+    }
 
     public override void UpdateRenderObject(
         RenderObject renderObject

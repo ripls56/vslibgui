@@ -51,6 +51,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Goldens\*.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="$(VINTAGE_STORY)/Lib/libSkiaSharp.dll">
       <Link>libSkiaSharp.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

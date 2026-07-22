@@ -12,7 +12,8 @@ namespace Gui.Example.Pages;
 
 internal class ThemingPage : StatelessWidget
 {
-    private static readonly ThemeData OceanTheme = new(
+    private static readonly ThemeData OceanTheme = new
+    (
         new ColorScheme
         {
             Primary = "#5B9BD5".FromHex(),
@@ -36,22 +37,24 @@ internal class ThemingPage : StatelessWidget
 
     public override Widget Build(BuildContext context)
     {
-        var colors = Theme.Of(context).ColorScheme;
+        var theme = Theme.Of(context);
+        var colors = theme.ColorScheme;
+        var headerStyle = theme.TextTheme.Headline;
+        headerStyle.Color = colors.Primary;
 
-        return new Column(
+        return new Column
+        (
             crossAxisAlignment: CrossAxisAlignment.Stretch,
             spacing: 16,
             children:
             [
-                new Text("Theming",
-                    new TextStyle
-                    {
-                        FontSize = 22, Weight = FontWeight.Bold, Color = colors.Primary
-                    }),
+                new Text("Theming", headerStyle),
 
-                new DemoCard(
+                new DemoCard
+                (
                     "Global theme",
-                    new ListenableBuilder(
+                    new ListenableBuilder
+                    (
                         ThemeData.DefaultNotifier,
                         _ => new Theme(ThemeData.DefaultNotifier.Value, new ThemeSwatches())
                     ),
@@ -60,9 +63,11 @@ internal class ThemingPage : StatelessWidget
                     "Edit libgui.json and save — changes apply instantly via FileSystemWatcher."
                 ),
 
-                new Theme(
+                new Theme
+                (
                     OceanTheme,
-                    new DemoCard(
+                    new DemoCard
+                    (
                         "Per-window override",
                         new ThemeSwatches(),
                         "protected override Widget Build() =>\n    new Theme(data: _myTheme, child: new MyContent());",
@@ -79,7 +84,8 @@ internal class ThemingPage : StatelessWidget
         public override Widget Build(BuildContext context)
         {
             var c = Theme.Of(context).ColorScheme;
-            return new Row(
+            return new Row
+            (
                 8,
                 children:
                 [
@@ -91,13 +97,29 @@ internal class ThemingPage : StatelessWidget
             );
         }
 
-        private static Widget Swatch(Vector4 bg, Vector4 fg, string label)
+        private static Widget Swatch
+        (
+            Vector4 bg,
+            Vector4 fg,
+            string label
+        )
         {
-            return new Container(
-                new BoxStyle { Color = bg, CornerRadius = new Vector4(4) },
-                new Padding(
+            return new Container
+            (
+                new BoxStyle
+                {
+                    Color = bg, CornerRadius = new Vector4(4)
+                },
+                new Padding
+                (
                     EdgeInsets.Symmetric(8, 16),
-                    new Text(label, new TextStyle { Color = fg, FontSize = 13 })
+                    new Text
+                    (
+                        label, new TextStyle
+                        {
+                            Color = fg, FontSize = 13
+                        }
+                    )
                 )
             );
         }

@@ -9,7 +9,8 @@ public enum KeyEventType
 
 public class KeyboardEvent
 {
-    public KeyboardEvent(
+    public KeyboardEvent
+    (
         KeyEventType type,
         int keyCode = 0,
         char keyChar = '\0',
@@ -37,21 +38,35 @@ public class KeyboardEvent
 
 public interface IKeyDownHandler
 {
-    void OnKeyDown(
+    void OnKeyDown
+    (
         KeyboardEvent e
     );
 }
 
 public interface IKeyUpHandler
 {
-    void OnKeyUp(
+    void OnKeyUp
+    (
         KeyboardEvent e
     );
 }
 
 public interface IKeyCharHandler
 {
-    void OnKeyChar(
+    void OnKeyChar
+    (
         KeyboardEvent e
     );
+}
+
+/// <summary>
+///     Implemented by widgets (or their <c>State</c>) that can be activated by the
+///     keyboard. When the focused element is <see cref="IActivatable" />, pressing
+///     Enter or Space invokes <see cref="Activate" />.
+/// </summary>
+public interface IActivatable
+{
+    /// <summary>Performs the same action as a click/tap.</summary>
+    void Activate();
 }

@@ -83,7 +83,6 @@ csharp_style_expression_bodied_properties = true:suggestion
 csharp_style_expression_bodied_accessors = true:suggestion
 csharp_style_expression_bodied_constructors = false:silent
 csharp_prefer_braces = true:suggestion
-csharp_style_namespace_declarations = file_scoped:warning
 dotnet_style_object_initializer = true:suggestion
 dotnet_style_collection_initializer = true:suggestion
 dotnet_style_prefer_conditional_expression_over_assignment = true:silent
@@ -148,19 +147,3 @@ dotnet_naming_rule.types_pascal.severity = warning
 dotnet_naming_rule.interfaces_i_prefix.symbols = interfaces
 dotnet_naming_rule.interfaces_i_prefix.style = interface_prefix
 dotnet_naming_rule.interfaces_i_prefix.severity = warning
-
-#### Analyzer severity overrides (project-specific) ####
-# S3011: Reflection should not increase accessibility
-dotnet_diagnostic.S3011.severity = none
-# IDE0130: Namespace does not match folder structure
-dotnet_diagnostic.IDE0130.severity = none
-# IDE0290: Use primary constructor
-dotnet_diagnostic.IDE0290.severity = none
-# S6602: "Find" instead of "FirstOrDefault"
-dotnet_diagnostic.S6602.severity = none
-# IDE0305: Simplify collection initialization
-dotnet_diagnostic.IDE0305.severity = silent
-# IDE0022: Use expression body for method
-dotnet_diagnostic.IDE0022.severity = silent
-# IDE0060: Remove unused parameter
-dotnet_diagnostic.IDE0060.severity = silent

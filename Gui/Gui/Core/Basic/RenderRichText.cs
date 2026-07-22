@@ -6,6 +6,7 @@ using Gui.Rendering.Text;
 using Gui.Vtml;
 using Gui.Widgets.Basic;
 using Gui.Widgets.Framework;
+using Gui.Widgets.Layout;
 using Gui.Widgets.Spans;
 using OpenTK.Mathematics;
 using SkiaSharp;
@@ -888,8 +889,10 @@ public class RenderRichText : RenderBox
         float width,
         float height,
         float y
-    ) =>
-        new() { Fragments = [..fragments], Width = width, Height = height, Y = y };
+    )
+    {
+        return new VisualLine { Fragments = [..fragments], Width = width, Height = height, Y = y };
+    }
 
     private void StoreBounds(
         List<VisualLine> lines
@@ -1134,6 +1137,40 @@ public class RenderRichText : RenderBox
     ) =>
         GetMinIntrinsicHeight(width);
 
+    /// <inheritdoc />
+    public override float? GetDistanceToBaseline(
+        TextBaseline baseline
+    )
+    {
+        if (_runsDirty)
+        {
+            FlattenRuns();
+        }
+
+        foreach (var run in _runs)
+        {
+            if (run.Type != PlacedRunType.Text)
+            {
+                continue;
+            }
+
+            var font = TextLayoutHelper.GetFont(
+                run.Style.FontFamily,
+                run.Style.FontSize,
+                run.Style.Weight
+            );
+            var metrics = font.Metrics;
+
+            if (baseline == TextBaseline.Ideographic && metrics.CapHeight != 0)
+            {
+                return -metrics.CapHeight;
+            }
+
+            return -metrics.Ascent;
+        }
+
+        return null;
+    }
 
     private static float GetLineHeight(
         SKFont font,
