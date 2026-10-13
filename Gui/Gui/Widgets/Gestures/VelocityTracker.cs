@@ -14,16 +14,19 @@ public class VelocityTracker
     private readonly List<EventPoint> _points = [];
     private readonly Stopwatch _stopwatch = Stopwatch.StartNew();
 
-    public void AddPosition(
+    public void AddPosition
+    (
         float x,
         float y
     )
     {
         var now = _stopwatch.Elapsed.TotalSeconds;
-        _points.Add(
+        _points.Add
+        (
             new EventPoint
             {
-                Position = new Vector2(
+                Position = new Vector2
+                (
                     x,
                     y
                 ),
@@ -33,7 +36,8 @@ public class VelocityTracker
         Prune(now);
     }
 
-    private void Prune(
+    private void Prune
+    (
         double now
     )
     {

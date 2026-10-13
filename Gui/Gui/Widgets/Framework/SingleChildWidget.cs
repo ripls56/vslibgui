@@ -12,7 +12,8 @@ public abstract class SingleChildWidget : RenderObjectWidget, ISingleChildWidget
     /// <summary>The single optional child widget.</summary>
     public readonly Widget? Child;
 
-    protected SingleChildWidget(
+    protected SingleChildWidget
+    (
         Widget? child = null,
         Key? key = null
     ) : base(key)

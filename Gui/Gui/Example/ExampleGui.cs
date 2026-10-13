@@ -12,10 +12,10 @@ public class ExampleGui(ICoreClientAPI capi) : GuiBase(capi)
 {
     public override bool Focusable => true;
 
-    protected override WindowConfig CreateWindowConfig()
+    protected override WindowConfig CreateWindowConfig() => new()
     {
-        return new WindowConfig { Size = new Vector2(1080, 660) };
-    }
+        Size = new Vector2(1080, 660)
+    };
 
     protected override Widget Build() =>
         new WindowFrame("Example", new ExampleContent(capi), fillHeight: true);

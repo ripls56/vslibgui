@@ -25,7 +25,8 @@ public class HotkeyChip : StatelessWidget
     /// <param name="fallbackText">Label shown when <paramref name="mapping" /> is null.</param>
     /// <param name="fontSize">Surrounding font size the chip scales itself to.</param>
     /// <param name="key">Optional widget key for reconciliation.</param>
-    public HotkeyChip(
+    public HotkeyChip
+    (
         KeyCombination? mapping,
         string fallbackText,
         float fontSize,
@@ -47,7 +48,8 @@ public class HotkeyChip : StatelessWidget
     public float FontSize { get; }
 
     /// <inheritdoc />
-    public override Widget Build(
+    public override Widget Build
+    (
         BuildContext context
     )
     {
@@ -55,25 +57,29 @@ public class HotkeyChip : StatelessWidget
 
         if (Mapping == null || Mapping.KeyCode < 0)
         {
-            return new HotkeyBadge(
+            return new HotkeyBadge
+            (
                 FallbackText,
                 style
             );
         }
 
         var parts = new List<Widget>();
-        AddModifierBadges(
+        AddModifierBadges
+        (
             parts,
             style
         );
-        AddKeyBadge(
+        AddKeyBadge
+        (
             parts,
             Mapping.KeyCode,
             style
         );
         if (Mapping.SecondKeyCode is > 0)
         {
-            AddKeyBadge(
+            AddKeyBadge
+            (
                 parts,
                 Mapping.SecondKeyCode.Value,
                 style
@@ -85,18 +91,21 @@ public class HotkeyChip : StatelessWidget
             return parts[0];
         }
 
-        return new Row(
+        return new Row
+        (
             FontSize * 0.2f,
             crossAxisAlignment: CrossAxisAlignment.Center,
             mainAxisSize: MainAxisSize.Min,
-            children: JoinWithSeparators(
+            children: JoinWithSeparators
+            (
                 parts,
                 style.TextStyle
             )
         );
     }
 
-    private void AddModifierBadges(
+    private void AddModifierBadges
+    (
         List<Widget> parts,
         HotkeyBadgeStyle style
     )
@@ -117,7 +126,8 @@ public class HotkeyChip : StatelessWidget
         }
     }
 
-    private void AddKeyBadge(
+    private void AddKeyBadge
+    (
         List<Widget> parts,
         int keyCode,
         HotkeyBadgeStyle style
@@ -125,9 +135,12 @@ public class HotkeyChip : StatelessWidget
     {
         if (Mapping!.IsMouseButton(keyCode))
         {
-            parts.Add(
-                new HotkeyBadge(
-                    BuildMouseIcon(
+            parts.Add
+            (
+                new HotkeyBadge
+                (
+                    BuildMouseIcon
+                    (
                         keyCode,
                         style.TextStyle.Color
                     ),
@@ -137,15 +150,18 @@ public class HotkeyChip : StatelessWidget
             return;
         }
 
-        parts.Add(
-            new HotkeyBadge(
+        parts.Add
+        (
+            new HotkeyBadge
+            (
                 KeyName(keyCode),
                 style
             )
         );
     }
 
-    private Widget BuildMouseIcon(
+    private Widget BuildMouseIcon
+    (
         int keyCode,
         Vector4 color
     )
@@ -156,7 +172,8 @@ public class HotkeyChip : StatelessWidget
             2 => "textures/icons/mouse-right.svg",
             _ => "textures/icons/mouse.svg"
         };
-        return new Icon(
+        return new Icon
+        (
             "gui",
             path,
             FontSize,
@@ -164,7 +181,8 @@ public class HotkeyChip : StatelessWidget
         );
     }
 
-    private static string KeyName(
+    private static string KeyName
+    (
         int keyCode
     )
     {
@@ -176,7 +194,8 @@ public class HotkeyChip : StatelessWidget
         return GlKeyNames.ToString((GlKeys)keyCode) ?? "?";
     }
 
-    private static List<Widget> JoinWithSeparators(
+    private static List<Widget> JoinWithSeparators
+    (
         List<Widget> parts,
         TextStyle textStyle
     )
@@ -195,7 +214,8 @@ public class HotkeyChip : StatelessWidget
         return result;
     }
 
-    private HotkeyBadgeStyle ScaleStyle(
+    private HotkeyBadgeStyle ScaleStyle
+    (
         HotkeyBadgeStyle baseStyle
     )
     {
@@ -208,7 +228,8 @@ public class HotkeyChip : StatelessWidget
             BorderThickness = baseStyle.BorderThickness,
             CornerRadius = baseStyle.CornerRadius,
             TextStyle = textStyle,
-            Padding = EdgeInsets.Symmetric(
+            Padding = EdgeInsets.Symmetric
+            (
                 FontSize * 0.12f,
                 FontSize * 0.38f
             ),

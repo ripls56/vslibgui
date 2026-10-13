@@ -11,20 +11,24 @@ public class SkiaAssetLoader
 {
     private readonly ICoreClientAPI _capi;
 
-    public SkiaAssetLoader(
+    public SkiaAssetLoader
+    (
         ICoreClientAPI capi
     )
     {
         _capi = capi;
     }
 
-    public string? LoadSksl(
+    public string? LoadSksl
+    (
         string domain,
         string path
     )
     {
-        var asset = _capi.Assets.TryGet(
-            new AssetLocation(
+        var asset = _capi.Assets.TryGet
+        (
+            new AssetLocation
+            (
                 domain,
                 path
             )
@@ -38,13 +42,16 @@ public class SkiaAssetLoader
         return Encoding.UTF8.GetString(asset.Data);
     }
 
-    public SKBitmap? LoadBitmap(
+    public SKBitmap? LoadBitmap
+    (
         string domain,
         string path
     )
     {
-        var asset = _capi.Assets.TryGet(
-            new AssetLocation(
+        var asset = _capi.Assets.TryGet
+        (
+            new AssetLocation
+            (
                 domain,
                 path
             )
@@ -58,13 +65,16 @@ public class SkiaAssetLoader
         return SKBitmap.Decode(stream);
     }
 
-    public SKTypeface? LoadFont(
+    public SKTypeface? LoadFont
+    (
         string domain,
         string path
     )
     {
-        var asset = _capi.Assets.TryGet(
-            new AssetLocation(
+        var asset = _capi.Assets.TryGet
+        (
+            new AssetLocation
+            (
                 domain,
                 path.ToLower()
             )
@@ -79,12 +89,14 @@ public class SkiaAssetLoader
         return SKTypeface.FromStream(stream);
     }
 
-    public SKSvg? LoadSvg(
+    public SKSvg? LoadSvg
+    (
         string domain,
         string path
     )
     {
-        var cached = SvgPictureCache.TryGet(
+        var cached = SvgPictureCache.TryGet
+        (
             domain,
             path
         );
@@ -93,8 +105,10 @@ public class SkiaAssetLoader
             return cached;
         }
 
-        var asset = _capi.Assets.TryGet(
-            new AssetLocation(
+        var asset = _capi.Assets.TryGet
+        (
+            new AssetLocation
+            (
                 domain,
                 path
             )
@@ -115,7 +129,8 @@ public class SkiaAssetLoader
             return null;
         }
 
-        SvgPictureCache.Store(
+        SvgPictureCache.Store
+        (
             domain,
             path,
             svg

@@ -50,7 +50,8 @@ public class PreSkiaPipeline : IRenderer
 
         SavedShader = _capi.Render.CurrentActiveShader;
         WasBegun = true;
-        _skiaRenderer.Begin(
+        _skiaRenderer.Begin
+        (
             _capi.Render.FrameWidth,
             _capi.Render.FrameHeight,
             RuntimeEnv.GUIScale

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Gui;
 using Gui.Widgets.Framework;
 
 namespace Gui.Theming;
@@ -15,9 +14,28 @@ public static class ThemePresetRegistry
 {
     private static readonly string[] Ids =
     {
-        "arctic", "ash", "aurora", "autumn", "blood_moon", "candy", "copper",
-        "default", "ember", "forest", "magenta", "mauve", "midnight", "mist",
-        "neon_city", "ocean", "rose_gold", "sage", "slate", "sunset", "toxic", "void"
+        "arctic",
+        "ash",
+        "aurora",
+        "autumn",
+        "blood_moon",
+        "candy",
+        "copper",
+        "default",
+        "ember",
+        "forest",
+        "magenta",
+        "mauve",
+        "midnight",
+        "mist",
+        "neon_city",
+        "ocean",
+        "rose_gold",
+        "sage",
+        "slate",
+        "sunset",
+        "toxic",
+        "void"
     };
 
     /// <summary>The file ids of every shipped preset, alphabetical.</summary>
@@ -32,10 +50,14 @@ public static class ThemePresetRegistry
         return Ids
             .Select(id => (Id: id, Section: loadSection(id)))
             .Where(x => x.Section is not null)
-            .Select(x => new ThemePreset(
-                x.Id,
-                ThemePreset.DeriveDisplayName(x.Id),
-                x.Section!.ToColorScheme(ColorScheme.Default())))
+            .Select
+            (x => new ThemePreset
+                (
+                    x.Id,
+                    ThemePreset.DeriveDisplayName(x.Id),
+                    x.Section!.ToColorScheme(ColorScheme.Default())
+                )
+            )
             .ToList();
     }
 }

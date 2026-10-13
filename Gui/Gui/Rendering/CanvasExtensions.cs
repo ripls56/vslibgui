@@ -11,7 +11,8 @@ public static class CanvasExtensions
     {
         private readonly SKCanvas _canvas;
 
-        public CanvasScope(
+        public CanvasScope
+        (
             SKCanvas canvas
         )
         {

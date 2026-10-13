@@ -15,7 +15,8 @@ public static class CanvasDrawExtensions
 {
     [ThreadStatic] private static SKPoint[]? _radiiBuffer;
 
-    private static void SetRadii(
+    private static void SetRadii
+    (
         SKRoundRect rr,
         SKRect rect,
         float tl,
@@ -25,23 +26,28 @@ public static class CanvasDrawExtensions
     )
     {
         _radiiBuffer ??= new SKPoint[4];
-        _radiiBuffer[0] = new SKPoint(
+        _radiiBuffer[0] = new SKPoint
+        (
             tl,
             tl
         );
-        _radiiBuffer[1] = new SKPoint(
+        _radiiBuffer[1] = new SKPoint
+        (
             tr,
             tr
         );
-        _radiiBuffer[2] = new SKPoint(
+        _radiiBuffer[2] = new SKPoint
+        (
             br,
             br
         );
-        _radiiBuffer[3] = new SKPoint(
+        _radiiBuffer[3] = new SKPoint
+        (
             bl,
             bl
         );
-        rr.SetRectRadii(
+        rr.SetRectRadii
+        (
             rect,
             _radiiBuffer
         );
@@ -52,7 +58,8 @@ public static class CanvasDrawExtensions
     ///     This matches SkiaSharp's clockwise SetRectRadii order starting from top-left.
     ///     Pass <c>new Vector4(r)</c> for uniform radii on all corners.
     /// </param>
-    public static void DrawBox(
+    public static void DrawBox
+    (
         this SKCanvas canvas,
         Vector2 pos,
         Vector2 size,
@@ -68,7 +75,8 @@ public static class CanvasDrawExtensions
     )
     {
         _radiiBuffer ??= new SKPoint[4];
-        var bgInset = DrawingOperations.ComputeBgInset(
+        var bgInset = DrawingOperations.ComputeBgInset
+        (
             border,
             borderColor.W
         );
@@ -84,29 +92,34 @@ public static class CanvasDrawExtensions
         sharedPaint.IsAntialias = true;
 
         var rect = size.ToSkRect(pos);
-        var bgRect = new SKRect(
+        var bgRect = new SKRect
+        (
             rect.Left + bgInset,
             rect.Top + bgInset,
             rect.Right - bgInset,
             rect.Bottom - bgInset
         );
-        var bgRadii = DrawingOperations.InsetRadii(
+        var bgRadii = DrawingOperations.InsetRadii
+        (
             radii,
             bgInset
         );
-        DrawingOperations.SetRadii(
+        DrawingOperations.SetRadii
+        (
             sharedRoundRect,
             bgRect,
             bgRadii,
             _radiiBuffer
         );
 
-        canvas.DrawRoundRect(
+        canvas.DrawRoundRect
+        (
             sharedRoundRect,
             sharedPaint
         );
 
-        DrawingOperations.DrawBorder(
+        DrawingOperations.DrawBorder
+        (
             canvas,
             rect,
             radii,
@@ -127,7 +140,8 @@ public static class CanvasDrawExtensions
     ///     clipped to the rounded-rect widget boundary, with an optional border.
     ///     Accepts both <see cref="SKBitmap" /> and <see cref="SKImage" />.
     /// </summary>
-    public static void DrawImage(
+    public static void DrawImage
+    (
         this SKCanvas canvas,
         SKBitmap bitmap,
         Vector2 pos,
@@ -140,9 +154,43 @@ public static class CanvasDrawExtensions
         SKPaint sharedPaint,
         SKRoundRect sharedRoundRect,
         SKRoundRect sharedBorderRoundRect
+    ) => canvas.DrawImage
+    (
+        bitmap,
+        pos,
+        size,
+        srcRect,
+        dstRect,
+        radii,
+        border,
+        borderColor,
+        sharedPaint,
+        sharedRoundRect,
+        sharedBorderRoundRect,
+        null
+    );
+
+    /// <inheritdoc cref="DrawImage(SKCanvas,SKBitmap,Vector2,Vector2,SKRect,SKRect,Vector4,float,Vector4,SKPaint,SKRoundRect,SKRoundRect)" />
+    /// <param name="colorFilter">Recolors the image; null draws it as-is.</param>
+    public static void DrawImage
+    (
+        this SKCanvas canvas,
+        SKBitmap bitmap,
+        Vector2 pos,
+        Vector2 size,
+        SKRect srcRect,
+        SKRect dstRect,
+        Vector4 radii,
+        float border,
+        Vector4 borderColor,
+        SKPaint sharedPaint,
+        SKRoundRect sharedRoundRect,
+        SKRoundRect sharedBorderRoundRect,
+        SKColorFilter? colorFilter
     )
     {
-        DrawImageCore(
+        DrawImageCore
+        (
             canvas,
             bitmap,
             null,
@@ -155,7 +203,8 @@ public static class CanvasDrawExtensions
             borderColor,
             sharedPaint,
             sharedRoundRect,
-            sharedBorderRoundRect
+            sharedBorderRoundRect,
+            colorFilter
         );
     }
 
@@ -163,7 +212,8 @@ public static class CanvasDrawExtensions
     ///     Draws an <see cref="SKImage" /> (immutable, GPU-friendly) using
     ///     pre-computed source and destination rects.
     /// </summary>
-    public static void DrawImage(
+    public static void DrawImage
+    (
         this SKCanvas canvas,
         SKImage image,
         Vector2 pos,
@@ -176,9 +226,43 @@ public static class CanvasDrawExtensions
         SKPaint sharedPaint,
         SKRoundRect sharedRoundRect,
         SKRoundRect sharedBorderRoundRect
+    ) => canvas.DrawImage
+    (
+        image,
+        pos,
+        size,
+        srcRect,
+        dstRect,
+        radii,
+        border,
+        borderColor,
+        sharedPaint,
+        sharedRoundRect,
+        sharedBorderRoundRect,
+        null
+    );
+
+    /// <inheritdoc cref="DrawImage(SKCanvas,SKImage,Vector2,Vector2,SKRect,SKRect,Vector4,float,Vector4,SKPaint,SKRoundRect,SKRoundRect)" />
+    /// <param name="colorFilter">Recolors the image; null draws it as-is.</param>
+    public static void DrawImage
+    (
+        this SKCanvas canvas,
+        SKImage image,
+        Vector2 pos,
+        Vector2 size,
+        SKRect srcRect,
+        SKRect dstRect,
+        Vector4 radii,
+        float border,
+        Vector4 borderColor,
+        SKPaint sharedPaint,
+        SKRoundRect sharedRoundRect,
+        SKRoundRect sharedBorderRoundRect,
+        SKColorFilter? colorFilter
     )
     {
-        DrawImageCore(
+        DrawImageCore
+        (
             canvas,
             null,
             image,
@@ -191,11 +275,13 @@ public static class CanvasDrawExtensions
             borderColor,
             sharedPaint,
             sharedRoundRect,
-            sharedBorderRoundRect
+            sharedBorderRoundRect,
+            colorFilter
         );
     }
 
-    private static void DrawImageCore(
+    private static void DrawImageCore
+    (
         SKCanvas canvas,
         SKBitmap? bitmap,
         SKImage? image,
@@ -208,26 +294,31 @@ public static class CanvasDrawExtensions
         Vector4 borderColor,
         SKPaint sharedPaint,
         SKRoundRect sharedRoundRect,
-        SKRoundRect sharedBorderRoundRect
+        SKRoundRect sharedBorderRoundRect,
+        SKColorFilter? colorFilter = null
     )
     {
         _radiiBuffer ??= new SKPoint[4];
-        var bgInset = DrawingOperations.ComputeBgInset(
+        var bgInset = DrawingOperations.ComputeBgInset
+        (
             border,
             borderColor.W
         );
 
-        var clipRect = new SKRect(
+        var clipRect = new SKRect
+        (
             pos.X + bgInset,
             pos.Y + bgInset,
             pos.X + size.X - bgInset,
             pos.Y + size.Y - bgInset
         );
-        var bgRadii = DrawingOperations.InsetRadii(
+        var bgRadii = DrawingOperations.InsetRadii
+        (
             radii,
             bgInset
         );
-        DrawingOperations.SetRadii(
+        DrawingOperations.SetRadii
+        (
             sharedRoundRect,
             clipRect,
             bgRadii,
@@ -236,7 +327,8 @@ public static class CanvasDrawExtensions
 
         using (canvas.SaveScope())
         {
-            canvas.ClipRoundRect(
+            canvas.ClipRoundRect
+            (
                 sharedRoundRect,
                 SKClipOperation.Intersect,
                 true
@@ -247,7 +339,9 @@ public static class CanvasDrawExtensions
             sharedPaint.BlendMode = SKBlendMode.SrcOver;
             sharedPaint.Shader = null;
             sharedPaint.ImageFilter = null;
-            var adjustedDst = new SKRect(
+            sharedPaint.ColorFilter = colorFilter;
+            var adjustedDst = new SKRect
+            (
                 pos.X + dstRect.Left,
                 pos.Y + dstRect.Top,
                 pos.X + dstRect.Right,
@@ -257,7 +351,8 @@ public static class CanvasDrawExtensions
 
             if (image != null)
             {
-                canvas.DrawImage(
+                canvas.DrawImage
+                (
                     image,
                     srcRect,
                     adjustedDst,
@@ -273,9 +368,12 @@ public static class CanvasDrawExtensions
                 sharedPaint.FilterQuality = SKFilterQuality.None;
 #pragma warning restore CS0618
             }
+
+            sharedPaint.ColorFilter = null;
         }
 
-        DrawingOperations.DrawBorder(
+        DrawingOperations.DrawBorder
+        (
             canvas,
             clipRect,
             radii,
@@ -300,7 +398,8 @@ public static class CanvasDrawExtensions
     /// <param name="slice">Corner insets in source-texture pixels.</param>
     /// <param name="mode">Simple / Sliced / Tiled.</param>
     /// <param name="tint">Multiply tint; Vector4.One = no tint.</param>
-    public static void DrawNineSlice(
+    public static void DrawNineSlice
+    (
         this SKCanvas canvas,
         Vector2 pos,
         Vector2 size,
@@ -339,15 +438,18 @@ public static class CanvasDrawExtensions
 
         if (mode == ImageDrawMode.Simple)
         {
-            canvas.DrawBitmap(
+            canvas.DrawBitmap
+            (
                 bitmap,
-                SKRect.Create(
+                SKRect.Create
+                (
                     0,
                     0,
                     bW,
                     bH
                 ),
-                SKRect.Create(
+                SKRect.Create
+                (
                     pos.X,
                     pos.Y,
                     dW,
@@ -359,19 +461,23 @@ public static class CanvasDrawExtensions
         }
 
         // Clamp source borders so they never exceed half the source dimension.
-        var sL = Math.Min(
+        var sL = Math.Min
+        (
             slice.Left,
             bW / 2f
         );
-        var sT = Math.Min(
+        var sT = Math.Min
+        (
             slice.Top,
             bH / 2f
         );
-        var sR = Math.Min(
+        var sR = Math.Min
+        (
             slice.Right,
             bW / 2f
         );
-        var sB = Math.Min(
+        var sB = Math.Min
+        (
             slice.Bottom,
             bH / 2f
         );
@@ -408,114 +514,132 @@ public static class CanvasDrawExtensions
         sharedPaint.IsAntialias =
             false; // Prevents Skia from blending adjacent edges with the background
 
-        var srcTl = SKRect.Create(
+        var srcTl = SKRect.Create
+        (
             0,
             0,
             sL,
             sT
         );
-        var srcTc = SKRect.Create(
+        var srcTc = SKRect.Create
+        (
             sL,
             0,
             bW - sL - sR,
             sT
         );
-        var srcTr = SKRect.Create(
+        var srcTr = SKRect.Create
+        (
             bW - sR,
             0,
             sR,
             sT
         );
 
-        var srcMl = SKRect.Create(
+        var srcMl = SKRect.Create
+        (
             0,
             sT,
             sL,
             bH - sT - sB
         );
-        var srcMc = SKRect.Create(
+        var srcMc = SKRect.Create
+        (
             sL,
             sT,
             bW - sL - sR,
             bH - sT - sB
         );
-        var srcMr = SKRect.Create(
+        var srcMr = SKRect.Create
+        (
             bW - sR,
             sT,
             sR,
             bH - sT - sB
         );
 
-        var srcBl = SKRect.Create(
+        var srcBl = SKRect.Create
+        (
             0,
             bH - sB,
             sL,
             sB
         );
-        var srcBc = SKRect.Create(
+        var srcBc = SKRect.Create
+        (
             sL,
             bH - sB,
             bW - sL - sR,
             sB
         );
-        var srcBr = SKRect.Create(
+        var srcBr = SKRect.Create
+        (
             bW - sR,
             bH - sB,
             sR,
             sB
         );
 
-        var dstTl = SKRect.Create(
+        var dstTl = SKRect.Create
+        (
             pos.X,
             pos.Y,
             dL,
             dT
         );
-        var dstTc = SKRect.Create(
+        var dstTc = SKRect.Create
+        (
             pos.X + dL,
             pos.Y,
             dW - dL - dR,
             dT
         );
-        var dstTr = SKRect.Create(
+        var dstTr = SKRect.Create
+        (
             pos.X + dW - dR,
             pos.Y,
             dR,
             dT
         );
 
-        var dstMl = SKRect.Create(
+        var dstMl = SKRect.Create
+        (
             pos.X,
             pos.Y + dT,
             dL,
             dH - dT - dB
         );
-        var dstMc = SKRect.Create(
+        var dstMc = SKRect.Create
+        (
             pos.X + dL,
             pos.Y + dT,
             dW - dL - dR,
             dH - dT - dB
         );
-        var dstMr = SKRect.Create(
+        var dstMr = SKRect.Create
+        (
             pos.X + dW - dR,
             pos.Y + dT,
             dR,
             dH - dT - dB
         );
 
-        var dstBl = SKRect.Create(
+        var dstBl = SKRect.Create
+        (
             pos.X,
             pos.Y + dH - dB,
             dL,
             dB
         );
-        var dstBc = SKRect.Create(
+        var dstBc = SKRect.Create
+        (
             pos.X + dL,
             pos.Y + dH - dB,
             dW - dL - dR,
             dB
         );
-        var dstBr = SKRect.Create(
+        var dstBr = SKRect.Create
+        (
             pos.X + dW - dR,
             pos.Y + dH - dB,
             dR,
@@ -525,7 +649,8 @@ public static class CanvasDrawExtensions
         switch (mode)
         {
             case ImageDrawMode.Sliced:
-                DrawRegion(
+                DrawRegion
+                (
                     canvas,
                     bitmap,
                     sharedPaint,
@@ -533,7 +658,8 @@ public static class CanvasDrawExtensions
                     dstTl,
                     false
                 );
-                DrawRegion(
+                DrawRegion
+                (
                     canvas,
                     bitmap,
                     sharedPaint,
@@ -541,7 +667,8 @@ public static class CanvasDrawExtensions
                     dstTc,
                     false
                 );
-                DrawRegion(
+                DrawRegion
+                (
                     canvas,
                     bitmap,
                     sharedPaint,
@@ -549,7 +676,8 @@ public static class CanvasDrawExtensions
                     dstTr,
                     false
                 );
-                DrawRegion(
+                DrawRegion
+                (
                     canvas,
                     bitmap,
                     sharedPaint,
@@ -557,7 +685,8 @@ public static class CanvasDrawExtensions
                     dstMl,
                     false
                 );
-                DrawRegion(
+                DrawRegion
+                (
                     canvas,
                     bitmap,
                     sharedPaint,
@@ -565,7 +694,8 @@ public static class CanvasDrawExtensions
                     dstMc,
                     false
                 );
-                DrawRegion(
+                DrawRegion
+                (
                     canvas,
                     bitmap,
                     sharedPaint,
@@ -573,7 +703,8 @@ public static class CanvasDrawExtensions
                     dstMr,
                     false
                 );
-                DrawRegion(
+                DrawRegion
+                (
                     canvas,
                     bitmap,
                     sharedPaint,
@@ -581,7 +712,8 @@ public static class CanvasDrawExtensions
                     dstBl,
                     false
                 );
-                DrawRegion(
+                DrawRegion
+                (
                     canvas,
                     bitmap,
                     sharedPaint,
@@ -589,7 +721,8 @@ public static class CanvasDrawExtensions
                     dstBc,
                     false
                 );
-                DrawRegion(
+                DrawRegion
+                (
                     canvas,
                     bitmap,
                     sharedPaint,
@@ -600,7 +733,8 @@ public static class CanvasDrawExtensions
                 break;
 
             case ImageDrawMode.Tiled:
-                DrawRegion(
+                DrawRegion
+                (
                     canvas,
                     bitmap,
                     sharedPaint,
@@ -608,7 +742,8 @@ public static class CanvasDrawExtensions
                     dstTl,
                     false
                 );
-                DrawRegion(
+                DrawRegion
+                (
                     canvas,
                     bitmap,
                     sharedPaint,
@@ -616,7 +751,8 @@ public static class CanvasDrawExtensions
                     dstTc,
                     true
                 );
-                DrawRegion(
+                DrawRegion
+                (
                     canvas,
                     bitmap,
                     sharedPaint,
@@ -624,7 +760,8 @@ public static class CanvasDrawExtensions
                     dstTr,
                     false
                 );
-                DrawRegion(
+                DrawRegion
+                (
                     canvas,
                     bitmap,
                     sharedPaint,
@@ -632,7 +769,8 @@ public static class CanvasDrawExtensions
                     dstMl,
                     true
                 );
-                DrawRegion(
+                DrawRegion
+                (
                     canvas,
                     bitmap,
                     sharedPaint,
@@ -640,7 +778,8 @@ public static class CanvasDrawExtensions
                     dstMc,
                     true
                 );
-                DrawRegion(
+                DrawRegion
+                (
                     canvas,
                     bitmap,
                     sharedPaint,
@@ -648,7 +787,8 @@ public static class CanvasDrawExtensions
                     dstMr,
                     true
                 );
-                DrawRegion(
+                DrawRegion
+                (
                     canvas,
                     bitmap,
                     sharedPaint,
@@ -656,7 +796,8 @@ public static class CanvasDrawExtensions
                     dstBl,
                     false
                 );
-                DrawRegion(
+                DrawRegion
+                (
                     canvas,
                     bitmap,
                     sharedPaint,
@@ -664,7 +805,8 @@ public static class CanvasDrawExtensions
                     dstBc,
                     true
                 );
-                DrawRegion(
+                DrawRegion
+                (
                     canvas,
                     bitmap,
                     sharedPaint,
@@ -678,7 +820,8 @@ public static class CanvasDrawExtensions
         sharedPaint.IsAntialias = originalAa;
     }
 
-    private static void DrawRegion(
+    private static void DrawRegion
+    (
         SKCanvas canvas,
         SKBitmap bitmap,
         SKPaint sharedPaint,
@@ -694,7 +837,8 @@ public static class CanvasDrawExtensions
 
         if (tile)
         {
-            DrawTiledRegion(
+            DrawTiledRegion
+            (
                 canvas,
                 bitmap,
                 sharedPaint,
@@ -704,7 +848,8 @@ public static class CanvasDrawExtensions
         }
         else
         {
-            canvas.DrawBitmap(
+            canvas.DrawBitmap
+            (
                 bitmap,
                 src,
                 dst,
@@ -713,7 +858,8 @@ public static class CanvasDrawExtensions
         }
     }
 
-    private static void DrawTiledRegion(
+    private static void DrawTiledRegion
+    (
         SKCanvas canvas,
         SKBitmap bitmap,
         SKPaint sharedPaint,
@@ -741,13 +887,15 @@ public static class CanvasDrawExtensions
             for (var ty = dstRegion.Top; ty < dstRegion.Bottom; ty += tileH)
             for (var tx = dstRegion.Left; tx < dstRegion.Right; tx += tileW)
             {
-                var tileRect = new SKRect(
+                var tileRect = new SKRect
+                (
                     tx,
                     ty,
                     tx + tileW,
                     ty + tileH
                 );
-                canvas.DrawBitmap(
+                canvas.DrawBitmap
+                (
                     bitmap,
                     srcRegion,
                     tileRect,
@@ -757,7 +905,8 @@ public static class CanvasDrawExtensions
         }
     }
 
-    public static void DrawMaskedBox(
+    public static void DrawMaskedBox
+    (
         this SKCanvas canvas,
         Vector2 pos,
         Vector2 size,
@@ -771,22 +920,26 @@ public static class CanvasDrawExtensions
     )
     {
         _radiiBuffer ??= new SKPoint[4];
-        var bgInset = DrawingOperations.ComputeBgInset(
+        var bgInset = DrawingOperations.ComputeBgInset
+        (
             border,
             borderColor.W
         );
 
-        var clipRect = new SKRect(
+        var clipRect = new SKRect
+        (
             pos.X + bgInset,
             pos.Y + bgInset,
             pos.X + size.X - bgInset,
             pos.Y + size.Y - bgInset
         );
-        var bgRadii = DrawingOperations.InsetRadii(
+        var bgRadii = DrawingOperations.InsetRadii
+        (
             radii,
             bgInset
         );
-        DrawingOperations.SetRadii(
+        DrawingOperations.SetRadii
+        (
             sharedRoundRect,
             clipRect,
             bgRadii,
@@ -797,7 +950,8 @@ public static class CanvasDrawExtensions
 
         using (canvas.SaveScope())
         {
-            canvas.ClipRoundRect(
+            canvas.ClipRoundRect
+            (
                 sharedRoundRect,
                 SKClipOperation.Intersect,
                 true
@@ -809,7 +963,8 @@ public static class CanvasDrawExtensions
 #pragma warning restore CS0618
         }
 
-        DrawingOperations.DrawBorder(
+        DrawingOperations.DrawBorder
+        (
             canvas,
             rect,
             radii,
@@ -830,7 +985,8 @@ public static class CanvasDrawExtensions
     ///     then draws one <see cref="SKTextBlob" /> per run for each enabled pass
     ///     (glow → outline → fill).
     /// </summary>
-    public static void DrawText(
+    public static void DrawText
+    (
         this SKCanvas canvas,
         string text,
         Vector2 pos,
@@ -857,7 +1013,10 @@ public static class CanvasDrawExtensions
         var originalSize = font.Size;
         font.Size = fontSize; // exact size for smooth animation (GetFont rounds for cache key)
 
-        var paint = sharedPaint ?? new SKPaint { IsAntialias = true };
+        var paint = sharedPaint ?? new SKPaint
+        {
+            IsAntialias = true
+        };
         paint.Style = SKPaintStyle.Fill;
         paint.StrokeWidth = 0;
         paint.ImageFilter = null;
@@ -930,18 +1089,21 @@ public static class CanvasDrawExtensions
         return blobs;
     }
 
-    private static SKImageFilter GetBlurFilter(
+    private static SKImageFilter GetBlurFilter
+    (
         Dictionary<float, SKImageFilter>? cache,
         float sigma
     )
     {
         // Round to 2 dp so that near-identical animation frames reuse the same filter.
-        var key = MathF.Round(
+        var key = MathF.Round
+        (
             sigma,
             2
         );
 
-        if (cache != null && cache.TryGetValue(
+        if (cache != null && cache.TryGetValue
+            (
                 key,
                 out var cached
             ))
@@ -949,7 +1111,8 @@ public static class CanvasDrawExtensions
             return cached;
         }
 
-        var filter = SKImageFilter.CreateBlur(
+        var filter = SKImageFilter.CreateBlur
+        (
             sigma,
             sigma
         );
@@ -959,12 +1122,13 @@ public static class CanvasDrawExtensions
             const int maxCache = 32;
             if (cache.Count >= maxCache)
             {
-                foreach (var f in cache.Values)
+                // Evict a single entry instead of clearing the whole cache on overflow.
+                foreach (var evictKey in cache.Keys)
                 {
-                    f.Dispose();
+                    cache[evictKey].Dispose();
+                    cache.Remove(evictKey);
+                    break;
                 }
-
-                cache.Clear();
             }
 
             cache[key] = filter;

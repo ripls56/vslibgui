@@ -4,7 +4,8 @@ namespace Gui.Widgets.Animations;
 
 public interface ITickerProvider
 {
-    Ticker CreateTicker(
+    Ticker CreateTicker
+    (
         Action<TimeSpan> onTick
     );
 }

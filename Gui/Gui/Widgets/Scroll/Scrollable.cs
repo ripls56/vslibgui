@@ -36,7 +36,8 @@ public static class Scrollable
     ///     an instant jump.
     /// </param>
     /// <param name="curve">Easing curve. Defaults to <see cref="Curves.EaseOut" />.</param>
-    public static void EnsureVisible(
+    public static void EnsureVisible
+    (
         Element target,
         TimeSpan? duration = null,
         Curve? curve = null
@@ -88,7 +89,8 @@ public static class Scrollable
 
         // Compute the target's Y in content space by summing Y offsets from
         // the target up to (but not including) the viewport itself.
-        var contentY = ComputeContentSpaceY(
+        var contentY = ComputeContentSpaceY
+        (
             targetRo,
             viewport
         );
@@ -114,11 +116,13 @@ public static class Scrollable
             newOffset = itemTop;
         }
 
-        var maxScroll = Math.Max(
+        var maxScroll = Math.Max
+        (
             0,
             scrollCtx.ContentHeight - scrollCtx.ViewportHeight
         );
-        newOffset = Math.Clamp(
+        newOffset = Math.Clamp
+        (
             newOffset,
             0,
             maxScroll
@@ -135,7 +139,8 @@ public static class Scrollable
         }
         else
         {
-            scrollCtx.ScrollController.AnimateTo(
+            scrollCtx.ScrollController.AnimateTo
+            (
                 newOffset,
                 duration.Value,
                 curve,
@@ -145,7 +150,8 @@ public static class Scrollable
         }
     }
 
-    private static float ComputeContentSpaceY(
+    private static float ComputeContentSpaceY
+    (
         RenderObject descendant,
         RenderObject ancestor
     )

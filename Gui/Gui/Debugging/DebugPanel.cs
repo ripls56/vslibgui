@@ -59,32 +59,70 @@ public class DebugPanel : StatefulWidget
 
             if (windows.Count > 0)
             {
-                var items = windows.Select((w, i) => new DropdownItem<int>
-                {
-                    Value = i, Label = w.GetType().Name
-                }).ToList();
+                var items = windows.Select
+                ((w, i) => new DropdownItem<int>
+                    {
+                        Value = i, Label = w.GetType().Name
+                    }
+                ).ToList();
 
                 children.Add(new Text("Window", SectionLabelStyle));
-                children.Add(new Dropdown<int>(
-                    _selectedIndex,
-                    items,
-                    i => SetState(() => _selectedIndex = i)
-                ));
+                children.Add
+                (
+                    new Dropdown<int>
+                    (
+                        _selectedIndex,
+                        items,
+                        i => SetState(() => _selectedIndex = i)
+                    )
+                );
                 children.Add(new SizedBox(height: 4));
             }
 
-            children.Add(new DebugToggleRow("Show Bounds", settings.ShowBounds,
-                v => settings.ShowBounds = v));
-            children.Add(new DebugToggleRow("Track Repaints", settings.ShowPaint,
-                v => settings.ShowPaint = v));
-            children.Add(new DebugToggleRow("Heat Map", settings.ShowHeatMap,
-                v => settings.ShowHeatMap = v));
-            children.Add(new DebugToggleRow("Violations", settings.ShowViolations,
-                v => settings.ShowViolations = v));
-            children.Add(
-                new DebugToggleRow("Show HUD", settings.ShowHud, v => settings.ShowHud = v));
-            children.Add(new DebugToggleRow("Show Tree", settings.ShowTree,
-                v => settings.ShowTree = v));
+            children.Add
+            (
+                new DebugToggleRow
+                (
+                    "Show Bounds", settings.ShowBounds,
+                    v => settings.ShowBounds = v
+                )
+            );
+            children.Add
+            (
+                new DebugToggleRow
+                (
+                    "Track Repaints", settings.ShowPaint,
+                    v => settings.ShowPaint = v
+                )
+            );
+            children.Add
+            (
+                new DebugToggleRow
+                (
+                    "Heat Map", settings.ShowHeatMap,
+                    v => settings.ShowHeatMap = v
+                )
+            );
+            children.Add
+            (
+                new DebugToggleRow
+                (
+                    "Violations", settings.ShowViolations,
+                    v => settings.ShowViolations = v
+                )
+            );
+            children.Add
+            (
+                new DebugToggleRow("Show HUD", settings.ShowHud, v => settings.ShowHud = v)
+            );
+            children.Add
+            (
+                new DebugToggleRow
+                (
+                    "Show Tree", settings.ShowTree,
+                    v => settings.ShowTree = v
+                )
+            );
             children.Add(new SizedBox(height: 8));
             children.Add(new Text("Performance", SectionLabelStyle));
             children.Add(new DebugPerformancePanel(metrics));
@@ -96,9 +134,11 @@ public class DebugPanel : StatefulWidget
                 children.Add(new DebugTreePanel(root));
             }
 
-            return new Padding(
+            return new Padding
+            (
                 EdgeInsets.All(12),
-                new Column(
+                new Column
+                (
                     crossAxisAlignment: CrossAxisAlignment.Start,
                     spacing: 4,
                     children: children

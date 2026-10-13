@@ -23,12 +23,14 @@ public class ValueKey<T>(T value) : Key
 {
     public T Value { get; } = value;
 
-    public override bool Equals(
+    public override bool Equals
+    (
         object? obj
     )
     {
         return obj is ValueKey<T> other &&
-               EqualityComparer<T>.Default.Equals(
+               EqualityComparer<T>.Default.Equals
+               (
                    Value,
                    other.Value
                );
@@ -72,13 +74,15 @@ public abstract class Widget(Key? key = null) : IDisposable
     ///     <paramref name="newWidget" /> in its next build. Requires matching runtime type and
     ///     equal <see cref="Key" />.
     /// </summary>
-    public static bool CanUpdate(
+    public static bool CanUpdate
+    (
         Widget oldWidget,
         Widget newWidget
     )
     {
         return oldWidget.GetType() == newWidget.GetType() &&
-               Equals(
+               Equals
+               (
                    oldWidget.Key,
                    newWidget.Key
                );
@@ -91,7 +95,8 @@ public abstract class Widget(Key? key = null) : IDisposable
     /// </summary>
     public virtual RenderObject CreateRenderObject()
     {
-        throw new NotImplementedException(
+        throw new NotImplementedException
+        (
             "Widgets that produce a RenderObject must override CreateRenderObject."
         );
     }
@@ -101,7 +106,8 @@ public abstract class Widget(Key? key = null) : IDisposable
     ///     <paramref name="renderObject" />. Called every time this widget's element is updated
     ///     with a new widget instance. The render object is <b>reused</b> — not recreated.
     /// </summary>
-    public virtual void UpdateRenderObject(
+    public virtual void UpdateRenderObject
+    (
         RenderObject renderObject
     )
     {

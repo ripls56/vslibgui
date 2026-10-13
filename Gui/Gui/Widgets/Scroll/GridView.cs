@@ -7,6 +7,7 @@ using Gui.Widgets.Framework;
 using Gui.Widgets.Gestures;
 using Gui.Widgets.Input;
 using Gui.Widgets.Layout;
+using Gui.Widgets.Painting;
 using OpenTK.Mathematics;
 
 namespace Gui.Widgets.Scroll;
@@ -14,7 +15,8 @@ namespace Gui.Widgets.Scroll;
 public class GridView : StatefulWidget
 {
     /// <summary>Static mode: all children provided up-front.</summary>
-    public GridView(
+    public GridView
+    (
         IEnumerable<Widget> children,
         SliverGridDelegate gridDelegate,
         ScrollController? controller = null,
@@ -29,7 +31,8 @@ public class GridView : StatefulWidget
         Reverse = reverse;
     }
 
-    private GridView(
+    private GridView
+    (
         IndexedWidgetBuilder itemBuilder,
         int itemCount,
         SliverGridDelegate gridDelegate,
@@ -58,7 +61,8 @@ public class GridView : StatefulWidget
     public bool Reverse { get; }
 
     /// <summary>Builder mode: children created lazily with virtualization.</summary>
-    public static GridView Builder(
+    public static GridView Builder
+    (
         IndexedWidgetBuilder itemBuilder,
         int itemCount,
         SliverGridDelegate gridDelegate,
@@ -67,7 +71,8 @@ public class GridView : StatefulWidget
         Framework.Key? key = null
     )
     {
-        return new GridView(
+        return new GridView
+        (
             itemBuilder,
             itemCount,
             gridDelegate,
@@ -112,15 +117,18 @@ public class GridView : StatefulWidget
                 : 400;
             var geometry = Widget.GridDelegate.GetGeometry(effectiveWidth);
             _contentHeight = geometry.TotalContentHeight(Widget.ItemCount);
-            var maxScroll = Math.Max(
+            var maxScroll = Math.Max
+            (
                 0,
                 _contentHeight - _viewportHeight
             );
 
             if (Controller.Offset < -50 || Controller.Offset > maxScroll + 50)
             {
-                Controller.JumpTo(
-                    Math.Clamp(
+                Controller.JumpTo
+                (
+                    Math.Clamp
+                    (
                         Controller.Offset,
                         0,
                         maxScroll
@@ -131,7 +139,8 @@ public class GridView : StatefulWidget
             SetState(() => { });
         }
 
-        private void OnMouseWheel(
+        private void OnMouseWheel
+        (
             PointerEvent e
         )
         {
@@ -140,7 +149,8 @@ public class GridView : StatefulWidget
                 : 400;
             var geometry = Widget.GridDelegate.GetGeometry(effectiveWidth);
             _contentHeight = geometry.TotalContentHeight(Widget.ItemCount);
-            var maxScroll = Math.Max(
+            var maxScroll = Math.Max
+            (
                 0,
                 _contentHeight - _viewportHeight
             );
@@ -179,12 +189,14 @@ public class GridView : StatefulWidget
                 _currentVelocity = impulse;
             }
 
-            _currentVelocity = Math.Clamp(
+            _currentVelocity = Math.Clamp
+            (
                 _currentVelocity,
                 -8000,
                 8000
             );
-            Controller.StartSimulation(
+            Controller.StartSimulation
+            (
                 -_currentVelocity,
                 0,
                 maxScroll
@@ -192,7 +204,8 @@ public class GridView : StatefulWidget
             e.Handled = true;
         }
 
-        public override Widget Build(
+        public override Widget Build
+        (
             BuildContext context
         )
         {
@@ -207,14 +220,18 @@ public class GridView : StatefulWidget
                 ? Math.Max(0, maxScroll - Controller.Offset)
                 : Controller.Offset;
 
-            return new GestureDetector(
+            return new GestureDetector
+            (
                 onWheel: OnMouseWheel,
-                child: new Viewport(
-                    new Vector2(
+                child: new Viewport
+                (
+                    new Vector2
+                    (
                         0,
                         effectiveOffset
                     ),
-                    new GridContent(
+                    new GridContent
+                    (
                         Widget.ItemBuilder,
                         Widget.Children,
                         Widget.ItemCount,
@@ -251,7 +268,8 @@ public class GridView : StatefulWidget
         public readonly Action<float> OnViewportWidth;
         public readonly float ScrollOffset;
 
-        public GridContent(
+        public GridContent
+        (
             IndexedWidgetBuilder? itemBuilder,
             IReadOnlyList<Widget>? items,
             int itemCount,
@@ -277,13 +295,19 @@ public class GridView : StatefulWidget
     private class GridContentElement : Element
     {
         private readonly Dictionary<int, Element> _activeChildren = new();
+        private readonly List<int> _removeBuffer = new();
         private readonly RenderGridContent _renderObject;
+        // Reused across frames — reconciliation and VisitChildren run per mouse move.
+        private readonly HashSet<int> _targetIndices = new();
+        private readonly List<int> _visitKeyBuffer = new();
 
-        public GridContentElement(
+        public GridContentElement
+        (
             GridContent widget
         ) : base(widget)
         {
-            _renderObject = new RenderGridContent(
+            _renderObject = new RenderGridContent
+            (
                 widget.OnViewportLayout,
                 widget.OnViewportWidth
             );
@@ -291,7 +315,8 @@ public class GridView : StatefulWidget
 
         public override RenderObject? RenderObject => _renderObject;
 
-        public override void Mount(
+        public override void Mount
+        (
             Element? parent
         )
         {
@@ -305,7 +330,8 @@ public class GridView : StatefulWidget
             UpdateVisibleCells();
         }
 
-        public override void Update(
+        public override void Update
+        (
             Widget newWidget
         )
         {
@@ -339,20 +365,23 @@ public class GridView : StatefulWidget
                 viewportHeight = 400;
             }
 
-            var (firstIndex, lastIndex) = geometry.ComputeVisibleRange(
+            var (firstIndex, lastIndex) = geometry.ComputeVisibleRange
+            (
                 widget.ScrollOffset,
                 viewportHeight,
                 widget.ItemCount
             );
 
-            var targetIndices = new HashSet<int>();
+            var targetIndices = _targetIndices;
+            targetIndices.Clear();
             for (var i = firstIndex; i <= lastIndex; i++)
             {
                 targetIndices.Add(i);
             }
 
             // Remove children that scrolled out of view
-            var toRemove = new List<int>();
+            var toRemove = _removeBuffer;
+            toRemove.Clear();
             foreach (var index in _activeChildren.Keys)
             {
                 if (!targetIndices.Contains(index))
@@ -374,26 +403,34 @@ public class GridView : StatefulWidget
             }
 
             // Add or update visible children
-            var ctx = new BuildContext(
+            var ctx = new BuildContext
+            (
                 Widget,
                 this
             );
             foreach (var index in targetIndices)
             {
-                var itemWidget = widget.Items != null
-                    ? widget.Items[index]
-                    : widget.ItemBuilder!(
-                        ctx,
-                        index
-                    );
+                // Own paint layer per cell — see the ListView counterpart.
+                var itemWidget = new RepaintBoundary
+                (
+                    widget.Items != null
+                        ? widget.Items[index]
+                        : widget.ItemBuilder!
+                        (
+                            ctx,
+                            index
+                        )
+                );
 
-                if (_activeChildren.TryGetValue(
+                if (_activeChildren.TryGetValue
+                    (
                         index,
                         out var existing
                     ))
                 {
                     var oldRo = existing.RenderObject;
-                    var updated = UpdateChild(
+                    var updated = UpdateChild
+                    (
                         existing,
                         itemWidget
                     )!;
@@ -414,7 +451,8 @@ public class GridView : StatefulWidget
                 }
                 else
                 {
-                    var newEl = UpdateChild(
+                    var newEl = UpdateChild
+                    (
                         null,
                         itemWidget
                     )!;
@@ -452,27 +490,31 @@ public class GridView : StatefulWidget
             base.Unmount();
         }
 
-        public override void VisitChildren(
+        public override void VisitChildren
+        (
             Action<Element> visitor
         )
         {
-            var keys = new List<int>(_activeChildren.Keys);
-            keys.Sort();
-            foreach (var key in keys)
+            _visitKeyBuffer.Clear();
+            _visitKeyBuffer.AddRange(_activeChildren.Keys);
+            _visitKeyBuffer.Sort();
+            foreach (var key in _visitKeyBuffer)
             {
                 visitor(_activeChildren[key]);
             }
         }
 
-        protected override void VisitChildrenInReverse(
+        protected override void VisitChildrenInReverse
+        (
             Action<Element> visitor
         )
         {
-            var keys = new List<int>(_activeChildren.Keys);
-            keys.Sort();
-            for (var i = keys.Count - 1; i >= 0; i--)
+            _visitKeyBuffer.Clear();
+            _visitKeyBuffer.AddRange(_activeChildren.Keys);
+            _visitKeyBuffer.Sort();
+            for (var i = _visitKeyBuffer.Count - 1; i >= 0; i--)
             {
-                visitor(_activeChildren[keys[i]]);
+                visitor(_activeChildren[_visitKeyBuffer[i]]);
             }
         }
     }

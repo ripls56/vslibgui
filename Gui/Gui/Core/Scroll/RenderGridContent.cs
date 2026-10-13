@@ -10,7 +10,8 @@ namespace Gui.Core.Scroll;
 /// </summary>
 internal class RenderGridContent : RenderObject
 {
-    public RenderGridContent(
+    public RenderGridContent
+    (
         Action<float> onViewportLayout,
         Action<float> onViewportWidth
     )
@@ -37,14 +38,16 @@ internal class RenderGridContent : RenderObject
         OnViewportLayout(ViewportHeight);
         OnViewportWidth(ViewportWidth);
 
-        Size = new Vector2(
+        Size = new Vector2
+        (
             Constraints.MaxWidth,
             TotalHeight
         );
 
         if (Geometry.CellWidth > 0 && Geometry.CellHeight > 0)
         {
-            var cellConstraints = LayoutConstraints.Tight(
+            var cellConstraints = LayoutConstraints.Tight
+            (
                 Geometry.CellWidth,
                 Geometry.CellHeight
             );

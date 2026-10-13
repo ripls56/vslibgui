@@ -54,14 +54,22 @@ internal class IconButtonState : FocusableState<IconButton>, IActivatable
 
     private bool _isHovered;
     private bool _isPressed;
-    private AnimationController _statusTransition = null!;
-    private CurvedAnimation _statusCurved = null!;
     private ButtonStatus _lastStatus;
+    private CurvedAnimation _statusCurved = null!;
+    private AnimationController _statusTransition = null!;
 
     private bool IsInteractive => Widget.Enabled && Widget.Status != ButtonStatus.Loading;
     private bool EffectivePressed => (_isPressed || Widget.ForceActive) && IsInteractive;
     private bool EffectiveHovered => (_isHovered || Widget.ForceHover) && IsInteractive;
     private bool EffectiveFocused => FocusNode.ShowsFocusIndicator || Widget.ForceFocus;
+
+    public void Activate()
+    {
+        if (IsInteractive)
+        {
+            HandleTap(KeyboardActivation);
+        }
+    }
 
     public override void InitState()
     {
@@ -79,19 +87,12 @@ internal class IconButtonState : FocusableState<IconButton>, IActivatable
         base.Dispose();
     }
 
-    public void Activate()
-    {
-        if (IsInteractive) HandleTap(KeyboardActivation);
-    }
-
-    private void PlaySound()
-    {
-        Element.Owner!.GetSoundPlayer().Play("click", Pitch.Varied(.95f, .05f), .2f);
-    }
-
     private void HandleTap(PointerEvent e)
     {
-        if (IsInteractive) Widget.OnTap?.Invoke(e);
+        if (IsInteractive)
+        {
+            Widget.OnTap?.Invoke(e);
+        }
     }
 
     public override Widget Build(BuildContext context)
@@ -109,7 +110,7 @@ internal class IconButtonState : FocusableState<IconButton>, IActivatable
         var backgroundColor = GetBackgroundColor(theme, variantStyle);
         var borderColor = GetBorderColor(theme, variantStyle);
         var foregroundColor = GetForegroundColor(theme);
-        var scale = EffectivePressed ? 0.96f : (EffectiveHovered ? 1.03f : 1f);
+        var scale = EffectivePressed ? 0.96f : EffectiveHovered ? 1.03f : 1f;
 
         return new MouseRegion
         (
@@ -121,7 +122,10 @@ internal class IconButtonState : FocusableState<IconButton>, IActivatable
                 (() =>
                     {
                         _isPressed = true;
-                        if (IsInteractive) PlaySound();
+                        if (IsInteractive)
+                        {
+                            this.Click();
+                        }
                     }
                 ),
                 onRelease: _ => SetState(() => _isPressed = false),
@@ -133,33 +137,39 @@ internal class IconButtonState : FocusableState<IconButton>, IActivatable
                         _isPressed = false;
                     }
                 ),
-                child: new AnimatedScale
+                child: new RepaintBoundary
                 (
-                    scale: scale,
-                    duration: TimeSpan.FromMilliseconds(140),
-                    curve: Curves.EaseOut,
-                    alignment: Alignment.Center,
-                    child: new AnimatedContainer
+                    new AnimatedScale
                     (
-                        duration: TimeSpan.FromMilliseconds(200),
-                        curve: Curves.EaseOutCubic,
-                        style: new BoxStyle
-                        {
-                            Color = backgroundColor,
-                            Width = style.Size,
-                            Height = style.Size,
-                            BorderColor = borderColor,
-                            BorderThickness = MathF.Max(1f, variantStyle.BorderThickness),
-                            CornerRadius = new Vector4(variantStyle.CornerRadius),
-                            BoxShadows = BuildShadows(Widget.Variant, backgroundColor)
-                        },
-                        child: new Opacity
+                        scale,
+                        TimeSpan.FromMilliseconds(140),
+                        Curves.EaseOut,
+                        alignment: Alignment.Center,
+                        child: new AnimatedContainer
                         (
-                            Widget.Enabled ? 1f : 0.45f,
-                            new IconTheme
+                            duration: TimeSpan.FromMilliseconds(200),
+                            curve: Curves.EaseOutCubic,
+                            style: new BoxStyle
+                            {
+                                Color = backgroundColor,
+                                Width = style.Size,
+                                Height = style.Size,
+                                BorderColor = borderColor,
+                                BorderThickness = MathF.Max(1f, variantStyle.BorderThickness),
+                                CornerRadius = new Vector4(variantStyle.CornerRadius),
+                                BoxShadows = BuildShadows(Widget.Variant, backgroundColor)
+                            },
+                            child: new Opacity
                             (
-                                new IconThemeData { Color = foregroundColor },
-                                new Center(BuildContent(foregroundColor))
+                                Widget.Enabled ? 1f : 0.45f,
+                                new IconTheme
+                                (
+                                    new IconThemeData
+                                    {
+                                        Color = foregroundColor
+                                    },
+                                    new Center(BuildContent(foregroundColor))
+                                )
                             )
                         )
                     )
@@ -170,8 +180,14 @@ internal class IconButtonState : FocusableState<IconButton>, IActivatable
 
     private Vector4 GetForegroundColor(ThemeData theme)
     {
-        if (Widget.Status == ButtonStatus.Error) return theme.ColorScheme.OnError;
-        if (Widget.Status == ButtonStatus.Success) return theme.ColorScheme.OnSecondary;
+        if (Widget.Status == ButtonStatus.Error)
+        {
+            return theme.ColorScheme.OnError;
+        }
+        if (Widget.Status == ButtonStatus.Success)
+        {
+            return theme.ColorScheme.OnSecondary;
+        }
 
         return Widget.Variant switch
         {
@@ -183,16 +199,31 @@ internal class IconButtonState : FocusableState<IconButton>, IActivatable
 
     private Vector4 GetBackgroundColor(ThemeData theme, ButtonVariantStyle variant)
     {
-        if (Widget.Status == ButtonStatus.Error) return theme.ColorScheme.Error;
-        if (Widget.Status == ButtonStatus.Success) return theme.ColorScheme.Secondary;
-        if (EffectivePressed) return variant.PressBackgroundColor;
-        if (EffectiveHovered) return variant.HoverBackgroundColor;
+        if (Widget.Status == ButtonStatus.Error)
+        {
+            return theme.ColorScheme.Error;
+        }
+        if (Widget.Status == ButtonStatus.Success)
+        {
+            return theme.ColorScheme.Secondary;
+        }
+        if (EffectivePressed)
+        {
+            return variant.PressBackgroundColor;
+        }
+        if (EffectiveHovered)
+        {
+            return variant.HoverBackgroundColor;
+        }
         return variant.BackgroundColor;
     }
 
     private Vector4 GetBorderColor(ThemeData theme, ButtonVariantStyle variant)
     {
-        if (EffectiveFocused) return theme.FocusOutlineColor;
+        if (EffectiveFocused)
+        {
+            return theme.FocusOutlineColor;
+        }
 
         if (Widget.Variant == ButtonVariant.Ghost && variant.BorderColor.W < 0.01f)
         {
@@ -206,9 +237,10 @@ internal class IconButtonState : FocusableState<IconButton>, IActivatable
     {
         var shadow = new BoxShadow
         (
-            backgroundColor.WithAlpha(variant is ButtonVariant.Primary or ButtonVariant.Danger ? 0.35f : 0.17f),
+            backgroundColor.WithAlpha
+                (variant is ButtonVariant.Primary or ButtonVariant.Danger ? 0.35f : 0.17f),
             Vector2.Zero,
-            BlurRadius: 6
+            6
         );
         var shadows = new List<BoxShadow>();
 
@@ -219,7 +251,13 @@ internal class IconButtonState : FocusableState<IconButton>, IActivatable
 
         if (EffectiveHovered && !EffectivePressed)
         {
-            shadows.Add(shadow with { Offset = new Vector2(0, 3) });
+            shadows.Add
+            (
+                shadow with
+                {
+                    Offset = new Vector2(0, 3)
+                }
+            );
         }
 
         return shadows.ToArray();
@@ -229,8 +267,8 @@ internal class IconButtonState : FocusableState<IconButton>, IActivatable
     {
         return new AnimatedBuilder
         (
-            animation: _statusTransition,
-            builder: _ => new Opacity
+            _statusTransition,
+            _ => new Opacity
             (
                 (float)_statusCurved.Value,
                 Widget.Status == ButtonStatus.Loading

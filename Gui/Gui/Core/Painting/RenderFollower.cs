@@ -1,3 +1,4 @@
+using System;
 using Gui.Core.Framework;
 using Gui.Core.Layout;
 using Gui.Rendering;
@@ -12,13 +13,20 @@ namespace Gui.Core.Painting;
 /// </summary>
 internal class RenderFollower : RenderProxyBox
 {
-    public override bool IsHitTestTarget => true;
+    private bool _registeredWithLink;
+
+    /// <summary>
+    ///     A follower is a placement wrapper, not a surface: it must not claim a pointer
+    ///     its own subtree refused. Claiming it would let an <c>IgnorePointer</c> overlay
+    ///     (a hover card, a tooltip) swallow the pointer for whatever it happens to cover —
+    ///     and since the overlay stack hit-tests its topmost entry first and stops at the
+    ///     first hit, the widget underneath would never see the pointer at all.
+    /// </summary>
+    public override bool IsHitTestTarget => false;
 
     public LayerLink? Link { get; set; }
     public Vector2 Offset { get; set; }
     public bool ShowAbove { get; set; }
-
-    private bool _registeredWithLink;
 
     /// <summary>
     ///     Eagerly writes <see cref="StackParentData" /> with <c>Left=0, Top=0</c>
@@ -29,7 +37,10 @@ internal class RenderFollower : RenderProxyBox
     {
         if (ParentData is not StackParentData)
         {
-            ParentData = new StackParentData { Left = 0, Top = 0 };
+            ParentData = new StackParentData
+            {
+                Left = 0, Top = 0
+            };
         }
     }
 
@@ -62,6 +73,28 @@ internal class RenderFollower : RenderProxyBox
     // The target moved in another window; nudge our own window to repaint.
     private void OnTargetMoved() => MarkNeedsPaint();
 
+    /// <summary>
+    ///     The target's extent measured in the follower's own space. A target sitting
+    ///     inside a scaled viewport paints larger (or smaller) than its layout
+    ///     <see cref="RenderObject.Size" />, and placement happens in follower space — so
+    ///     map the box through <see cref="RenderObject.LocalToGlobal" /> instead of reading
+    ///     <c>Size</c> directly. Reading it raw makes an overlay anchored below a zoomed
+    ///     trigger land on top of that trigger, by exactly the zoom factor.
+    /// </summary>
+    protected static Vector2 TargetSpan
+    (
+        RenderObject target
+    )
+    {
+        var origin = target.LocalToGlobal(Vector2.Zero);
+        var far = target.LocalToGlobal(target.Size);
+        return new Vector2
+        (
+            Math.Abs(far.X - origin.X),
+            Math.Abs(far.Y - origin.Y)
+        );
+    }
+
     public override void Dispose()
     {
         if (_registeredWithLink)
@@ -72,7 +105,8 @@ internal class RenderFollower : RenderProxyBox
         base.Dispose();
     }
 
-    public override void Layout(
+    public override void Layout
+    (
         LayoutConstraints constraints
     )
     {
@@ -94,7 +128,8 @@ internal class RenderFollower : RenderProxyBox
         }
     }
 
-    public override void Paint(
+    public override void Paint
+    (
         PaintingContext context
     )
     {
@@ -111,7 +146,8 @@ internal class RenderFollower : RenderProxyBox
         {
             X = desiredX;
             Y = desiredY;
-            context.Canvas?.Translate(
+            context.Canvas?.Translate
+            (
                 dx,
                 dy
             );

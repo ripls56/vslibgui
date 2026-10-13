@@ -23,7 +23,8 @@ public class RenderWrap : RenderBox
     public FlexDirection Direction
     {
         get;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref field,
             value,
             relayout: true
@@ -34,7 +35,8 @@ public class RenderWrap : RenderBox
     public float Spacing
     {
         get => _spacing;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref _spacing,
             value,
             relayout: true
@@ -45,7 +47,8 @@ public class RenderWrap : RenderBox
     public float RunSpacing
     {
         get => _runSpacing;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref _runSpacing,
             value,
             relayout: true
@@ -56,7 +59,8 @@ public class RenderWrap : RenderBox
     public MainAxisAlignment MainAxisAlignment
     {
         get => _mainAxisAlignment;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref _mainAxisAlignment,
             value,
             relayout: true
@@ -67,7 +71,8 @@ public class RenderWrap : RenderBox
     public CrossAxisAlignment CrossAxisAlignment
     {
         get => _crossAxisAlignment;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref _crossAxisAlignment,
             value,
             relayout: true
@@ -78,7 +83,8 @@ public class RenderWrap : RenderBox
     public MainAxisAlignment RunAlignment
     {
         get => _runAlignment;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref _runAlignment,
             value,
             relayout: true
@@ -103,7 +109,8 @@ public class RenderWrap : RenderBox
         }
 
         // 1. Measure children with loose constraints
-        var childConstraints = new LayoutConstraints(
+        var childConstraints = new LayoutConstraints
+        (
             0,
             Constraints.MaxWidth,
             0,
@@ -138,7 +145,8 @@ public class RenderWrap : RenderBox
             if (runCount > 0 && runMainExtent + spacingNeeded + childMain > maxMainAxis + 0.001f)
             {
                 // Finalize current run
-                runs.Add(
+                runs.Add
+                (
                     new RunMetrics
                     {
                         StartIndex = runStart,
@@ -155,7 +163,8 @@ public class RenderWrap : RenderBox
             else
             {
                 runMainExtent += spacingNeeded + childMain;
-                runCrossExtent = Math.Max(
+                runCrossExtent = Math.Max
+                (
                     runCrossExtent,
                     childCross
                 );
@@ -166,7 +175,8 @@ public class RenderWrap : RenderBox
         // Final run
         if (runCount > 0)
         {
-            runs.Add(
+            runs.Add
+            (
                 new RunMetrics
                 {
                     StartIndex = runStart,
@@ -192,18 +202,21 @@ public class RenderWrap : RenderBox
         float maxRunMain = 0;
         foreach (var run in runs)
         {
-            maxRunMain = Math.Max(
+            maxRunMain = Math.Max
+            (
                 maxRunMain,
                 run.MainAxisExtent
             );
         }
 
         var containerSize = isHorizontal
-            ? new Vector2(
+            ? new Vector2
+            (
                 maxRunMain,
                 totalCrossExtent
             )
-            : new Vector2(
+            : new Vector2
+            (
                 totalCrossExtent,
                 maxRunMain
             );
@@ -213,7 +226,8 @@ public class RenderWrap : RenderBox
         var containerCross = isHorizontal
             ? Size.Y
             : Size.X;
-        var freeCrossSpace = Math.Max(
+        var freeCrossSpace = Math.Max
+        (
             0,
             containerCross - totalCrossExtent
         );
@@ -261,7 +275,8 @@ public class RenderWrap : RenderBox
 
         foreach (var run in runs)
         {
-            var freeMainSpace = Math.Max(
+            var freeMainSpace = Math.Max
+            (
                 0,
                 containerMain - run.MainAxisExtent
             );
@@ -335,14 +350,16 @@ public class RenderWrap : RenderBox
     }
 
     /// <inheritdoc />
-    public override float GetMinIntrinsicWidth(
+    public override float GetMinIntrinsicWidth
+    (
         float height
     )
     {
         float max = 0;
         foreach (var child in Children)
         {
-            max = Math.Max(
+            max = Math.Max
+            (
                 max,
                 child.GetMinIntrinsicWidth(height)
             );
@@ -352,13 +369,15 @@ public class RenderWrap : RenderBox
     }
 
     /// <inheritdoc />
-    public override float GetMaxIntrinsicWidth(
+    public override float GetMaxIntrinsicWidth
+    (
         float height
     )
     {
         if (Direction == FlexDirection.Horizontal)
         {
-            var total = _spacing * Math.Max(
+            var total = _spacing * Math.Max
+            (
                 0,
                 Children.Count - 1
             );
@@ -373,7 +392,8 @@ public class RenderWrap : RenderBox
         float max = 0;
         foreach (var child in Children)
         {
-            max = Math.Max(
+            max = Math.Max
+            (
                 max,
                 child.GetMaxIntrinsicWidth(height)
             );
@@ -383,14 +403,16 @@ public class RenderWrap : RenderBox
     }
 
     /// <inheritdoc />
-    public override float GetMinIntrinsicHeight(
+    public override float GetMinIntrinsicHeight
+    (
         float width
     )
     {
         float max = 0;
         foreach (var child in Children)
         {
-            max = Math.Max(
+            max = Math.Max
+            (
                 max,
                 child.GetMinIntrinsicHeight(width)
             );
@@ -400,13 +422,15 @@ public class RenderWrap : RenderBox
     }
 
     /// <inheritdoc />
-    public override float GetMaxIntrinsicHeight(
+    public override float GetMaxIntrinsicHeight
+    (
         float width
     )
     {
         if (Direction == FlexDirection.Vertical)
         {
-            var total = _spacing * Math.Max(
+            var total = _spacing * Math.Max
+            (
                 0,
                 Children.Count - 1
             );
@@ -421,7 +445,8 @@ public class RenderWrap : RenderBox
         float max = 0;
         foreach (var child in Children)
         {
-            max = Math.Max(
+            max = Math.Max
+            (
                 max,
                 child.GetMaxIntrinsicHeight(width)
             );

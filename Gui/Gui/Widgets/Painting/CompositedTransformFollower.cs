@@ -28,13 +28,15 @@ namespace Gui.Widgets.Painting;
 /// </summary>
 public class CompositedTransformFollower : SingleChildWidget
 {
-    public CompositedTransformFollower(
+    public CompositedTransformFollower
+    (
         LayerLink link,
         Vector2? offset = null,
         Widget? child = null,
         bool showAbove = false,
         Framework.Key? key = null
-    ) : base(
+    ) : base
+    (
         child,
         key
     )
@@ -69,7 +71,8 @@ public class CompositedTransformFollower : SingleChildWidget
         return ro;
     }
 
-    public override void UpdateRenderObject(
+    public override void UpdateRenderObject
+    (
         RenderObject renderObject
     )
     {

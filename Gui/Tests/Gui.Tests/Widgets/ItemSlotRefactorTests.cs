@@ -102,6 +102,24 @@ public class ItemSlotRefactorTests
         Assert.DoesNotThrow(() => new FlatItemSlot());
 
     [Test]
+    public void ItemStackDisplay_WithoutStack_BuildsRawIconOnly()
+    {
+        var display = new ItemStackDisplay(showTooltip: true);
+        var built = display.Build(new BuildContext(display, null!));
+
+        Assert.That(built, Is.TypeOf<RawItemStackDisplay>());
+    }
+
+    [Test]
+    public void ItemStackDisplay_TooltipDisabled_BuildsRawIconOnly()
+    {
+        var display = new ItemStackDisplay(showTooltip: false);
+        var built = display.Build(new BuildContext(display, null!));
+
+        Assert.That(built, Is.TypeOf<RawItemStackDisplay>());
+    }
+
+    [Test]
     public void FlatItemSlot_NullStyleUsesDefault()
     {
         var slot = new FlatItemSlot(style: null);

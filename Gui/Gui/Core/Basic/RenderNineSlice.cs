@@ -129,8 +129,8 @@ public class RenderNineSlice : RenderBox
 
     public override bool IsHitTestTarget =>
         HitTestBehavior == HitTestBehavior.Opaque ||
-        (HitTestBehavior == HitTestBehavior.Defer &&
-         (_bitmap != null || Color.W > 0 || BorderThickness > 0));
+        HitTestBehavior == HitTestBehavior.Defer &&
+        (_bitmap != null || Color.W > 0 || BorderThickness > 0);
 
     private void InvalidateSliceCache()
     {
@@ -141,7 +141,8 @@ public class RenderNineSlice : RenderBox
     protected override void PerformLayout()
     {
         // Apply explicit width/height constraints if provided
-        var additional = new LayoutConstraints(
+        var additional = new LayoutConstraints
+        (
             _minWidth ?? 0,
             _maxWidth ?? float.PositiveInfinity,
             _minHeight ?? 0,
@@ -161,9 +162,12 @@ public class RenderNineSlice : RenderBox
         {
             var intrinsicW = _bitmap?.Width ?? 0f;
             var intrinsicH = _bitmap?.Height ?? 0f;
-            Size = Constraints.Constrain(
-                innerConstraints.Constrain(
-                    new Vector2(
+            Size = Constraints.Constrain
+            (
+                innerConstraints.Constrain
+                (
+                    new Vector2
+                    (
                         intrinsicW,
                         intrinsicH
                     )
@@ -172,7 +176,8 @@ public class RenderNineSlice : RenderBox
         }
     }
 
-    protected override void PaintInternal(
+    protected override void PaintInternal
+    (
         PaintingContext context
     )
     {
@@ -192,15 +197,18 @@ public class RenderNineSlice : RenderBox
             if (_sliceCache == null)
             {
                 using var recorder = new SKPictureRecorder();
-                var canvas = recorder.BeginRecording(
-                    new SKRect(
+                var canvas = recorder.BeginRecording
+                (
+                    new SKRect
+                    (
                         0,
                         0,
                         Size.X,
                         Size.Y
                     )
                 );
-                canvas.DrawNineSlice(
+                canvas.DrawNineSlice
+                (
                     Vector2.Zero,
                     Size,
                     _bitmap,
@@ -219,7 +227,8 @@ public class RenderNineSlice : RenderBox
 
         if (Color.W > 0 || BorderThickness > 0)
         {
-            context.Canvas.DrawBox(
+            context.Canvas.DrawBox
+            (
                 Vector2.Zero,
                 Size,
                 Color,

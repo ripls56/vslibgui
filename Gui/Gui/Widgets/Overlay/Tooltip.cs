@@ -1,4 +1,5 @@
 using System;
+using Gui.Core.Input;
 using Gui.Core.Painting;
 using Gui.Rendering;
 using Gui.Widgets.Animations;
@@ -29,7 +30,8 @@ namespace Gui.Widgets.Overlay;
 /// </summary>
 public class Tooltip : StatefulWidget
 {
-    public Tooltip(
+    public Tooltip
+    (
         Widget child,
         Widget content,
         TimeSpan? waitDuration = null,
@@ -94,6 +96,7 @@ internal class TooltipState : State<Tooltip>
     private readonly LayerLink _link = new();
     private AnimationController _anim = null!;
     private Ticker _delayTicker = null!;
+    private Ticker _pointerGuardTicker = null!;
     private TimeSpan _elapsed;
     private bool _isVisible;
     private OverlayEntry? _overlayEntry;
@@ -102,16 +105,21 @@ internal class TooltipState : State<Tooltip>
     {
         base.InitState();
         var vsync = Element.Owner!.GetTickerProvider();
-        _anim = new AnimationController(
+        _anim = new AnimationController
+        (
             Widget.FadeDuration,
             vsync
         );
         _anim.OnValueChanged += _onAnimTick;
         _anim.OnStatusChanged += _onAnimStatus;
+        // Created before the delay ticker so it runs first each frame: a pointer that already
+        // left the trigger must stop the wait instead of letting it open a doomed tooltip.
+        _pointerGuardTicker = vsync.CreateTicker(_onPointerGuardTick);
         _delayTicker = vsync.CreateTicker(_onDelayTick);
     }
 
-    public override void UpdateWidget(
+    public override void UpdateWidget
+    (
         Tooltip oldWidget
     )
     {
@@ -126,6 +134,7 @@ internal class TooltipState : State<Tooltip>
     public override void Dispose()
     {
         _delayTicker.Dispose();
+        _pointerGuardTicker.Dispose();
         _anim.OnValueChanged -= _onAnimTick;
         _anim.OnStatusChanged -= _onAnimStatus;
         _overlayEntry?.Remove();
@@ -135,11 +144,13 @@ internal class TooltipState : State<Tooltip>
         base.Dispose();
     }
 
-    private void _onEnter(
+    private void _onEnter
+    (
         PointerEvent _
     )
     {
         _elapsed = TimeSpan.Zero;
+        _pointerGuardTicker.Start();
         if (_isVisible)
         {
             _anim.Forward();
@@ -149,11 +160,13 @@ internal class TooltipState : State<Tooltip>
         _delayTicker.Start();
     }
 
-    private void _onExit(
+    private void _onExit
+    (
         PointerEvent _
     )
     {
         _delayTicker.Stop();
+        _pointerGuardTicker.Stop();
         _elapsed = TimeSpan.Zero;
         if (_isVisible)
         {
@@ -161,7 +174,62 @@ internal class TooltipState : State<Tooltip>
         }
     }
 
-    private void _onDelayTick(
+    /// <summary>
+    ///     Per-frame fallback for a lost pointer-exit. The engine routes a mouse move to one
+    ///     dialog only, so a window in front of the trigger swallows the move and neither the
+    ///     trigger nor this tooltip ever hears that the pointer left. Compare the global cursor
+    ///     with the trigger's screen rect and drop the hover when the cursor is no longer over
+    ///     it — before the wait elapses, so a starved tooltip never opens, and while visible.
+    /// </summary>
+    private void _onPointerGuardTick
+    (
+        TimeSpan _
+    )
+    {
+        if (_isPointerOverTrigger())
+        {
+            return;
+        }
+
+        _delayTicker.Stop();
+        _pointerGuardTicker.Stop();
+        _elapsed = TimeSpan.Zero;
+        if (_isVisible)
+        {
+            _close();
+        }
+    }
+
+    /// <summary>
+    ///     True while the global cursor is inside the trigger's screen rect. Returns true when
+    ///     the position is unknown (no game input in unit tests) or the trigger has no layout
+    ///     yet, so the guard only ever acts on a measured miss.
+    /// </summary>
+    private bool _isPointerOverTrigger()
+    {
+        var cursor = GlobalPointer.LogicalPosition;
+        if (cursor == null)
+        {
+            return true;
+        }
+
+        var ro = Element.RenderObject;
+        if (ro == null)
+        {
+            return false;
+        }
+
+        if (ro.Size.X <= 0f || ro.Size.Y <= 0f)
+        {
+            return true;
+        }
+
+        var topLeft = ro.LocalToGlobal(Vector2.Zero) + ro.GetScreenOffset();
+        return GlobalPointer.InsideRect(cursor.Value, topLeft, ro.Size);
+    }
+
+    private void _onDelayTick
+    (
         TimeSpan dt
     )
     {
@@ -192,8 +260,10 @@ internal class TooltipState : State<Tooltip>
         }
         else
         {
-            var overlay = Overlay.Of(
-                new BuildContext(
+            var overlay = Overlay.Of
+            (
+                new BuildContext
+                (
                     Widget,
                     Element
                 )
@@ -221,7 +291,8 @@ internal class TooltipState : State<Tooltip>
         _anim.Reverse();
     }
 
-    private void _onAnimTick(
+    private void _onAnimTick
+    (
         double value
     )
     {
@@ -234,7 +305,8 @@ internal class TooltipState : State<Tooltip>
         _overlayEntry.MarkNeedsBuild();
     }
 
-    private void _onAnimStatus(
+    private void _onAnimStatus
+    (
         AnimationStatus status
     )
     {
@@ -273,24 +345,28 @@ internal class TooltipState : State<Tooltip>
         var theme = Element.DependOnInheritedWidgetOfExactType<Theme>();
         var colors = theme?.Data.ColorScheme ?? ThemeData.Default.ColorScheme;
 
-        return new AnchoredOverlay(
+        return new AnchoredOverlay
+        (
             globalPos.X + anchorX,
             globalPos.Y,
             size.Y,
             Widget.VerticalGap,
             OverlaySide.Top,
             HorizontalAnchor.Center,
-            link: _link,
-            child: new Opacity(
+            _link,
+            new Opacity
+            (
                 t,
-                new Container(
+                new Container
+                (
                     new BoxStyle
                     {
                         Color = colors.Background,
                         BorderThickness = 1f,
                         BorderColor = colors.Border,
                         CornerRadius = new Vector4(4f),
-                        Padding = EdgeInsets.Symmetric(
+                        Padding = EdgeInsets.Symmetric
+                        (
                             5f,
                             10f
                         )
@@ -301,13 +377,16 @@ internal class TooltipState : State<Tooltip>
         );
     }
 
-    public override Widget Build(
+    public override Widget Build
+    (
         BuildContext context
     )
     {
-        return new CompositedTransformTarget(
+        return new CompositedTransformTarget
+        (
             _link,
-            new MouseRegion(
+            new MouseRegion
+            (
                 onEnter: _onEnter,
                 onExit: _onExit,
                 child: Widget.Child

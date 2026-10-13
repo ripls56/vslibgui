@@ -17,7 +17,8 @@ public class TickerScheduler : ITickerProvider, IDisposable
         _tickers.Clear();
     }
 
-    public Ticker CreateTicker(
+    public Ticker CreateTicker
+    (
         Action<TimeSpan> onTick
     )
     {
@@ -26,7 +27,8 @@ public class TickerScheduler : ITickerProvider, IDisposable
         return ticker;
     }
 
-    public void Update(
+    public void Update
+    (
         TimeSpan elapsed
     )
     {

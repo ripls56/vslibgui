@@ -10,7 +10,8 @@ public class GestureDetector : SingleChildWidget, IPointerEnterHandler, IPointer
     IPointerWheelHandler, IPointerDragEnterHandler, IPointerDragExitHandler,
     ISelectiveEventHandler
 {
-    public GestureDetector(
+    public GestureDetector
+    (
         Widget? child = null,
         Action<PointerEvent>? onTap = null,
         Action<PointerEvent>? onEnter = null,
@@ -44,7 +45,8 @@ public class GestureDetector : SingleChildWidget, IPointerEnterHandler, IPointer
     public Action<PointerEvent>? OnDragEnter { get; }
     public Action<PointerEvent>? OnDragExit { get; }
 
-    public void OnPointerClick(
+    public void OnPointerClick
+    (
         PointerEvent args
     )
     {
@@ -55,7 +57,8 @@ public class GestureDetector : SingleChildWidget, IPointerEnterHandler, IPointer
         }
     }
 
-    public void OnPointerDown(
+    public void OnPointerDown
+    (
         PointerEvent args
     )
     {
@@ -66,7 +69,8 @@ public class GestureDetector : SingleChildWidget, IPointerEnterHandler, IPointer
         }
     }
 
-    public void OnPointerDragEnter(
+    public void OnPointerDragEnter
+    (
         PointerEvent args
     )
     {
@@ -77,7 +81,8 @@ public class GestureDetector : SingleChildWidget, IPointerEnterHandler, IPointer
         }
     }
 
-    public void OnPointerDragExit(
+    public void OnPointerDragExit
+    (
         PointerEvent args
     )
     {
@@ -88,7 +93,8 @@ public class GestureDetector : SingleChildWidget, IPointerEnterHandler, IPointer
         }
     }
 
-    public void OnPointerEnter(
+    public void OnPointerEnter
+    (
         PointerEvent args
     )
     {
@@ -99,7 +105,8 @@ public class GestureDetector : SingleChildWidget, IPointerEnterHandler, IPointer
         }
     }
 
-    public void OnPointerExit(
+    public void OnPointerExit
+    (
         PointerEvent args
     )
     {
@@ -110,7 +117,8 @@ public class GestureDetector : SingleChildWidget, IPointerEnterHandler, IPointer
         }
     }
 
-    public void OnPointerMove(
+    public void OnPointerMove
+    (
         PointerEvent args
     )
     {
@@ -121,7 +129,8 @@ public class GestureDetector : SingleChildWidget, IPointerEnterHandler, IPointer
         }
     }
 
-    public void OnPointerUp(
+    public void OnPointerUp
+    (
         PointerEvent args
     )
     {
@@ -132,12 +141,14 @@ public class GestureDetector : SingleChildWidget, IPointerEnterHandler, IPointer
         }
     }
 
-    public void OnMouseWheel(
+    public void OnMouseWheel
+    (
         PointerEvent args
     ) =>
         OnWheel?.Invoke(args);
 
-    public bool HandlesEvent(
+    public bool HandlesEvent
+    (
         Type eventInterface
     )
     {
@@ -191,7 +202,8 @@ public class GestureDetector : SingleChildWidget, IPointerEnterHandler, IPointer
 
     public override RenderObject CreateRenderObject() => new RenderProxyBox();
 
-    public override void UpdateRenderObject(
+    public override void UpdateRenderObject
+    (
         RenderObject renderObject
     )
     {

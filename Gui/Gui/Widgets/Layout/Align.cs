@@ -6,7 +6,8 @@ namespace Gui.Widgets.Layout;
 
 public class Align : SingleChildWidget
 {
-    public Align(
+    public Align
+    (
         Alignment alignment,
         Widget? child = null,
         Framework.Key? key = null
@@ -18,9 +19,13 @@ public class Align : SingleChildWidget
     public Alignment Alignment { get; }
 
     public override RenderObject CreateRenderObject() =>
-        new RenderPositionedBox { Alignment = Alignment };
+        new RenderPositionedBox
+        {
+            Alignment = Alignment
+        };
 
-    public override void UpdateRenderObject(
+    public override void UpdateRenderObject
+    (
         RenderObject renderObject
     )
     {

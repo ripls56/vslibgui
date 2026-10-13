@@ -16,7 +16,8 @@ public abstract class Flex : MultiChildWidget
     ///     Creates a flex layout widget with the given direction and
     ///     alignment parameters.
     /// </summary>
-    protected Flex(
+    protected Flex
+    (
         FlexDirection direction,
         float spacing = 0,
         MainAxisAlignment mainAxisAlignment = MainAxisAlignment.Start,
@@ -62,7 +63,8 @@ public abstract class Flex : MultiChildWidget
     }
 
     /// <inheritdoc />
-    public override void UpdateRenderObject(
+    public override void UpdateRenderObject
+    (
         RenderObject renderObject
     )
     {

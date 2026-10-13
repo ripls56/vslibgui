@@ -11,8 +11,9 @@ public class SoundHandle : IDisposable
 {
     private ILoadedSound? _sound;
 
-    internal SoundHandle(
-        ILoadedSound sound
+    internal SoundHandle
+    (
+        ILoadedSound? sound
     )
     {
         _sound = sound;
@@ -34,13 +35,15 @@ public class SoundHandle : IDisposable
     public void Stop() => _sound?.Stop();
 
     /// <summary>Sets the playback pitch multiplier (1.0 = normal).</summary>
-    public void SetPitch(
+    public void SetPitch
+    (
         float pitch
     ) =>
         _sound?.SetPitch(pitch);
 
     /// <summary>Sets the playback volume (0.0–1.0).</summary>
-    public void SetVolume(
+    public void SetVolume
+    (
         float volume
     ) =>
         _sound?.SetVolume(volume);

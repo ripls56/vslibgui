@@ -1,7 +1,6 @@
 using System;
 using Gui.Rendering;
 using Gui.Rendering.Text;
-using Gui.Widgets.Framework;
 using OpenTK.Mathematics;
 
 namespace Gui.Theming;
@@ -27,30 +26,35 @@ public sealed class ColorOverrideSection
     public string? StateSelected { get; set; }
     public string? OutlineVariant { get; set; }
 
-    internal ColorOverrides? ToOverrides() => AnySet() ? new ColorOverrides
-    {
-        Primary = Parse(Primary),
-        OnPrimary = Parse(OnPrimary),
-        Secondary = Parse(Secondary),
-        OnSecondary = Parse(OnSecondary),
-        Surface = Parse(Surface),
-        OnSurface = Parse(OnSurface),
-        OnSurfaceVariant = Parse(OnSurfaceVariant),
-        Background = Parse(Background),
-        OnBackground = Parse(OnBackground),
-        Border = Parse(Border),
-        Error = Parse(Error),
-        OnError = Parse(OnError),
-        SurfaceLow = Parse(SurfaceLow),
-        SurfaceHigh = Parse(SurfaceHigh),
-        StateHover = Parse(StateHover),
-        StateSelected = Parse(StateSelected),
-        OutlineVariant = Parse(OutlineVariant)
-    } : null;
+    internal ColorOverrides? ToOverrides() => AnySet()
+        ? new ColorOverrides
+        {
+            Primary = Parse(Primary),
+            OnPrimary = Parse(OnPrimary),
+            Secondary = Parse(Secondary),
+            OnSecondary = Parse(OnSecondary),
+            Surface = Parse(Surface),
+            OnSurface = Parse(OnSurface),
+            OnSurfaceVariant = Parse(OnSurfaceVariant),
+            Background = Parse(Background),
+            OnBackground = Parse(OnBackground),
+            Border = Parse(Border),
+            Error = Parse(Error),
+            OnError = Parse(OnError),
+            SurfaceLow = Parse(SurfaceLow),
+            SurfaceHigh = Parse(SurfaceHigh),
+            StateHover = Parse(StateHover),
+            StateSelected = Parse(StateSelected),
+            OutlineVariant = Parse(OutlineVariant)
+        }
+        : null;
 
     internal static ColorOverrideSection? From(ColorOverrides? o)
     {
-        if (o is null) return null;
+        if (o is null)
+        {
+            return null;
+        }
         return new ColorOverrideSection
         {
             Primary = o.Primary?.ToHex(),
@@ -115,34 +119,39 @@ public sealed class TypographyOverrideSection
     public string? CaptionWeight { get; set; }
     public string? CaptionColor { get; set; }
 
-    internal TypographyOverrides? ToOverrides() => AnySet() ? new TypographyOverrides
-    {
-        DisplayFontSize = ToFloat(DisplayFontSize),
-        DisplayWeight = ParseWeight(DisplayWeight),
-        DisplayColor = Parse(DisplayColor),
-        HeadlineFontSize = ToFloat(HeadlineFontSize),
-        HeadlineWeight = ParseWeight(HeadlineWeight),
-        HeadlineColor = Parse(HeadlineColor),
-        TitleFontSize = ToFloat(TitleFontSize),
-        TitleWeight = ParseWeight(TitleWeight),
-        TitleColor = Parse(TitleColor),
-        SubtitleFontSize = ToFloat(SubtitleFontSize),
-        SubtitleWeight = ParseWeight(SubtitleWeight),
-        SubtitleColor = Parse(SubtitleColor),
-        BodyFontSize = ToFloat(BodyFontSize),
-        BodyWeight = ParseWeight(BodyWeight),
-        BodyColor = Parse(BodyColor),
-        LabelFontSize = ToFloat(LabelFontSize),
-        LabelWeight = ParseWeight(LabelWeight),
-        LabelColor = Parse(LabelColor),
-        CaptionFontSize = ToFloat(CaptionFontSize),
-        CaptionWeight = ParseWeight(CaptionWeight),
-        CaptionColor = Parse(CaptionColor)
-    } : null;
+    internal TypographyOverrides? ToOverrides() => AnySet()
+        ? new TypographyOverrides
+        {
+            DisplayFontSize = ToFloat(DisplayFontSize),
+            DisplayWeight = ParseWeight(DisplayWeight),
+            DisplayColor = Parse(DisplayColor),
+            HeadlineFontSize = ToFloat(HeadlineFontSize),
+            HeadlineWeight = ParseWeight(HeadlineWeight),
+            HeadlineColor = Parse(HeadlineColor),
+            TitleFontSize = ToFloat(TitleFontSize),
+            TitleWeight = ParseWeight(TitleWeight),
+            TitleColor = Parse(TitleColor),
+            SubtitleFontSize = ToFloat(SubtitleFontSize),
+            SubtitleWeight = ParseWeight(SubtitleWeight),
+            SubtitleColor = Parse(SubtitleColor),
+            BodyFontSize = ToFloat(BodyFontSize),
+            BodyWeight = ParseWeight(BodyWeight),
+            BodyColor = Parse(BodyColor),
+            LabelFontSize = ToFloat(LabelFontSize),
+            LabelWeight = ParseWeight(LabelWeight),
+            LabelColor = Parse(LabelColor),
+            CaptionFontSize = ToFloat(CaptionFontSize),
+            CaptionWeight = ParseWeight(CaptionWeight),
+            CaptionColor = Parse(CaptionColor)
+        }
+        : null;
 
     internal static TypographyOverrideSection? From(TypographyOverrides? o)
     {
-        if (o is null) return null;
+        if (o is null)
+        {
+            return null;
+        }
         return new TypographyOverrideSection
         {
             DisplayFontSize = ToDouble(o.DisplayFontSize),
@@ -183,8 +192,11 @@ public sealed class TypographyOverrideSection
 
     private static FontWeight? ParseWeight(string? value)
     {
-        if (value is null) return null;
-        if (Enum.TryParse<FontWeight>(value, ignoreCase: true, out var w))
+        if (value is null)
+        {
+            return null;
+        }
+        if (Enum.TryParse<FontWeight>(value, true, out var w))
         {
             return w;
         }
@@ -204,19 +216,24 @@ public sealed class ButtonVariantOverrideSection
     public double? BorderThickness { get; set; }
     public double? CornerRadius { get; set; }
 
-    internal ButtonVariantOverrides? ToOverrides() => AnySet() ? new ButtonVariantOverrides
-    {
-        BackgroundColor = Parse(BackgroundColor),
-        HoverBackgroundColor = Parse(HoverBackgroundColor),
-        PressBackgroundColor = Parse(PressBackgroundColor),
-        BorderColor = Parse(BorderColor),
-        BorderThickness = ToFloat(BorderThickness),
-        CornerRadius = ToFloat(CornerRadius)
-    } : null;
+    internal ButtonVariantOverrides? ToOverrides() => AnySet()
+        ? new ButtonVariantOverrides
+        {
+            BackgroundColor = Parse(BackgroundColor),
+            HoverBackgroundColor = Parse(HoverBackgroundColor),
+            PressBackgroundColor = Parse(PressBackgroundColor),
+            BorderColor = Parse(BorderColor),
+            BorderThickness = ToFloat(BorderThickness),
+            CornerRadius = ToFloat(CornerRadius)
+        }
+        : null;
 
     internal static ButtonVariantOverrideSection? From(ButtonVariantOverrides? o)
     {
-        if (o is null) return null;
+        if (o is null)
+        {
+            return null;
+        }
         return new ButtonVariantOverrideSection
         {
             BackgroundColor = o.BackgroundColor?.ToHex(),
@@ -230,8 +247,8 @@ public sealed class ButtonVariantOverrideSection
 
     private bool AnySet() =>
         BackgroundColor is not null || HoverBackgroundColor is not null
-        || PressBackgroundColor is not null || BorderColor is not null
-        || BorderThickness is not null || CornerRadius is not null;
+                                    || PressBackgroundColor is not null || BorderColor is not null
+                                    || BorderThickness is not null || CornerRadius is not null;
 
     private static float? ToFloat(double? value) => value.HasValue ? (float)value.Value : null;
     private static double? ToDouble(float? value) => value.HasValue ? (double)value.Value : null;
@@ -251,18 +268,23 @@ public sealed class ButtonOverrideSection
     public ButtonVariantOverrideSection? Danger { get; set; }
     public ButtonVariantOverrideSection? Ghost { get; set; }
 
-    internal ButtonOverrides? ToOverrides() => AnySet() ? new ButtonOverrides
-    {
-        Padding = ParsePadding(),
-        Primary = Primary?.ToOverrides(),
-        Secondary = Secondary?.ToOverrides(),
-        Danger = Danger?.ToOverrides(),
-        Ghost = Ghost?.ToOverrides()
-    } : null;
+    internal ButtonOverrides? ToOverrides() => AnySet()
+        ? new ButtonOverrides
+        {
+            Padding = ParsePadding(),
+            Primary = Primary?.ToOverrides(),
+            Secondary = Secondary?.ToOverrides(),
+            Danger = Danger?.ToOverrides(),
+            Ghost = Ghost?.ToOverrides()
+        }
+        : null;
 
     internal static ButtonOverrideSection? From(ButtonOverrides? o)
     {
-        if (o is null) return null;
+        if (o is null)
+        {
+            return null;
+        }
         return new ButtonOverrideSection
         {
             PaddingLeft = o.Padding?.Left,
@@ -277,12 +299,14 @@ public sealed class ButtonOverrideSection
     }
 
     private bool AnySet() =>
-        PaddingLeft is not null || PaddingTop is not null || PaddingRight is not null || PaddingBottom is not null
+        PaddingLeft is not null || PaddingTop is not null || PaddingRight is not null ||
+        PaddingBottom is not null
         || Primary is not null || Secondary is not null || Danger is not null || Ghost is not null;
 
     private EdgeInsets? ParsePadding()
     {
-        if (PaddingLeft is null && PaddingTop is null && PaddingRight is null && PaddingBottom is null)
+        if (PaddingLeft is null && PaddingTop is null && PaddingRight is null &&
+            PaddingBottom is null)
         {
             return null;
         }
@@ -316,19 +340,24 @@ public sealed class TextFieldOverrideSection
     public double? Height { get; set; }
     public double? CornerRadius { get; set; }
 
-    internal TextFieldOverrides? ToOverrides() => AnySet() ? new TextFieldOverrides
-    {
-        FillColor = Parse(FillColor),
-        BorderColor = Parse(BorderColor),
-        SelectionColor = Parse(SelectionColor),
-        BorderThickness = ToFloat(BorderThickness),
-        Height = ToFloat(Height),
-        CornerRadius = ToVector4(CornerRadius)
-    } : null;
+    internal TextFieldOverrides? ToOverrides() => AnySet()
+        ? new TextFieldOverrides
+        {
+            FillColor = Parse(FillColor),
+            BorderColor = Parse(BorderColor),
+            SelectionColor = Parse(SelectionColor),
+            BorderThickness = ToFloat(BorderThickness),
+            Height = ToFloat(Height),
+            CornerRadius = ToVector4(CornerRadius)
+        }
+        : null;
 
     internal static TextFieldOverrideSection? From(TextFieldOverrides? o)
     {
-        if (o is null) return null;
+        if (o is null)
+        {
+            return null;
+        }
         return new TextFieldOverrideSection
         {
             FillColor = o.FillColor?.ToHex(),
@@ -346,7 +375,10 @@ public sealed class TextFieldOverrideSection
 
     private static float? ToFloat(double? value) => value.HasValue ? (float)value.Value : null;
     private static double? ToDouble(float? value) => value.HasValue ? (double)value.Value : null;
-    private static Vector4? ToVector4(double? value) => value.HasValue ? new Vector4((float)value.Value) : null;
+
+    private static Vector4? ToVector4
+        (double? value) => value.HasValue ? new Vector4((float)value.Value) : null;
+
     private static Vector4? Parse(string? hex) => hex is null ? null : hex.FromHex();
 }
 
@@ -359,18 +391,23 @@ public sealed class CheckboxOverrideSection
     public double? BorderThickness { get; set; }
     public double? CornerRadius { get; set; }
 
-    internal CheckboxOverrides? ToOverrides() => AnySet() ? new CheckboxOverrides
-    {
-        CheckColor = Parse(CheckColor),
-        BackgroundColor = Parse(BackgroundColor),
-        BorderColor = Parse(BorderColor),
-        BorderThickness = ToFloat(BorderThickness),
-        CornerRadius = ToFloat(CornerRadius)
-    } : null;
+    internal CheckboxOverrides? ToOverrides() => AnySet()
+        ? new CheckboxOverrides
+        {
+            CheckColor = Parse(CheckColor),
+            BackgroundColor = Parse(BackgroundColor),
+            BorderColor = Parse(BorderColor),
+            BorderThickness = ToFloat(BorderThickness),
+            CornerRadius = ToFloat(CornerRadius)
+        }
+        : null;
 
     internal static CheckboxOverrideSection? From(CheckboxOverrides? o)
     {
-        if (o is null) return null;
+        if (o is null)
+        {
+            return null;
+        }
         return new CheckboxOverrideSection
         {
             CheckColor = o.CheckColor?.ToHex(),
@@ -398,17 +435,22 @@ public sealed class RadioButtonOverrideSection
     public string? BorderColor { get; set; }
     public double? BorderThickness { get; set; }
 
-    internal RadioButtonOverrides? ToOverrides() => AnySet() ? new RadioButtonOverrides
-    {
-        DotColor = Parse(DotColor),
-        BackgroundColor = Parse(BackgroundColor),
-        BorderColor = Parse(BorderColor),
-        BorderThickness = ToFloat(BorderThickness)
-    } : null;
+    internal RadioButtonOverrides? ToOverrides() => AnySet()
+        ? new RadioButtonOverrides
+        {
+            DotColor = Parse(DotColor),
+            BackgroundColor = Parse(BackgroundColor),
+            BorderColor = Parse(BorderColor),
+            BorderThickness = ToFloat(BorderThickness)
+        }
+        : null;
 
     internal static RadioButtonOverrideSection? From(RadioButtonOverrides? o)
     {
-        if (o is null) return null;
+        if (o is null)
+        {
+            return null;
+        }
         return new RadioButtonOverrideSection
         {
             DotColor = o.DotColor?.ToHex(),
@@ -419,7 +461,8 @@ public sealed class RadioButtonOverrideSection
     }
 
     private bool AnySet() =>
-        DotColor is not null || BackgroundColor is not null || BorderColor is not null || BorderThickness is not null;
+        DotColor is not null || BackgroundColor is not null || BorderColor is not null ||
+        BorderThickness is not null;
 
     private static float? ToFloat(double? value) => value.HasValue ? (float)value.Value : null;
     private static double? ToDouble(float? value) => value.HasValue ? (double)value.Value : null;
@@ -437,20 +480,25 @@ public sealed class SliderOverrideSection
     public double? ThumbHeight { get; set; }
     public double? ThumbRadius { get; set; }
 
-    internal SliderOverrides? ToOverrides() => AnySet() ? new SliderOverrides
-    {
-        ActiveColor = Parse(ActiveColor),
-        InactiveColor = Parse(InactiveColor),
-        ThumbColor = Parse(ThumbColor),
-        TrackHeight = ToFloat(TrackHeight),
-        ThumbWidth = ToFloat(ThumbWidth),
-        ThumbHeight = ToFloat(ThumbHeight),
-        ThumbRadius = ToFloat(ThumbRadius)
-    } : null;
+    internal SliderOverrides? ToOverrides() => AnySet()
+        ? new SliderOverrides
+        {
+            ActiveColor = Parse(ActiveColor),
+            InactiveColor = Parse(InactiveColor),
+            ThumbColor = Parse(ThumbColor),
+            TrackHeight = ToFloat(TrackHeight),
+            ThumbWidth = ToFloat(ThumbWidth),
+            ThumbHeight = ToFloat(ThumbHeight),
+            ThumbRadius = ToFloat(ThumbRadius)
+        }
+        : null;
 
     internal static SliderOverrideSection? From(SliderOverrides? o)
     {
-        if (o is null) return null;
+        if (o is null)
+        {
+            return null;
+        }
         return new SliderOverrideSection
         {
             ActiveColor = o.ActiveColor?.ToHex(),
@@ -465,7 +513,8 @@ public sealed class SliderOverrideSection
 
     private bool AnySet() =>
         ActiveColor is not null || InactiveColor is not null || ThumbColor is not null
-        || TrackHeight is not null || ThumbWidth is not null || ThumbHeight is not null || ThumbRadius is not null;
+        || TrackHeight is not null || ThumbWidth is not null || ThumbHeight is not null ||
+        ThumbRadius is not null;
 
     private static float? ToFloat(double? value) => value.HasValue ? (float)value.Value : null;
     private static double? ToDouble(float? value) => value.HasValue ? (double)value.Value : null;
@@ -509,32 +558,37 @@ public sealed class DropdownOverrideSection
     public double? ItemPaddingRight { get; set; }
     public double? ItemPaddingBottom { get; set; }
 
-    internal DropdownOverrides? ToOverrides() => AnySet() ? new DropdownOverrides
-    {
-        ButtonHeight = ToFloat(ButtonHeight),
-        ButtonColor = Parse(ButtonColor),
-        BorderColor = Parse(BorderColor),
-        BorderThickness = ToFloat(BorderThickness),
-        ButtonCornerRadius = ToFloat(ButtonCornerRadius),
-        ButtonPadding = ParseButtonPadding(),
-        MenuMinWidth = ToFloat(MenuMinWidth),
-        VisibleItemCount = VisibleItemCount,
-        ItemSpacing = ToFloat(ItemSpacing),
-        MenuColor = Parse(MenuColor),
-        MenuCornerRadius = ToFloat(MenuCornerRadius),
-        MenuPadding = ParseMenuPadding(),
-        ItemPadding = ParseItemPadding(),
-        ItemCornerRadius = ToFloat(ItemCornerRadius),
-        SelectionColor = Parse(SelectionColor),
-        HoverColor = Parse(HoverColor),
-        ChevronColor = Parse(ChevronColor),
-        MenuGap = ToFloat(MenuGap),
-        SelectionAccentColor = Parse(SelectionAccentColor)
-    } : null;
+    internal DropdownOverrides? ToOverrides() => AnySet()
+        ? new DropdownOverrides
+        {
+            ButtonHeight = ToFloat(ButtonHeight),
+            ButtonColor = Parse(ButtonColor),
+            BorderColor = Parse(BorderColor),
+            BorderThickness = ToFloat(BorderThickness),
+            ButtonCornerRadius = ToFloat(ButtonCornerRadius),
+            ButtonPadding = ParseButtonPadding(),
+            MenuMinWidth = ToFloat(MenuMinWidth),
+            VisibleItemCount = VisibleItemCount,
+            ItemSpacing = ToFloat(ItemSpacing),
+            MenuColor = Parse(MenuColor),
+            MenuCornerRadius = ToFloat(MenuCornerRadius),
+            MenuPadding = ParseMenuPadding(),
+            ItemPadding = ParseItemPadding(),
+            ItemCornerRadius = ToFloat(ItemCornerRadius),
+            SelectionColor = Parse(SelectionColor),
+            HoverColor = Parse(HoverColor),
+            ChevronColor = Parse(ChevronColor),
+            MenuGap = ToFloat(MenuGap),
+            SelectionAccentColor = Parse(SelectionAccentColor)
+        }
+        : null;
 
     internal static DropdownOverrideSection? From(DropdownOverrides? o)
     {
-        if (o is null) return null;
+        if (o is null)
+        {
+            return null;
+        }
         return new DropdownOverrideSection
         {
             ButtonHeight = ToDouble(o.ButtonHeight),
@@ -589,7 +643,8 @@ public sealed class DropdownOverrideSection
 
     private EdgeInsets? ParseButtonPadding()
     {
-        if (ButtonPaddingLeft is null && ButtonPaddingTop is null && ButtonPaddingRight is null && ButtonPaddingBottom is null)
+        if (ButtonPaddingLeft is null && ButtonPaddingTop is null && ButtonPaddingRight is null &&
+            ButtonPaddingBottom is null)
         {
             return null;
         }
@@ -613,7 +668,8 @@ public sealed class DropdownOverrideSection
 
     private EdgeInsets? ParseMenuPadding()
     {
-        if (MenuPaddingLeft is null && MenuPaddingTop is null && MenuPaddingRight is null && MenuPaddingBottom is null)
+        if (MenuPaddingLeft is null && MenuPaddingTop is null && MenuPaddingRight is null &&
+            MenuPaddingBottom is null)
         {
             return null;
         }
@@ -637,7 +693,8 @@ public sealed class DropdownOverrideSection
 
     private EdgeInsets? ParseItemPadding()
     {
-        if (ItemPaddingLeft is null && ItemPaddingTop is null && ItemPaddingRight is null && ItemPaddingBottom is null)
+        if (ItemPaddingLeft is null && ItemPaddingTop is null && ItemPaddingRight is null &&
+            ItemPaddingBottom is null)
         {
             return null;
         }
@@ -672,20 +729,25 @@ public sealed class ProgressBarOverrideSection
     public string? TrackColor { get; set; }
     public string? BorderColor { get; set; }
 
-    internal ProgressBarOverrides? ToOverrides() => AnySet() ? new ProgressBarOverrides
-    {
-        Height = ToFloat(Height),
-        CornerRadius = ToFloat(CornerRadius),
-        BorderThickness = ToFloat(BorderThickness),
-        FillPadding = ToFloat(FillPadding),
-        FillColor = Parse(FillColor),
-        TrackColor = Parse(TrackColor),
-        BorderColor = Parse(BorderColor)
-    } : null;
+    internal ProgressBarOverrides? ToOverrides() => AnySet()
+        ? new ProgressBarOverrides
+        {
+            Height = ToFloat(Height),
+            CornerRadius = ToFloat(CornerRadius),
+            BorderThickness = ToFloat(BorderThickness),
+            FillPadding = ToFloat(FillPadding),
+            FillColor = Parse(FillColor),
+            TrackColor = Parse(TrackColor),
+            BorderColor = Parse(BorderColor)
+        }
+        : null;
 
     internal static ProgressBarOverrideSection? From(ProgressBarOverrides? o)
     {
-        if (o is null) return null;
+        if (o is null)
+        {
+            return null;
+        }
         return new ProgressBarOverrideSection
         {
             Height = ToDouble(o.Height),
@@ -699,7 +761,8 @@ public sealed class ProgressBarOverrideSection
     }
 
     private bool AnySet() =>
-        Height is not null || CornerRadius is not null || BorderThickness is not null || FillPadding is not null
+        Height is not null || CornerRadius is not null || BorderThickness is not null ||
+        FillPadding is not null
         || FillColor is not null || TrackColor is not null || BorderColor is not null;
 
     private static float? ToFloat(double? value) => value.HasValue ? (float)value.Value : null;
@@ -713,19 +776,22 @@ public sealed class FocusOverrideSection
     public string? OutlineColor { get; set; }
     public double? OutlineWidth { get; set; }
 
-    internal FocusOverrides? ToOverrides() => AnySet() ? new FocusOverrides
-    {
-        OutlineColor = Parse(OutlineColor),
-        OutlineWidth = ToFloat(OutlineWidth)
-    } : null;
+    internal FocusOverrides? ToOverrides() => AnySet()
+        ? new FocusOverrides
+        {
+            OutlineColor = Parse(OutlineColor), OutlineWidth = ToFloat(OutlineWidth)
+        }
+        : null;
 
     internal static FocusOverrideSection? From(FocusOverrides? o)
     {
-        if (o is null) return null;
+        if (o is null)
+        {
+            return null;
+        }
         return new FocusOverrideSection
         {
-            OutlineColor = o.OutlineColor?.ToHex(),
-            OutlineWidth = ToDouble(o.OutlineWidth)
+            OutlineColor = o.OutlineColor?.ToHex(), OutlineWidth = ToDouble(o.OutlineWidth)
         };
     }
 
@@ -736,7 +802,7 @@ public sealed class FocusOverrideSection
     private static Vector4? Parse(string? hex) => hex is null ? null : hex.FromHex();
 }
 
-/// <summary>Serializable theme overrides (mirrors <see cref="ThemeOverrides"/>).</summary>
+/// <summary>Serializable theme overrides (mirrors <see cref="ThemeOverrides" />).</summary>
 public sealed class ThemeOverridesSection
 {
     public ColorOverrideSection? Colors { get; set; }
@@ -750,7 +816,7 @@ public sealed class ThemeOverridesSection
     public ProgressBarOverrideSection? ProgressBar { get; set; }
     public FocusOverrideSection? Focus { get; set; }
 
-    /// <summary>Converts this section into a <see cref="ThemeOverrides"/> model.</summary>
+    /// <summary>Converts this section into a <see cref="ThemeOverrides" /> model.</summary>
     public ThemeOverrides ToOverrides() => new()
     {
         Colors = Colors?.ToOverrides(),
@@ -765,7 +831,7 @@ public sealed class ThemeOverridesSection
         Focus = Focus?.ToOverrides()
     };
 
-    /// <summary>Builds a section from a <see cref="ThemeOverrides"/> model.</summary>
+    /// <summary>Builds a section from a <see cref="ThemeOverrides" /> model.</summary>
     public static ThemeOverridesSection FromOverrides(ThemeOverrides o) => new()
     {
         Colors = ColorOverrideSection.From(o.Colors),

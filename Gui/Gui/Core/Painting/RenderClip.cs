@@ -24,7 +24,8 @@ public class RenderClip : RenderProxyBox
     }
 
     /// <inheritdoc />
-    public override void Paint(
+    public override void Paint
+    (
         PaintingContext context
     )
     {
@@ -35,23 +36,28 @@ public class RenderClip : RenderProxyBox
         }
 
         var rect = Size.ToSkRect(Vector2.Zero);
-        _roundRect.SetRectRadii(
+        _roundRect.SetRectRadii
+        (
             rect,
             new[]
             {
-                new SKPoint(
+                new SKPoint
+                (
                     _borderRadius.Z,
                     _borderRadius.Z
                 ), // Top-Left
-                new SKPoint(
+                new SKPoint
+                (
                     _borderRadius.X,
                     _borderRadius.X
                 ), // Top-Right
-                new SKPoint(
+                new SKPoint
+                (
                     _borderRadius.Y,
                     _borderRadius.Y
                 ), // Bottom-Right
-                new SKPoint(
+                new SKPoint
+                (
                     _borderRadius.W,
                     _borderRadius.W
                 ) // Bottom-Left
@@ -60,7 +66,8 @@ public class RenderClip : RenderProxyBox
 
         using (context.Canvas.SaveScope())
         {
-            context.Canvas.ClipRoundRect(
+            context.Canvas.ClipRoundRect
+            (
                 _roundRect,
                 SKClipOperation.Intersect,
                 ClipBehavior == ClipBehavior.AntiAlias

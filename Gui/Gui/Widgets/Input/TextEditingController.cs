@@ -10,18 +10,23 @@ public struct TextSelection
 
     public bool IsEmpty => BaseOffset == ExtentOffset;
 
-    public int Start => Math.Min(
+    public int Start => Math.Min
+    (
         BaseOffset,
         ExtentOffset
     );
 
-    public int End => Math.Max(
+    public int End => Math.Max
+    (
         BaseOffset,
         ExtentOffset
     );
 
     public static TextSelection Collapsed(int offset) =>
-        new() { BaseOffset = offset, ExtentOffset = offset };
+        new()
+        {
+            BaseOffset = offset, ExtentOffset = offset
+        };
 }
 
 public struct TextEditingValue
@@ -29,7 +34,8 @@ public struct TextEditingValue
     public string Text;
     public TextSelection Selection;
 
-    public TextEditingValue(
+    public TextEditingValue
+    (
         string text = "",
         TextSelection? selection = null
     )
@@ -43,7 +49,8 @@ public struct TextEditingValue
 
 public class TextEditingController : ValueNotifier<TextEditingValue>
 {
-    public TextEditingController(
+    public TextEditingController
+    (
         string text = ""
     ) : base(new TextEditingValue(text))
     {
@@ -52,7 +59,8 @@ public class TextEditingController : ValueNotifier<TextEditingValue>
     public string Text
     {
         get => Value.Text;
-        set => Value = new TextEditingValue(
+        set => Value = new TextEditingValue
+        (
             value,
             TextSelection.Collapsed(value.Length)
         );
@@ -61,7 +69,8 @@ public class TextEditingController : ValueNotifier<TextEditingValue>
     public TextSelection Selection
     {
         get => Value.Selection;
-        set => Value = new TextEditingValue(
+        set => Value = new TextEditingValue
+        (
             Value.Text,
             value
         );

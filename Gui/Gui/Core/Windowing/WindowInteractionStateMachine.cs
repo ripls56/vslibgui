@@ -5,26 +5,32 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 namespace Gui.Core.Windowing;
 
 /// <summary>
-/// Pure state machine for window drag and resize interactions.
-/// Holds start-of-interaction snapshots and processes move/up events to compute
-/// desired position and size. Contains no VS or GLFW API dependencies beyond types.
+///     Pure state machine for window drag and resize interactions.
+///     Holds start-of-interaction snapshots and processes move/up events to compute
+///     desired position and size. Contains no VS or GLFW API dependencies beyond types.
 /// </summary>
 internal sealed class WindowInteractionStateMachine
 {
     private const double SettleMs = 150.0;
 
     private readonly WindowConfig _config;
-
-    private Vector2 _dragStartScreen;
     private Vector2 _dragStartPos;
 
-    private ResizeEdge _resizeEdge;
-    private Vector2 _resizeStartScreen;
-    private Vector2 _resizeStartPos;
-    private Vector2 _resizeStartSize;
+    private Vector2 _dragStartScreen;
 
     private double _lastResizeTimeSeconds;
+
+    private ResizeEdge _resizeEdge;
     private bool _resizeLayoutPending;
+    private Vector2 _resizeStartPos;
+    private Vector2 _resizeStartScreen;
+    private Vector2 _resizeStartSize;
+
+    /// <summary>Creates a new state machine bound to the given window configuration.</summary>
+    public WindowInteractionStateMachine(WindowConfig config)
+    {
+        _config = config;
+    }
 
     /// <summary>True while a drag interaction is active.</summary>
     public bool IsDragging { get; private set; }
@@ -35,31 +41,38 @@ internal sealed class WindowInteractionStateMachine
     /// <summary>True while any window interaction is active.</summary>
     public bool IsInteracting => IsDragging || IsResizing;
 
-    /// <summary>Creates a new state machine bound to the given window configuration.</summary>
-    public WindowInteractionStateMachine(WindowConfig config) => _config = config;
-
     /// <summary>
-    /// Detects which resize edge a window-local point falls on.
-    /// Returns <see cref="ResizeEdge.None"/> when the window is not resizable or
-    /// the point is outside a grip zone.
+    ///     Detects which resize edge a window-local point falls on.
+    ///     Returns <see cref="ResizeEdge.None" /> when the window is not resizable or
+    ///     the point is outside a grip zone.
     /// </summary>
     public ResizeEdge DetectResizeEdge(Vector2 local, Vector2 windowSize)
     {
         if (!_config.Resizable || !IsInsideWindow(local, windowSize))
+        {
             return ResizeEdge.None;
+        }
 
         var grip = _config.ResizeHandleSize;
         var edge = ResizeEdge.None;
 
         if (local.X <= grip)
+        {
             edge |= ResizeEdge.Left;
+        }
         else if (local.X >= windowSize.X - grip)
+        {
             edge |= ResizeEdge.Right;
+        }
 
         if (local.Y <= grip)
+        {
             edge |= ResizeEdge.Top;
+        }
         else if (local.Y >= windowSize.Y - grip)
+        {
             edge |= ResizeEdge.Bottom;
+        }
 
         return edge;
     }
@@ -73,18 +86,20 @@ internal sealed class WindowInteractionStateMachine
     }
 
     /// <summary>
-    /// Returns the cursor shape to display when hovering at a window-local position,
-    /// or <c>null</c> when an interaction is active and the cursor should not change.
+    ///     Returns the cursor shape to display when hovering at a window-local position,
+    ///     or <c>null</c> when an interaction is active and the cursor should not change.
     /// </summary>
     public CursorShape? HoverCursorFor(Vector2 local, Vector2 windowSize)
     {
         if (IsDragging || IsResizing)
+        {
             return null;
+        }
         var edge = DetectResizeEdge(local, windowSize);
         return edge != ResizeEdge.None ? CursorForEdge(edge) : CursorShape.Arrow;
     }
 
-    /// <summary>Maps a <see cref="ResizeEdge"/> combination to the appropriate cursor shape.</summary>
+    /// <summary>Maps a <see cref="ResizeEdge" /> combination to the appropriate cursor shape.</summary>
     public static CursorShape CursorForEdge(ResizeEdge edge)
     {
         var left = (edge & ResizeEdge.Left) != 0;
@@ -92,14 +107,22 @@ internal sealed class WindowInteractionStateMachine
         var top = (edge & ResizeEdge.Top) != 0;
         var bottom = (edge & ResizeEdge.Bottom) != 0;
 
-        if ((left && top) || (right && bottom))
+        if (left && top || right && bottom)
+        {
             return CursorShape.ResizeNWSE;
-        if ((right && top) || (left && bottom))
+        }
+        if (right && top || left && bottom)
+        {
             return CursorShape.ResizeNESW;
+        }
         if (left || right)
+        {
             return CursorShape.ResizeEW;
+        }
         if (top || bottom)
+        {
             return CursorShape.ResizeNS;
+        }
         return CursorShape.Arrow;
     }
 
@@ -112,7 +135,13 @@ internal sealed class WindowInteractionStateMachine
     }
 
     /// <summary>Starts a resize interaction. Call when <c>OnMouseDown</c> detects a resize edge.</summary>
-    public void BeginResize(ResizeEdge edge, Vector2 screen, Vector2 currentPos, Vector2 currentSize)
+    public void BeginResize
+    (
+        ResizeEdge edge,
+        Vector2 screen,
+        Vector2 currentPos,
+        Vector2 currentSize
+    )
     {
         IsResizing = true;
         _resizeEdge = edge;
@@ -122,12 +151,18 @@ internal sealed class WindowInteractionStateMachine
     }
 
     /// <summary>
-    /// Processes a mouse-move event during an active interaction.
-    /// Returns <c>true</c> when drag or resize is active; <paramref name="newPos"/> and
-    /// <paramref name="newSize"/> hold the desired values (newSize is default for drag).
-    /// Also advances the settle-throttle timer when resizing.
+    ///     Processes a mouse-move event during an active interaction.
+    ///     Returns <c>true</c> when drag or resize is active; <paramref name="newPos" /> and
+    ///     <paramref name="newSize" /> hold the desired values (newSize is default for drag).
+    ///     Also advances the settle-throttle timer when resizing.
     /// </summary>
-    public bool OnMove(Vector2 screen, double elapsedSeconds, out Vector2 newPos, out Vector2 newSize)
+    public bool OnMove
+    (
+        Vector2 screen,
+        double elapsedSeconds,
+        out Vector2 newPos,
+        out Vector2 newSize
+    )
     {
         newPos = default;
         newSize = default;
@@ -151,7 +186,9 @@ internal sealed class WindowInteractionStateMachine
             }
 
             if ((_resizeEdge & ResizeEdge.Right) != 0)
+            {
                 size.X = _resizeStartSize.X + delta.X;
+            }
 
             if ((_resizeEdge & ResizeEdge.Top) != 0)
             {
@@ -160,15 +197,21 @@ internal sealed class WindowInteractionStateMachine
             }
 
             if ((_resizeEdge & ResizeEdge.Bottom) != 0)
+            {
                 size.Y = _resizeStartSize.Y + delta.Y;
+            }
 
             var clamped = ClampSize(size);
 
             if ((_resizeEdge & ResizeEdge.Left) != 0)
+            {
                 pos.X += size.X - clamped.X;
+            }
 
             if ((_resizeEdge & ResizeEdge.Top) != 0)
+            {
                 pos.Y += size.Y - clamped.Y;
+            }
 
             newPos = pos;
             newSize = clamped;
@@ -182,9 +225,9 @@ internal sealed class WindowInteractionStateMachine
     }
 
     /// <summary>
-    /// Ends the current drag or resize interaction.
-    /// Returns <c>(wasDragging, wasResizing)</c> so the caller can apply side effects
-    /// (save drag position, commit resize layout).
+    ///     Ends the current drag or resize interaction.
+    ///     Returns <c>(wasDragging, wasResizing)</c> so the caller can apply side effects
+    ///     (save drag position, commit resize layout).
     /// </summary>
     public (bool wasDragging, bool wasResizing) OnUp()
     {
@@ -196,25 +239,30 @@ internal sealed class WindowInteractionStateMachine
     }
 
     /// <summary>
-    /// Returns <c>true</c> once when the resize settle throttle fires (no resize move
-    /// for 150 ms). Resets the pending flag on return — subsequent calls return
-    /// <c>false</c> until the next resize move.
-    /// Both <paramref name="elapsedSeconds"/> here and in <see cref="OnMove"/> must come
-    /// from the same monotonically increasing game clock (accumulated frame time in seconds).
+    ///     Returns <c>true</c> once when the resize settle throttle fires (no resize move
+    ///     for 150 ms). Resets the pending flag on return — subsequent calls return
+    ///     <c>false</c> until the next resize move.
+    ///     Both <paramref name="elapsedSeconds" /> here and in <see cref="OnMove" /> must come
+    ///     from the same monotonically increasing game clock (accumulated frame time in seconds).
     /// </summary>
     public bool ShouldCommitLayout(double elapsedSeconds)
     {
         if (!_resizeLayoutPending)
+        {
             return false;
+        }
         if ((elapsedSeconds - _lastResizeTimeSeconds) * 1000.0 < SettleMs)
+        {
             return false;
+        }
 
         _resizeLayoutPending = false;
         return true;
     }
 
     private Vector2 ClampSize(Vector2 size) =>
-        new(
+        new
+        (
             Math.Clamp(size.X, _config.MinSize.X, _config.MaxSize.X),
             Math.Clamp(size.Y, _config.MinSize.Y, _config.MaxSize.Y)
         );

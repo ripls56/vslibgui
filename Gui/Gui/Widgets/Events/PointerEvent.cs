@@ -16,7 +16,8 @@ public enum PointerButton
 
 public class PointerEvent
 {
-    public PointerEvent(
+    public PointerEvent
+    (
         float x,
         float y,
         PointerButton button = PointerButton.Left,
@@ -38,49 +39,56 @@ public class PointerEvent
 
 public interface IPointerDownHandler
 {
-    void OnPointerDown(
+    void OnPointerDown
+    (
         PointerEvent e
     );
 }
 
 public interface IPointerUpHandler
 {
-    void OnPointerUp(
+    void OnPointerUp
+    (
         PointerEvent e
     );
 }
 
 public interface IPointerClickHandler
 {
-    void OnPointerClick(
+    void OnPointerClick
+    (
         PointerEvent e
     );
 }
 
 public interface IPointerEnterHandler
 {
-    void OnPointerEnter(
+    void OnPointerEnter
+    (
         PointerEvent e
     );
 }
 
 public interface IPointerExitHandler
 {
-    void OnPointerExit(
+    void OnPointerExit
+    (
         PointerEvent e
     );
 }
 
 public interface IPointerMoveHandler
 {
-    void OnPointerMove(
+    void OnPointerMove
+    (
         PointerEvent e
     );
 }
 
 public interface IPointerWheelHandler
 {
-    void OnMouseWheel(
+    void OnMouseWheel
+    (
         PointerEvent e
     );
 }
@@ -92,7 +100,8 @@ public interface IPointerWheelHandler
 /// </summary>
 public interface IPointerDragEnterHandler
 {
-    void OnPointerDragEnter(
+    void OnPointerDragEnter
+    (
         PointerEvent e
     );
 }
@@ -103,7 +112,8 @@ public interface IPointerDragEnterHandler
 /// </summary>
 public interface IPointerDragExitHandler
 {
-    void OnPointerDragExit(
+    void OnPointerDragExit
+    (
         PointerEvent e
     );
 }
@@ -116,7 +126,8 @@ public interface IPointerDragExitHandler
 /// </summary>
 public interface ISelectiveEventHandler
 {
-    bool HandlesEvent(
+    bool HandlesEvent
+    (
         Type eventInterface
     );
 }

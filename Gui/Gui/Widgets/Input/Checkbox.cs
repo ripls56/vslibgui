@@ -1,4 +1,5 @@
 using System;
+using Gui.Sound;
 using Gui.Widgets.Animations;
 using Gui.Widgets.Basic;
 using Gui.Widgets.Events;
@@ -49,7 +50,24 @@ internal class CheckboxState : FocusableState<Checkbox>, IActivatable
     private bool _pressed;
 
     /// <inheritdoc />
-    public void Activate() => Widget.OnChanged?.Invoke(!Widget.Value);
+    public void Activate()
+    {
+        PlayToggleSound();
+        Widget.OnChanged?.Invoke(!Widget.Value);
+    }
+
+    /// <summary>Rising tone when checking, falling when unchecking.</summary>
+    private void PlayToggleSound()
+    {
+        if (Widget.Value)
+        {
+            this.ToggleOff();
+        }
+        else
+        {
+            this.ToggleOn();
+        }
+    }
 
     public override void InitState()
     {
@@ -165,7 +183,13 @@ internal class CheckboxState : FocusableState<Checkbox>, IActivatable
                     _pressed = false;
                 }
             ),
-            onPress: _ => SetState(() => _pressed = true),
+            onPress: _ => SetState
+            (() =>
+                {
+                    _pressed = true;
+                    PlayToggleSound();
+                }
+            ),
             onRelease: _ => SetState(() => _pressed = false),
             child: body
         );

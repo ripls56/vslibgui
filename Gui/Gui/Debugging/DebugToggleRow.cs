@@ -11,7 +11,12 @@ namespace Gui.Debugging;
 public class DebugToggleRow : StatelessWidget
 {
     /// <summary>Initializes a new <see cref="DebugToggleRow" />.</summary>
-    public DebugToggleRow(string label, bool value, Action<bool> onChanged)
+    public DebugToggleRow
+    (
+        string label,
+        bool value,
+        Action<bool> onChanged
+    )
     {
         Label = label;
         Value = value;

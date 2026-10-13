@@ -25,14 +25,16 @@ public class MouseRegion : SingleChildWidget,
     IPointerEnterHandler, IPointerExitHandler, IPointerMoveHandler,
     ISelectiveEventHandler
 {
-    public MouseRegion(
+    public MouseRegion
+    (
         Widget? child = null,
         Action<PointerEvent>? onEnter = null,
         Action<PointerEvent>? onExit = null,
         Action<PointerEvent>? onHover = null,
         MouseCursor? cursor = null,
         Framework.Key? key = null
-    ) : base(
+    ) : base
+    (
         child,
         key
     )
@@ -58,7 +60,8 @@ public class MouseRegion : SingleChildWidget,
     /// </summary>
     public MouseCursor? Cursor { get; }
 
-    public void OnPointerEnter(
+    public void OnPointerEnter
+    (
         PointerEvent e
     )
     {
@@ -69,7 +72,8 @@ public class MouseRegion : SingleChildWidget,
         }
     }
 
-    public void OnPointerExit(
+    public void OnPointerExit
+    (
         PointerEvent e
     )
     {
@@ -80,7 +84,8 @@ public class MouseRegion : SingleChildWidget,
         }
     }
 
-    public void OnPointerMove(
+    public void OnPointerMove
+    (
         PointerEvent e
     )
     {
@@ -91,7 +96,8 @@ public class MouseRegion : SingleChildWidget,
         }
     }
 
-    public bool HandlesEvent(
+    public bool HandlesEvent
+    (
         Type eventInterface
     )
     {
@@ -117,7 +123,8 @@ public class MouseRegion : SingleChildWidget,
 
     public override RenderObject CreateRenderObject() => new RenderProxyBox();
 
-    public override void UpdateRenderObject(
+    public override void UpdateRenderObject
+    (
         RenderObject renderObject
     )
     {

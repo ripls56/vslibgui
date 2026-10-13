@@ -39,19 +39,22 @@ public class RenderFractionalTranslation : RenderProxyBox
     }
 
     /// <inheritdoc />
-    public override bool HitTest(
+    public override bool HitTest
+    (
         HitTestResult result,
         Vector2 position,
         Element element
     )
     {
         var offset = Children.Count > 0
-            ? new Vector2(
+            ? new Vector2
+            (
                 Children[0].Size.X * _translation.X,
                 Children[0].Size.Y * _translation.Y
             )
             : Vector2.Zero;
-        return base.HitTest(
+        return base.HitTest
+        (
             result,
             position - offset,
             element

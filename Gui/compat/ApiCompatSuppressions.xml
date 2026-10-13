@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- https://learn.microsoft.com/dotnet/fundamentals/package-validation/diagnostic-ids -->
+<Suppressions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Suppression>
+    <DiagnosticId>CP0007</DiagnosticId>
+    <Target>T:Gui.Widgets.Inventory.ItemStackDisplay</Target>
+    <Left>../compat/baseline/Gui.dll</Left>
+    <Right>../Gui/bin/Release/Mods/mod/publish/Gui.dll</Right>
+  </Suppression>
+</Suppressions>

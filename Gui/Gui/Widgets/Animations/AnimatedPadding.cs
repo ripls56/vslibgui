@@ -15,7 +15,8 @@ public class AnimatedPadding : ImplicitlyAnimatedWidget
     ///     Creates an animated padding widget that transitions between padding
     ///     values over the given <paramref name="duration" />.
     /// </summary>
-    public AnimatedPadding(
+    public AnimatedPadding
+    (
         EdgeInsets padding,
         TimeSpan duration,
         Curve? curve = null,
@@ -23,7 +24,8 @@ public class AnimatedPadding : ImplicitlyAnimatedWidget
         Widget? child = null,
         Framework.Key? key = null
     )
-        : base(
+        : base
+        (
             duration,
             curve,
             onEnd,
@@ -53,14 +55,17 @@ internal class AnimatedPaddingState
     private EdgeInsetsTween? _paddingTween;
 
     /// <inheritdoc />
-    protected override void ForEachTween(
+    protected override void ForEachTween
+    (
         TweenVisitor visitor
     )
     {
-        _paddingTween = (EdgeInsetsTween)visitor.Visit(
+        _paddingTween = (EdgeInsetsTween)visitor.Visit
+        (
             _paddingTween,
             Widget.PaddingValue,
-            v => new EdgeInsetsTween(
+            v => new EdgeInsetsTween
+            (
                 v,
                 v
             )
@@ -68,11 +73,13 @@ internal class AnimatedPaddingState
     }
 
     /// <inheritdoc />
-    public override Widget Build(
+    public override Widget Build
+    (
         BuildContext context
     )
     {
-        return new Padding(
+        return new Padding
+        (
             _paddingTween!.Evaluate(Animation),
             Widget.Child
         );

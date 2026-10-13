@@ -16,7 +16,8 @@ public abstract class InlineSpan
     ///     Collects flattened text runs from this span and its children,
     ///     resolving styles against the <paramref name="inherited" /> parent style.
     /// </summary>
-    internal abstract void CollectRuns(
+    internal abstract void CollectRuns
+    (
         TextStyle inherited,
         List<PlacedRun> runs
     );
@@ -102,19 +103,22 @@ internal static class InlineSpanHelper
     /// <summary>
     ///     Collects all widget children from WidgetSpan nodes in the span tree.
     /// </summary>
-    public static List<Widget> CollectWidgetChildren(
+    public static List<Widget> CollectWidgetChildren
+    (
         InlineSpan? root
     )
     {
         var result = new List<Widget>();
-        Collect(
+        Collect
+        (
             root,
             result
         );
         return result;
     }
 
-    private static void Collect(
+    private static void Collect
+    (
         InlineSpan? span,
         List<Widget> result
     )
@@ -127,7 +131,8 @@ internal static class InlineSpanHelper
             case TextSpan ts when ts.Children != null:
                 foreach (var child in ts.Children)
                 {
-                    Collect(
+                    Collect
+                    (
                         child,
                         result
                     );

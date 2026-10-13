@@ -15,7 +15,8 @@ namespace Gui.Widgets.Inventory;
 public class FlatItemSlot : StatelessWidget
 {
     /// <summary>Creates a flat-background inventory slot.</summary>
-    public FlatItemSlot(
+    public FlatItemSlot
+    (
         ItemSlot? slot = null,
         SlotController? controller = null,
         ItemSlotStyle? style = null,
@@ -56,7 +57,8 @@ public class FlatItemSlot : StatelessWidget
     /// <inheritdoc />
     public override Widget Build(BuildContext context)
     {
-        return new ItemSlotGestureLayer(
+        return new ItemSlotGestureLayer
+        (
             slot: Slot,
             controller: Controller,
             isHighlighted: IsHighlighted,
@@ -100,7 +102,8 @@ public class FlatItemSlot : StatelessWidget
             var hoverT = highlighted ? 1f : (float)(hoverAnim?.Value ?? 0);
 
             var borderThickness = highlighted ? 2 : 1;
-            return new Container(
+            return new Container
+            (
                 new BoxStyle
                 {
                     Width = _style.Size,

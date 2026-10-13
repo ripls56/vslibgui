@@ -1,7 +1,8 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Gui.Core.Painting;
 using Gui.Rendering.Text;
+using Gui.Sound;
 using Gui.Widgets.Animations;
 using Gui.Widgets.Basic;
 using Gui.Widgets.Events;
@@ -131,8 +132,9 @@ internal class DropdownState<T> : FocusableState<Dropdown<T>>, IActivatable
                                 style,
                                 () =>
                                 {
+                                    UiSounds.Click(this);
                                     Widget.OnChanged?.Invoke(item.Value);
-                                    Close();
+                                    CloseMenu();
                                 }
                             )
                         )
@@ -146,7 +148,8 @@ internal class DropdownState<T> : FocusableState<Dropdown<T>>, IActivatable
     {
         if (_isOpen)
         {
-            Close();
+            UiSounds.Close(this);
+            CloseMenu();
         }
         else
         {
@@ -192,13 +195,14 @@ internal class DropdownState<T> : FocusableState<Dropdown<T>>, IActivatable
                 style.MenuGap,
                 OverlaySide.Bottom,
                 HorizontalAnchor.Start,
-                link: _link,
-                child: menu
+                _link,
+                menu
             )
         );
 
         overlay.Insert(_barrierEntry);
         overlay.Insert(_overlayEntry);
+        UiSounds.Open(this);
         SetState(() => _isOpen = true);
     }
 
@@ -212,7 +216,11 @@ internal class DropdownState<T> : FocusableState<Dropdown<T>>, IActivatable
             0,
             child: new GestureDetector
             (
-                onTap: _ => Close(),
+                onTap: _ =>
+                {
+                    UiSounds.Close(this);
+                    CloseMenu();
+                },
                 child: new Container
                 (
                     new BoxStyle
@@ -257,7 +265,7 @@ internal class DropdownState<T> : FocusableState<Dropdown<T>>, IActivatable
         _scrollController.JumpTo(Math.Max(0, scrollTo));
     }
 
-    private void Close()
+    private void CloseMenu()
     {
         if (!_isOpen)
         {
@@ -336,7 +344,7 @@ internal class DropdownState<T> : FocusableState<Dropdown<T>>, IActivatable
 
     public override void Dispose()
     {
-        Close();
+        CloseMenu();
         _scrollController.Dispose();
         base.Dispose();
     }

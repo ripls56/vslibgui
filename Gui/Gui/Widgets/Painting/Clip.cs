@@ -26,13 +26,15 @@ public class Clip : SingleChildWidget
     ///     bypasses clipping entirely — the child paints as if this widget were not present.
     /// </param>
     /// <param name="key">Optional key for element identity.</param>
-    public Clip(
+    public Clip
+    (
         Vector4 borderRadius = default,
         Widget? child = null,
         ClipBehavior clipBehavior = ClipBehavior.AntiAlias,
         Framework.Key? key = null
     )
-        : base(
+        : base
+        (
             child,
             key
         )
@@ -48,13 +50,14 @@ public class Clip : SingleChildWidget
     public ClipBehavior ClipBehavior { get; }
 
     /// <inheritdoc />
-    public override RenderObject CreateRenderObject()
+    public override RenderObject CreateRenderObject() => new RenderClip
     {
-        return new RenderClip { BorderRadius = BorderRadius, ClipBehavior = ClipBehavior };
-    }
+        BorderRadius = BorderRadius, ClipBehavior = ClipBehavior
+    };
 
     /// <inheritdoc />
-    public override void UpdateRenderObject(
+    public override void UpdateRenderObject
+    (
         RenderObject renderObject
     )
     {

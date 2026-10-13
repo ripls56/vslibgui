@@ -17,7 +17,8 @@ public sealed class TextSpan : InlineSpan
     /// <param name="style">Partial style overrides.</param>
     /// <param name="children">Child inline spans.</param>
     /// <param name="recognizer">Gesture recognizer for tap handling.</param>
-    public TextSpan(
+    public TextSpan
+    (
         string? text = null,
         SpanStyle? style = null,
         IReadOnlyList<InlineSpan>? children = null,
@@ -49,7 +50,8 @@ public sealed class TextSpan : InlineSpan
     public GestureRecognizer? Recognizer { get; }
 
     /// <inheritdoc />
-    internal override void CollectRuns(
+    internal override void CollectRuns
+    (
         TextStyle inherited,
         List<PlacedRun> runs
     )
@@ -58,8 +60,12 @@ public sealed class TextSpan : InlineSpan
 
         if (Text != null)
         {
-            runs.Add(
-                new PlacedRun { Text = Text, Style = resolved, Source = this }
+            runs.Add
+            (
+                new PlacedRun
+                {
+                    Text = Text, Style = resolved, Source = this
+                }
             );
         }
 
@@ -67,7 +73,8 @@ public sealed class TextSpan : InlineSpan
         {
             foreach (var child in Children)
             {
-                child.CollectRuns(
+                child.CollectRuns
+                (
                     resolved,
                     runs
                 );

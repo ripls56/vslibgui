@@ -20,7 +20,8 @@ public class LoadingDots : StatefulWidget
     /// <param name="color">Dot color.</param>
     /// <param name="dotSize">Diameter of each dot, in pixels.</param>
     /// <param name="spacing">Horizontal gap between dots, in pixels.</param>
-    public LoadingDots(
+    public LoadingDots
+    (
         Vector4 color,
         float dotSize = 6f,
         float spacing = 6f,
@@ -52,7 +53,8 @@ internal class LoadingDotsState : State<LoadingDots>
     public override void InitState()
     {
         base.InitState();
-        _controller = new AnimationController(
+        _controller = new AnimationController
+        (
             TimeSpan.FromMilliseconds(1200),
             Element.Owner!.GetTickerProvider()
         );
@@ -76,17 +78,22 @@ internal class LoadingDotsState : State<LoadingDots>
     public override Widget Build(BuildContext context)
     {
         var t = _controller?.Value ?? 0.0;
-        return new Row(
-            spacing: Widget.Spacing,
-            mainAxisAlignment: MainAxisAlignment.Center,
-            crossAxisAlignment: CrossAxisAlignment.Center,
-            mainAxisSize: MainAxisSize.Min,
-            children: new List<Widget>
-            {
-                Dot(t, 0),
-                Dot(t, 1),
-                Dot(t, 2)
-            }
+
+        // Ticks every frame while mounted, so isolate it — otherwise the whole window
+        // re-records for three pulsing dots.
+        return new RepaintBoundary
+        (
+            new Row
+            (
+                Widget.Spacing,
+                MainAxisAlignment.Center,
+                CrossAxisAlignment.Center,
+                MainAxisSize.Min,
+                new List<Widget>
+                {
+                    Dot(t, 0), Dot(t, 1), Dot(t, 2)
+                }
+            )
         );
     }
 
@@ -96,9 +103,11 @@ internal class LoadingDotsState : State<LoadingDots>
         var pulse = 0.5 - 0.5 * Math.Cos(2.0 * Math.PI * phase);
         var opacity = 0.3 + 0.7 * pulse;
 
-        return new Opacity(
+        return new Opacity
+        (
             (float)opacity,
-            new Container(
+            new Container
+            (
                 new BoxStyle
                 {
                     Color = Widget.Color,

@@ -59,7 +59,7 @@ public static class ProfilerOverlay
                 "re-record {0}/{1}",
                 profiler.ReRecordsInWindow,
                 profiler.FramesSampled
-            ),
+            )
         };
 
         if (profiler.FramesSampled > 0 && profiler.RepaintFrequency >= 1f)

@@ -80,7 +80,8 @@ public class RenderVsIcon : RenderObject
         if (_tintColor != _cachedTintKey)
         {
             _cachedTintFilter?.Dispose();
-            _cachedTintFilter = SKColorFilter.CreateBlendMode(
+            _cachedTintFilter = SKColorFilter.CreateBlendMode
+            (
                 _tintColor.ToSkColor(),
                 _blendMode
             );

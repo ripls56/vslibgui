@@ -37,19 +37,22 @@ public struct HotkeyBadgeStyle
     /// <summary>
     ///     Creates a default style derived from the given <paramref name="colors" />.
     /// </summary>
-    public static HotkeyBadgeStyle Default(
+    public static HotkeyBadgeStyle Default
+    (
         ColorScheme colors
     )
     {
         return new HotkeyBadgeStyle
         {
-            BackgroundColor = new Vector4(
+            BackgroundColor = new Vector4
+            (
                 0f,
                 0f,
                 0f,
                 0.45f
             ),
-            BorderColor = new Vector4(
+            BorderColor = new Vector4
+            (
                 1f,
                 1f,
                 1f,
@@ -60,7 +63,8 @@ public struct HotkeyBadgeStyle
             TextStyle = new TextStyle
             {
                 FontSize = 16,
-                Color = new Vector4(
+                Color = new Vector4
+                (
                     0.92f,
                     0.92f,
                     0.92f,
@@ -82,7 +86,8 @@ public struct HotkeyBadgeStyle
 public class HotkeyBadge : StatelessWidget
 {
     /// <summary>Creates a hotkey badge with a text label.</summary>
-    public HotkeyBadge(
+    public HotkeyBadge
+    (
         string label,
         HotkeyBadgeStyle? style = null,
         Framework.Key? key = null
@@ -93,7 +98,8 @@ public class HotkeyBadge : StatelessWidget
     }
 
     /// <summary>Creates a hotkey badge with an icon.</summary>
-    public HotkeyBadge(
+    public HotkeyBadge
+    (
         Widget iconWidget,
         HotkeyBadgeStyle? style = null,
         Framework.Key? key = null
@@ -122,19 +128,22 @@ public class HotkeyBadge : StatelessWidget
     public HotkeyBadgeStyle? StyleOverride { get; }
 
     /// <inheritdoc />
-    public override Widget Build(
+    public override Widget Build
+    (
         BuildContext context
     )
     {
         var style = StyleOverride ?? Theme.Of(context).HotkeyBadgeStyle;
 
         var content = IconWidget
-                      ?? new Text(
+                      ?? new Text
+                      (
                           Label ?? "",
                           style.TextStyle
                       );
 
-        Widget box = new Container(
+        Widget box = new Container
+        (
             new BoxStyle
             {
                 Color = style.BackgroundColor,
@@ -149,7 +158,8 @@ public class HotkeyBadge : StatelessWidget
         // Enforce minimum width without clamping wider content
         if (style.MinWidth > 0)
         {
-            box = new ConstrainedBox(
+            box = new ConstrainedBox
+            (
                 new LayoutConstraints(style.MinWidth),
                 box
             );

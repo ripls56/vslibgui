@@ -31,7 +31,7 @@ public sealed class MiscCategoryEditor : StatelessWidget
     {
         return new Column
         (
-            spacing: 12,
+            12,
             children:
             [
                 ProgressBarSection(),
@@ -47,7 +47,7 @@ public sealed class MiscCategoryEditor : StatelessWidget
         var s = _baseTheme.ProgressBarStyle;
         return new Column
         (
-            spacing: 4,
+            4,
             children:
             [
                 new Text("ProgressBar", _baseTheme.TextTheme.Title),
@@ -117,7 +117,7 @@ public sealed class MiscCategoryEditor : StatelessWidget
         var o = _draft.Focus;
         return new Column
         (
-            spacing: 4,
+            4,
             children:
             [
                 new Text("Focus", _baseTheme.TextTheme.Title),

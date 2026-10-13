@@ -51,6 +51,24 @@ public class RenderTransform : RenderProxyBox
         _UpdateEffectiveMatrix();
     }
 
+    /// <summary>
+    ///     Maps the subtree's paint bounds through the effective matrix, so an enclosing
+    ///     <see cref="RenderRepaintBoundary" /> records a region large enough for the
+    ///     transformed artwork instead of culling it.
+    /// </summary>
+    internal override SKRect ComputePaintBounds()
+    {
+        var bounds = new SKRect
+        (
+            0,
+            0,
+            Size.X,
+            Size.Y
+        );
+        UnionChildPaintBounds(ref bounds);
+        return _effectiveMatrix.MapRect(bounds);
+    }
+
     private void _UpdateEffectiveMatrix()
     {
         if (_alignment == null)
@@ -62,7 +80,8 @@ public class RenderTransform : RenderProxyBox
         // Compute pivot point in local pixel space from the alignment.
         // CalculateOffset(parentSize, Vector2.Zero) returns the position of a zero-size
         // item placed with this alignment — which is exactly the pivot we want.
-        var pivot = _alignment.CalculateOffset(
+        var pivot = _alignment.CalculateOffset
+        (
             Size,
             Vector2.Zero
         );
@@ -72,20 +91,24 @@ public class RenderTransform : RenderProxyBox
         //   start                       = T(-pivot)
         //   .PostConcat(_matrix)        → M * T(-pivot)
         //   .PostConcat(T(+pivot))      → T(+pivot) * M * T(-pivot)
-        _effectiveMatrix = SKMatrix.CreateTranslation(
+        _effectiveMatrix = SKMatrix.CreateTranslation
+            (
                 -pivot.X,
                 -pivot.Y
             )
             .PostConcat(_matrix)
-            .PostConcat(
-                SKMatrix.CreateTranslation(
+            .PostConcat
+            (
+                SKMatrix.CreateTranslation
+                (
                     pivot.X,
                     pivot.Y
                 )
             );
     }
 
-    public override void Paint(
+    public override void Paint
+    (
         PaintingContext context
     )
     {
@@ -102,28 +125,33 @@ public class RenderTransform : RenderProxyBox
         context.Canvas.Restore();
     }
 
-    public override Vector2 GlobalToChild(
+    public override Vector2 GlobalToChild
+    (
         RenderObject child,
         Vector2 position
     )
     {
         if (_effectiveMatrix.TryInvert(out var inverse))
         {
-            var pt = inverse.MapPoint(
+            var pt = inverse.MapPoint
+            (
                 position.X,
                 position.Y
             );
-            return new Vector2(
+            return new Vector2
+            (
                 pt.X,
                 pt.Y
-            ) - new Vector2(
+            ) - new Vector2
+            (
                 child.X,
                 child.Y
             );
         }
 
         // Degenerate transform (e.g. scale to zero) — report no hit.
-        return new Vector2(
+        return new Vector2
+        (
             float.NegativeInfinity,
             float.NegativeInfinity
         );

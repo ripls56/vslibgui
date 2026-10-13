@@ -20,11 +20,13 @@ namespace Gui.Widgets.Painting;
 /// </summary>
 public class CompositedTransformTarget : SingleChildWidget
 {
-    public CompositedTransformTarget(
+    public CompositedTransformTarget
+    (
         LayerLink link,
         Widget? child = null,
         Framework.Key? key = null
-    ) : base(
+    ) : base
+    (
         child,
         key
     )
@@ -41,7 +43,8 @@ public class CompositedTransformTarget : SingleChildWidget
         return ro;
     }
 
-    public override void UpdateRenderObject(
+    public override void UpdateRenderObject
+    (
         RenderObject renderObject
     ) =>
         ((RenderTarget)renderObject).Link = Link;

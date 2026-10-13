@@ -25,12 +25,14 @@ public class AnimatedSize : SingleChildWidget
     /// <param name="curve">The easing curve. Defaults to <see cref="Curves.Linear" />.</param>
     /// <param name="child">The child widget whose size changes are animated.</param>
     /// <param name="key">Optional key for element identity.</param>
-    public AnimatedSize(
+    public AnimatedSize
+    (
         TimeSpan duration,
         Curve? curve = null,
         Widget? child = null,
         Framework.Key? key = null
-    ) : base(
+    ) : base
+    (
         child,
         key
     )
@@ -45,14 +47,16 @@ public class AnimatedSize : SingleChildWidget
     /// <inheritdoc />
     public override RenderObject CreateRenderObject()
     {
-        return new RenderAnimatedSize(
+        return new RenderAnimatedSize
+        (
             Duration,
             Curve
         );
     }
 
     /// <inheritdoc />
-    public override void UpdateRenderObject(
+    public override void UpdateRenderObject
+    (
         RenderObject renderObject
     )
     {
@@ -70,19 +74,22 @@ public class AnimatedSizeElement : SingleChildElement
     /// <summary>
     ///     Creates a new <see cref="AnimatedSizeElement" />.
     /// </summary>
-    public AnimatedSizeElement(
+    public AnimatedSizeElement
+    (
         AnimatedSize widget
     ) : base(widget)
     {
     }
 
     /// <inheritdoc />
-    public override void Mount(
+    public override void Mount
+    (
         Element? parent
     )
     {
         base.Mount(parent);
-        ((RenderAnimatedSize)RenderObject!).Initialize(
+        ((RenderAnimatedSize)RenderObject!).Initialize
+        (
             Owner!.GetTickerProvider()
         );
     }

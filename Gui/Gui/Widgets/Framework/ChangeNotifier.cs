@@ -5,11 +5,13 @@ namespace Gui.Widgets.Framework;
 
 public interface IListenable
 {
-    void AddListener(
+    void AddListener
+    (
         Action listener
     );
 
-    void RemoveListener(
+    void RemoveListener
+    (
         Action listener
     );
 }
@@ -20,22 +22,29 @@ public abstract class ChangeNotifier : IListenable, IDisposable
 
     public virtual void Dispose() => _listeners.Clear();
 
-    public void AddListener(
+    public void AddListener
+    (
         Action listener
     ) =>
         _listeners.Add(listener);
 
-    public void RemoveListener(
+    public void RemoveListener
+    (
         Action listener
     ) =>
         _listeners.Remove(listener);
 
     protected void NotifyListeners()
     {
-        var snapshot = _listeners.ToArray();
-        foreach (var listener in snapshot)
+        // Iterate backwards by index so a listener removing itself (or a
+        // later listener) during the callback doesn't skip or repeat entries,
+        // avoiding a per-notify array allocation.
+        for (var i = _listeners.Count - 1; i >= 0; i--)
         {
-            listener();
+            if (i < _listeners.Count)
+            {
+                _listeners[i]();
+            }
         }
     }
 }
@@ -44,7 +53,8 @@ public class ValueNotifier<T> : ChangeNotifier
 {
     private T _value;
 
-    public ValueNotifier(
+    public ValueNotifier
+    (
         T value
     )
     {
@@ -56,7 +66,8 @@ public class ValueNotifier<T> : ChangeNotifier
         get => _value;
         set
         {
-            if (EqualityComparer<T>.Default.Equals(
+            if (EqualityComparer<T>.Default.Equals
+                (
                     _value,
                     value
                 ))

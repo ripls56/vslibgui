@@ -10,12 +10,12 @@ namespace Gui.Widgets.Framework;
 ///     <para>
 ///         Use <see cref="State.SetState" /> inside the state to trigger rebuilds when data
 ///         changes. The widget itself is immutable — only the state holds mutable fields.
-
 ///     </para>
 /// </summary>
 public abstract class StatefulWidget : Widget
 {
-    protected StatefulWidget(
+    protected StatefulWidget
+    (
         Key? key = null
     ) : base(key)
     {
@@ -55,7 +55,8 @@ public abstract class State
     ///     <see cref="SetState" /> call. Must be a pure function of this state's fields and
     ///     <see cref="Widget" />'s properties.
     /// </summary>
-    public abstract Widget Build(
+    public abstract Widget Build
+    (
         BuildContext context
     );
 
@@ -64,7 +65,8 @@ public abstract class State
     ///     this widget's subtree. Only the element that owns this state and its descendants
     ///     are rebuilt — ancestors are unaffected.
     /// </summary>
-    protected void SetState(
+    protected void SetState
+    (
         Action fn
     )
     {
@@ -87,7 +89,8 @@ public abstract class State
     ///     <paramref name="oldWidget" /> is the previous one. Call <see cref="SetState" /> here
     ///     if a property change requires a rebuild.
     /// </summary>
-    public virtual void UpdateWidget(
+    public virtual void UpdateWidget
+    (
         StatefulWidget oldWidget
     )
     {
@@ -121,7 +124,8 @@ public abstract class State<T> : State where T : StatefulWidget
     /// <summary>The current widget, strongly typed as <typeparamref name="T" />.</summary>
     public new T Widget => (T)base.Widget;
 
-    public override void UpdateWidget(
+    public override void UpdateWidget
+    (
         StatefulWidget oldWidget
     ) =>
         UpdateWidget((T)oldWidget);
@@ -131,7 +135,8 @@ public abstract class State<T> : State where T : StatefulWidget
     ///     a new <typeparamref name="T" /> widget. The current <see cref="Widget" /> is already
     ///     the new one when this is called.
     /// </summary>
-    public virtual void UpdateWidget(
+    public virtual void UpdateWidget
+    (
         T oldWidget
     )
     {
@@ -142,7 +147,8 @@ public class StatefulElement : Element
 {
     private Element? _child;
 
-    public StatefulElement(
+    public StatefulElement
+    (
         StatefulWidget widget
     ) : base(widget)
     {
@@ -154,7 +160,8 @@ public class StatefulElement : Element
     public State State { get; }
     public override RenderObject? RenderObject => _child?.RenderObject;
 
-    public override void Mount(
+    public override void Mount
+    (
         Element? parent
     )
     {
@@ -175,10 +182,11 @@ public class StatefulElement : Element
         var oldRo = _child?.RenderObject;
         var pendingError = PendingError;
         PendingError = null;
-        Widget builtWidget = pendingError != null
+        var builtWidget = pendingError != null
             ? ErrorWidget.Builder(pendingError)
             : State.Build(new BuildContext(Widget, this));
-        _child = UpdateChild(
+        _child = UpdateChild
+        (
             _child,
             builtWidget
         );
@@ -190,11 +198,13 @@ public class StatefulElement : Element
         }
     }
 
-    public override void Update(
+    public override void Update
+    (
         Widget newWidget
     )
     {
-        if (ReferenceEquals(
+        if (ReferenceEquals
+            (
                 Widget,
                 newWidget
             ))
@@ -218,7 +228,8 @@ public class StatefulElement : Element
         base.Unmount();
     }
 
-    public override void VisitChildren(
+    public override void VisitChildren
+    (
         Action<Element> visitor
     )
     {

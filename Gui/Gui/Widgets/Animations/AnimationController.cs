@@ -43,7 +43,8 @@ public class AnimationController : IAnimation, IDisposable
 
     /// <param name="duration">Total time to animate from 0.0 to 1.0 (or 1.0 to 0.0).</param>
     /// <param name="vsync">Ticker provider from <c>Element.Owner.GetTickerProvider()</c>.</param>
-    public AnimationController(
+    public AnimationController
+    (
         TimeSpan duration,
         ITickerProvider vsync
     )
@@ -78,7 +79,8 @@ public class AnimationController : IAnimation, IDisposable
     public double Value
     {
         get => _value;
-        set => _value = Math.Clamp(
+        set => _value = Math.Clamp
+        (
             value,
             0.0,
             1.0
@@ -100,7 +102,8 @@ public class AnimationController : IAnimation, IDisposable
     /// </summary>
     public event Action<AnimationStatus>? OnStatusChanged;
 
-    private void OnTick(
+    private void OnTick
+    (
         TimeSpan delta
     )
     {
@@ -127,7 +130,8 @@ public class AnimationController : IAnimation, IDisposable
 
         if (hitTarget)
         {
-            _value = Math.Clamp(
+            _value = Math.Clamp
+            (
                 _value,
                 0.0,
                 1.0
@@ -149,7 +153,8 @@ public class AnimationController : IAnimation, IDisposable
     ///     Starts animating toward 1.0. If <paramref name="from" /> is supplied, snaps
     ///     <see cref="Value" /> to that position before starting.
     /// </summary>
-    public void Forward(
+    public void Forward
+    (
         double? from = null
     )
     {

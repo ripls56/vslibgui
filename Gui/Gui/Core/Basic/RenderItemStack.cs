@@ -35,7 +35,8 @@ public class RenderItemStack : RenderBox
         get => _itemStack;
         set
         {
-            SetProperty(
+            SetProperty
+            (
                 ref _itemStack,
                 value,
                 true,
@@ -52,7 +53,8 @@ public class RenderItemStack : RenderBox
         get => _renderSize;
         set
         {
-            if (SetProperty(
+            if (SetProperty
+                (
                     ref _renderSize,
                     value,
                     relayout: true
@@ -67,7 +69,8 @@ public class RenderItemStack : RenderBox
     public float? Width
     {
         get => _width;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref _width,
             value,
             relayout: true
@@ -78,7 +81,8 @@ public class RenderItemStack : RenderBox
     public float? Height
     {
         get => _height;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref _height,
             value,
             relayout: true
@@ -88,15 +92,20 @@ public class RenderItemStack : RenderBox
     /// <inheritdoc />
     public override bool IsHitTestTarget =>
         HitTestBehavior == HitTestBehavior.Opaque ||
-        (HitTestBehavior == HitTestBehavior.Defer && _itemStack != null);
+        HitTestBehavior == HitTestBehavior.Defer && _itemStack != null;
+
+    /// <summary>The stack currently assigned to this slot, or null when empty.</summary>
+    internal ItemStack? CurrentStack => _itemStack;
 
     /// <inheritdoc />
     protected override void PerformLayout()
     {
         var w = _width ?? _renderSize;
         var h = _height ?? _renderSize;
-        Size = Constraints.Constrain(
-            new Vector2(
+        Size = Constraints.Constrain
+        (
+            new Vector2
+            (
                 w,
                 h
             )
@@ -104,7 +113,8 @@ public class RenderItemStack : RenderBox
     }
 
     /// <inheritdoc />
-    protected override void PaintInternal(
+    protected override void PaintInternal
+    (
         PaintingContext context
     )
     {
@@ -115,7 +125,8 @@ public class RenderItemStack : RenderBox
 
         if (Color.W > 0 || BorderThickness > 0)
         {
-            context.Canvas.DrawBox(
+            context.Canvas.DrawBox
+            (
                 Vector2.Zero,
                 Size,
                 Color,
@@ -136,7 +147,8 @@ public class RenderItemStack : RenderBox
 
         float imgW = image.Width;
         float imgH = image.Height;
-        var scale = Math.Min(
+        var scale = Math.Min
+        (
             Size.X / imgW,
             Size.Y / imgH
         );
@@ -153,11 +165,13 @@ public class RenderItemStack : RenderBox
         context.SharedPaint.BlendMode = SKBlendMode.SrcOver;
         context.SharedPaint.Shader = null;
         context.SharedPaint.ImageFilter = null;
-        context.Canvas.DrawImage(
+        context.Canvas.DrawImage
+        (
             image,
             src,
             dst,
-            new SKSamplingOptions(
+            new SKSamplingOptions
+            (
                 SKFilterMode.Linear,
                 SKMipmapMode.None
             ),
@@ -179,9 +193,6 @@ public class RenderItemStack : RenderBox
         _waitingForBitmap = false;
         MarkNeedsPaint();
     }
-
-    /// <summary>The stack currently assigned to this slot, or null when empty.</summary>
-    internal ItemStack? CurrentStack => _itemStack;
 
     /// <summary>
     ///     Called by <see cref="ItemStackRenderer" /> when a glowing item has cooled into a new

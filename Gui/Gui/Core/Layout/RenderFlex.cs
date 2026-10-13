@@ -72,7 +72,10 @@ public class RenderFlex : RenderBox
         );
     } = CrossAxisAlignment.Center;
 
-    /// <summary>Baseline type used when <see cref="CrossAxisAlignment"/> is <see cref="CrossAxisAlignment.Baseline"/>.</summary>
+    /// <summary>
+    ///     Baseline type used when <see cref="CrossAxisAlignment" /> is
+    ///     <see cref="CrossAxisAlignment.Baseline" />.
+    /// </summary>
     public TextBaseline TextBaseline
     {
         get;
@@ -213,7 +216,8 @@ public class RenderFlex : RenderBox
         Size = Constraints.Constrain(finalSize);
 
         if (totalMainSizeUsed > availableMainSize + 0.001f &&
-            !float.IsPositiveInfinity(availableMainSize))
+            !float.IsPositiveInfinity(availableMainSize) &&
+            OnLayoutViolation != null)
         {
             ReportLayoutViolation
             (

@@ -642,10 +642,22 @@ public readonly struct IconButtonStyle
         return new IconButtonStyle
         {
             Size = 40f,
-            Primary = buttons.Primary with { CornerRadius = 20f },
-            Secondary = buttons.Secondary with { CornerRadius = 20f },
-            Danger = buttons.Danger with { CornerRadius = 20f },
-            Ghost = buttons.Ghost with { CornerRadius = 20f }
+            Primary = buttons.Primary with
+            {
+                CornerRadius = 20f
+            },
+            Secondary = buttons.Secondary with
+            {
+                CornerRadius = 20f
+            },
+            Danger = buttons.Danger with
+            {
+                CornerRadius = 20f
+            },
+            Ghost = buttons.Ghost with
+            {
+                CornerRadius = 20f
+            }
         };
     }
 }
@@ -755,10 +767,7 @@ public readonly struct TextFieldStyle
     ///     Creates a default style derived from the given <paramref name="colors" />
     ///     and <paramref name="text" />.
     /// </summary>
-    public static TextFieldStyle Default(ColorScheme colors, TextTheme text)
-    {
-        return new TextFieldStyle(colors, text);
-    }
+    public static TextFieldStyle Default(ColorScheme colors, TextTheme text) => new(colors, text);
 }
 
 /// <summary>
@@ -848,7 +857,7 @@ public class ThemeData
     public TextFieldStyle TextFieldStyle { get; init; }
 
     /// <summary>Outline color applied to focused interactive widgets (buttons, toggles).</summary>
-    public Vector4 FocusOutlineColor { get; init; } = new Vector4
+    public Vector4 FocusOutlineColor { get; init; } = new
     (
         0.95f,
         0.78f,

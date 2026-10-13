@@ -26,7 +26,8 @@ public static class EventCheckHelper
     ///     <see cref="ISelectiveEventHandler" />, reports handling at least
     ///     one event type.
     /// </summary>
-    public static bool HandlesAnyPointerEvent(
+    public static bool HandlesAnyPointerEvent
+    (
         object source
     )
     {
@@ -61,7 +62,8 @@ public static class EventCheckHelper
     ///     event or implements <see cref="IFocusable" />. Used for hit-test
     ///     interactivity checks that include keyboard focus.
     /// </summary>
-    public static bool IsInteractive(
+    public static bool IsInteractive
+    (
         object source
     )
     {

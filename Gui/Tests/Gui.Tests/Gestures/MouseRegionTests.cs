@@ -168,4 +168,59 @@ public class MouseRegionTests
         var cursor = MouseCursor.Custom("mycursor");
         Assert.That(cursor.Name, Is.EqualTo("mycursor"));
     }
+
+    [Test]
+    public void CancelHover_FiresExitWithoutPointerMove()
+    {
+        var exits = 0;
+        var widget = new MouseRegion(
+            new SizedBox(100, 100),
+            onExit: _ => exits++);
+        var (root, _) = Mount(widget);
+        root.RenderObject!.Layout(LayoutConstraints.Tight(100, 100));
+
+        var dispatcher = new EventDispatcher();
+        dispatcher.DispatchPointerMove(root, new PointerEvent(50, 50));
+        dispatcher.CancelHover();
+
+        Assert.That(exits, Is.EqualTo(1));
+    }
+
+    [Test]
+    public void CancelHover_ClearsHoverState_SoReEntryFiresEnterAgain()
+    {
+        var enters = 0;
+        var exits = 0;
+        var widget = new MouseRegion(
+            new SizedBox(100, 100),
+            _ => enters++,
+            _ => exits++);
+        var (root, _) = Mount(widget);
+        root.RenderObject!.Layout(LayoutConstraints.Tight(100, 100));
+
+        var dispatcher = new EventDispatcher();
+        dispatcher.DispatchPointerMove(root, new PointerEvent(50, 50));
+        dispatcher.CancelHover();
+        dispatcher.DispatchPointerMove(root, new PointerEvent(50, 50));
+
+        Assert.That(enters, Is.EqualTo(2));
+        Assert.That(exits, Is.EqualTo(1));
+    }
+
+    [Test]
+    public void CancelHover_WithNothingHovered_FiresNoExit()
+    {
+        var exits = 0;
+        var widget = new MouseRegion(
+            new SizedBox(100, 100),
+            onExit: _ => exits++);
+        var (root, _) = Mount(widget);
+        root.RenderObject!.Layout(LayoutConstraints.Tight(100, 100));
+
+        var dispatcher = new EventDispatcher();
+        dispatcher.CancelHover();
+        dispatcher.CancelHover();
+
+        Assert.That(exits, Is.Zero);
+    }
 }

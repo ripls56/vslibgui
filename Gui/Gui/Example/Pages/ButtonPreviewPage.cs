@@ -38,14 +38,14 @@ internal class ButtonPreviewPage : StatelessWidget
                     description: "Matrix of all button variants across common interaction states.",
                     demo: new Column
                     (
-                        spacing: 24,
+                        24,
                         crossAxisAlignment: CrossAxisAlignment.Start,
                         children:
                         [
                             BuildVariantRow("Primary", ButtonVariant.Primary),
                             BuildVariantRow("Secondary", ButtonVariant.Secondary),
                             BuildVariantRow("Danger", ButtonVariant.Danger),
-                            BuildVariantRow("Ghost", ButtonVariant.Ghost),
+                            BuildVariantRow("Ghost", ButtonVariant.Ghost)
                         ]
                     ),
                     code: "new Button(child, ButtonVariant.Secondary)",
@@ -58,13 +58,13 @@ internal class ButtonPreviewPage : StatelessWidget
                     description: "Buttons handling disabled and async loading states.",
                     demo: new Row
                     (
-                        spacing: 12,
+                        12,
                         children:
                         [
                             new Button(new Text("Disabled"), enabled: false),
                             new Button(new Text("Loading"), status: ButtonStatus.Loading),
                             new Button(new Text("Success"), status: ButtonStatus.Success),
-                            new Button(new Text("Error"), status: ButtonStatus.Error),
+                            new Button(new Text("Error"), status: ButtonStatus.Error)
                         ]
                     ),
                     code: "new Button(child, status: ButtonStatus.Loading)",
@@ -77,13 +77,21 @@ internal class ButtonPreviewPage : StatelessWidget
                     description: "Button variants with centered icons for compact actions.",
                     demo: new Row
                     (
-                        spacing: 16,
+                        16,
                         children:
                         [
                             new IconButton(new Icon("gui", "textures/icons/sparkles.svg")),
-                            new IconButton(new Icon("gui", "textures/icons/edit-3.svg"), ButtonVariant.Secondary),
-                            new IconButton(new Icon("gui", "textures/icons/package.svg"), ButtonVariant.Danger),
-                            new IconButton(new Icon("gui", "textures/icons/palette.svg"), ButtonVariant.Ghost),
+                            new IconButton
+                            (
+                                new Icon("gui", "textures/icons/edit-3.svg"),
+                                ButtonVariant.Secondary
+                            ),
+                            new IconButton
+                            (
+                                new Icon("gui", "textures/icons/package.svg"), ButtonVariant.Danger
+                            ),
+                            new IconButton
+                                (new Icon("gui", "textures/icons/palette.svg"), ButtonVariant.Ghost)
                         ]
                     ),
                     code: "new IconButton(new Icon(...), ButtonVariant.Secondary)",
@@ -97,7 +105,7 @@ internal class ButtonPreviewPage : StatelessWidget
     {
         return new Column
         (
-            spacing: 8,
+            8,
             crossAxisAlignment: CrossAxisAlignment.Start,
             children:
             [
@@ -126,7 +134,7 @@ internal class ButtonPreviewPage : StatelessWidget
                         new Button(new Text("Active"), variant)
                         {
                             ForceActive = true
-                        },
+                        }
                     ]
                 )
             ]

@@ -26,7 +26,8 @@ public class RenderProxyBox : RenderBox
         }
     }
 
-    public override float GetMinIntrinsicWidth(
+    public override float GetMinIntrinsicWidth
+    (
         float height
     )
     {
@@ -35,7 +36,8 @@ public class RenderProxyBox : RenderBox
             : 0f;
     }
 
-    public override float GetMaxIntrinsicWidth(
+    public override float GetMaxIntrinsicWidth
+    (
         float height
     )
     {
@@ -44,7 +46,8 @@ public class RenderProxyBox : RenderBox
             : 0f;
     }
 
-    public override float GetMinIntrinsicHeight(
+    public override float GetMinIntrinsicHeight
+    (
         float width
     )
     {
@@ -53,7 +56,8 @@ public class RenderProxyBox : RenderBox
             : 0f;
     }
 
-    public override float GetMaxIntrinsicHeight(
+    public override float GetMaxIntrinsicHeight
+    (
         float width
     )
     {

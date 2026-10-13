@@ -1,10 +1,8 @@
 using Gui.Core.Framework;
 using Gui.Core.Overlay;
 using Gui.Core.Painting;
-using Gui.Widgets.Animations;
 using Gui.Widgets.Framework;
 using Gui.Widgets.Painting;
-using OpenTK.Mathematics;
 
 namespace Gui.Widgets.Overlay;
 
@@ -41,7 +39,8 @@ public enum HorizontalAnchor
 /// </summary>
 public sealed class AnchoredOverlay : SingleChildWidget
 {
-    public AnchoredOverlay(
+    public AnchoredOverlay
+    (
         float anchorX,
         float triggerGlobalY,
         float triggerHeight,
@@ -51,7 +50,8 @@ public sealed class AnchoredOverlay : SingleChildWidget
         LayerLink? link = null,
         Widget? child = null,
         Framework.Key? key = null
-    ) : base(
+    ) : base
+    (
         child,
         key
     )
@@ -108,7 +108,8 @@ public sealed class AnchoredOverlay : SingleChildWidget
     }
 
     /// <inheritdoc />
-    public override void UpdateRenderObject(
+    public override void UpdateRenderObject
+    (
         RenderObject renderObject
     )
     {

@@ -43,7 +43,8 @@ internal class RenderPositioned : RenderProxyBox
         }
     }
 
-    public override void Layout(
+    public override void Layout
+    (
         LayoutConstraints constraints
     )
     {

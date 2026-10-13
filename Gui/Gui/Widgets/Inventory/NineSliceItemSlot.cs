@@ -15,7 +15,8 @@ namespace Gui.Widgets.Inventory;
 public class NineSliceItemSlot : StatelessWidget
 {
     /// <summary>Creates a nine-slice inventory slot.</summary>
-    public NineSliceItemSlot(
+    public NineSliceItemSlot
+    (
         SKBitmap texture,
         EdgeInsets slice,
         float size = 64f,
@@ -64,10 +65,12 @@ public class NineSliceItemSlot : StatelessWidget
     /// <inheritdoc />
     public override Widget Build(BuildContext context)
     {
-        return new ItemSlotGestureLayer(
+        return new ItemSlotGestureLayer
+        (
             slot: Slot,
             controller: Controller,
-            childBuilder: () => new NineSliceBox(
+            childBuilder: () => new NineSliceBox
+            (
                 Texture,
                 Slice,
                 width: Size,

@@ -12,7 +12,8 @@ public interface ISoundPlayer
     /// <param name="name">Sound name relative to the mod's sounds folder (e.g. "click").</param>
     /// <param name="pitch">Playback pitch — fixed float or <see cref="Pitch.Varied" />.</param>
     /// <param name="volume">Playback volume (0.0–1.0).</param>
-    void Play(
+    void Play
+    (
         string name,
         Pitch pitch = default,
         float volume = 0.5f
@@ -26,7 +27,8 @@ public interface ISoundPlayer
     /// <param name="loop">Whether the sound should loop.</param>
     /// <param name="pitch">Initial pitch — fixed float or <see cref="Pitch.Varied" />.</param>
     /// <param name="volume">Initial volume (0.0–1.0).</param>
-    SoundHandle Load(
+    SoundHandle Load
+    (
         string name,
         bool loop = false,
         Pitch pitch = default,

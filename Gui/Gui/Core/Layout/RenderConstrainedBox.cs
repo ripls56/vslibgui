@@ -16,7 +16,8 @@ public class RenderConstrainedBox : RenderBox
         _additionalConstraints = new LayoutConstraints();
     }
 
-    public RenderConstrainedBox(
+    public RenderConstrainedBox
+    (
         LayoutConstraints additionalConstraints
     )
     {
@@ -113,8 +114,10 @@ public class RenderConstrainedBox : RenderBox
             var height = _additionalConstraints.MinHeight == _additionalConstraints.MaxHeight
                 ? _additionalConstraints.MaxHeight
                 : 0;
-            Size = Constraints.Constrain(
-                new Vector2(
+            Size = Constraints.Constrain
+            (
+                new Vector2
+                (
                     width,
                     height
                 )

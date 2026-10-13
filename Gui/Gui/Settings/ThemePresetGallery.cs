@@ -39,10 +39,8 @@ public class ThemePresetGallery : StatelessWidget
     }
 
     /// <inheritdoc />
-    public override Widget Build(BuildContext context)
-    {
-        return new ThemePresetBrowser(_presets, _onSelect);
-    }
+    public override Widget Build
+        (BuildContext context) => new ThemePresetBrowser(_presets, _onSelect);
 }
 
 /// <summary>
@@ -114,7 +112,7 @@ internal sealed class ThemePresetBrowserState : State<ThemePresetBrowser>
                         children:
                         [
                             BuildPresetList(colors),
-                            new Divider(1f, color: colors.OutlineVariant, axis: Axis.Vertical),
+                            new Divider(color: colors.OutlineVariant, axis: Axis.Vertical),
                             new Expanded
                                 (child: new Padding(EdgeInsets.All(24), BuildPreview(selected)))
                         ]
@@ -128,11 +126,11 @@ internal sealed class ThemePresetBrowserState : State<ThemePresetBrowser>
     {
         return new Padding
         (
-            edgeInsets: EdgeInsets.Symmetric(horizontal: 24) with
+            EdgeInsets.Symmetric(horizontal: 24) with
             {
                 Top = 16, Bottom = 16
             },
-            child: new Row
+            new Row
             (
                 mainAxisAlignment: MainAxisAlignment.SpaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.Center,
@@ -170,7 +168,7 @@ internal sealed class ThemePresetBrowserState : State<ThemePresetBrowser>
 
         return new SizedBox
         (
-            width: ListWidth,
+            ListWidth,
             child: new Container
             (
                 new BoxStyle
@@ -230,7 +228,7 @@ internal sealed class ThemePresetBrowserState : State<ThemePresetBrowser>
                     new SizedBox(width: 8),
                     new Row
                     (
-                        spacing: 4,
+                        4,
                         mainAxisSize: MainAxisSize.Min,
                         crossAxisAlignment: CrossAxisAlignment.Center,
                         children:
@@ -300,7 +298,7 @@ internal sealed class ThemePresetBrowserState : State<ThemePresetBrowser>
                         ),
                         new Row
                         (
-                            spacing: 12,
+                            12,
                             crossAxisAlignment: CrossAxisAlignment.Center,
                             children:
                             [
@@ -313,8 +311,7 @@ internal sealed class ThemePresetBrowserState : State<ThemePresetBrowser>
                                         {
                                             FontSize = 13, Color = scheme.OnPrimary
                                         }
-                                    ),
-                                    ButtonVariant.Primary
+                                    )
                                 ),
                                 new Button
                                 (
@@ -360,7 +357,7 @@ internal sealed class ThemePresetBrowserState : State<ThemePresetBrowser>
                         ),
                         new Row
                         (
-                            spacing: 8,
+                            8,
                             crossAxisAlignment: CrossAxisAlignment.Center,
                             children:
                             [
@@ -482,7 +479,7 @@ internal sealed class PresetCardState : State<PresetCard>
             [
                 new Row
                 (
-                    spacing: 8,
+                    8,
                     crossAxisAlignment: CrossAxisAlignment.Center,
                     children:
                     [
@@ -495,8 +492,7 @@ internal sealed class PresetCardState : State<PresetCard>
                                 {
                                     FontSize = 12, Color = scheme.OnPrimary
                                 }
-                            ),
-                            ButtonVariant.Primary
+                            )
                         ),
                         new Checkbox(true, size: 18)
                     ]
@@ -523,24 +519,24 @@ internal sealed class PresetCardState : State<PresetCard>
                 Padding = EdgeInsets.All(10)
             },
             SurfaceDuration,
-            curve: Curves.EaseOut,
+            Curves.EaseOut,
             child: content
         );
 
         var themed = new Theme(new ThemeData(colorScheme: scheme), surface);
-        var press = new AnimatedScale(scale, PressDuration, curve: Curves.EaseOut, child: themed);
+        var press = new AnimatedScale(scale, PressDuration, Curves.EaseOut, child: themed);
         var slide = new AnimatedSlide
         (
             _visible ? Vector2.Zero : new Vector2(0, 10),
             EntranceDuration,
-            curve: Curves.EaseOut,
+            Curves.EaseOut,
             child: press
         );
         var fade = new AnimatedOpacity
         (
             _visible ? 1f : 0f,
             EntranceDuration,
-            curve: Curves.EaseOut,
+            Curves.EaseOut,
             child: slide
         );
 

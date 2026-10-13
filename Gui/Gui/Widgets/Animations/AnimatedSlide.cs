@@ -17,7 +17,8 @@ public class AnimatedSlide : ImplicitlyAnimatedWidget
     ///     Creates an animated slide widget that transitions between offset
     ///     values over the given <paramref name="duration" />.
     /// </summary>
-    public AnimatedSlide(
+    public AnimatedSlide
+    (
         Vector2 offset,
         TimeSpan duration,
         Curve? curve = null,
@@ -25,7 +26,8 @@ public class AnimatedSlide : ImplicitlyAnimatedWidget
         Widget? child = null,
         Framework.Key? key = null
     )
-        : base(
+        : base
+        (
             duration,
             curve,
             onEnd,
@@ -55,14 +57,17 @@ internal class AnimatedSlideState
     private OffsetTween? _offsetTween;
 
     /// <inheritdoc />
-    protected override void ForEachTween(
+    protected override void ForEachTween
+    (
         TweenVisitor visitor
     )
     {
-        _offsetTween = (OffsetTween)visitor.Visit(
+        _offsetTween = (OffsetTween)visitor.Visit
+        (
             _offsetTween,
             Widget.Offset,
-            v => new OffsetTween(
+            v => new OffsetTween
+            (
                 v,
                 v
             )
@@ -70,14 +75,17 @@ internal class AnimatedSlideState
     }
 
     /// <inheritdoc />
-    public override Widget Build(
+    public override Widget Build
+    (
         BuildContext context
     )
     {
         var offset = _offsetTween!.Evaluate(Animation);
-        return new Transform(
+        return new Transform
+        (
             Widget.Child,
-            SKMatrix.CreateTranslation(
+            SKMatrix.CreateTranslation
+            (
                 offset.X,
                 offset.Y
             )

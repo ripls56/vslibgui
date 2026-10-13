@@ -7,16 +7,16 @@ namespace Gui.Widgets.Input;
 public abstract class FocusTraversalPolicy
 {
     /// <summary>
-    /// Returns the ordered list of traversable <see cref="FocusNode"/> instances within
-    /// <paramref name="root"/>'s subtree.
+    ///     Returns the ordered list of traversable <see cref="FocusNode" /> instances within
+    ///     <paramref name="root" />'s subtree.
     /// </summary>
     public abstract IReadOnlyList<FocusNode> GetTraversalOrder(Element root, FocusManager manager);
 }
 
 /// <summary>
-/// Traversal policy that follows document (depth-first) order.
-/// Respects <see cref="FocusScopeNode"/> scope boundaries: traversal is limited to the
-/// scope containing the currently focused node.
+///     Traversal policy that follows document (depth-first) order.
+///     Respects <see cref="FocusScopeNode" /> scope boundaries: traversal is limited to the
+///     scope containing the currently focused node.
 /// </summary>
 public sealed class ReadingOrderTraversalPolicy : FocusTraversalPolicy
 {
@@ -25,7 +25,7 @@ public sealed class ReadingOrderTraversalPolicy : FocusTraversalPolicy
     {
         var activeScope = FindScopeAncestor(manager.PrimaryFocus?.Owner);
         var result = new List<FocusNode>();
-        CollectNodes(root, activeScope, result, insideActiveScope: activeScope == null);
+        CollectNodes(root, activeScope, result, activeScope == null);
         result.Sort
         ((a, b) =>
             {
@@ -97,7 +97,7 @@ public sealed class ReadingOrderTraversalPolicy : FocusTraversalPolicy
             }
 
             element.VisitChildren
-                (child => CollectNodes(child, activeScope, result, insideActiveScope: true));
+                (child => CollectNodes(child, activeScope, result, true));
             return;
         }
 

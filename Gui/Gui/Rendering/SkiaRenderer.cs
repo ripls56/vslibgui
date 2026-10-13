@@ -25,7 +25,8 @@ public class SkiaRenderer : IDisposable
         GrContext?.Dispose();
     }
 
-    public void Begin(
+    public void Begin
+    (
         int width,
         int height,
         float scale = 1.0f
@@ -47,29 +48,34 @@ public class SkiaRenderer : IDisposable
             _surface?.Dispose();
             _renderTarget?.Dispose();
 
-            GL.GetInteger(
+            GL.GetInteger
+            (
                 GetPName.FramebufferBinding,
                 out var framebuffer
             );
-            GL.GetInteger(
+            GL.GetInteger
+            (
                 GetPName.Samples,
                 out var samples
             );
 
             var stencil = 8;
 
-            var glInfo = new GRGlFramebufferInfo(
+            var glInfo = new GRGlFramebufferInfo
+            (
                 (uint)framebuffer,
                 SKColorType.Rgba8888.ToGlSizedFormat()
             );
-            _renderTarget = new GRBackendRenderTarget(
+            _renderTarget = new GRBackendRenderTarget
+            (
                 width,
                 height,
                 samples,
                 stencil,
                 glInfo
             );
-            _surface = SKSurface.Create(
+            _surface = SKSurface.Create
+            (
                 GrContext,
                 _renderTarget,
                 GRSurfaceOrigin.BottomLeft,
@@ -80,7 +86,8 @@ public class SkiaRenderer : IDisposable
 
         GrContext.ResetContext();
         Canvas?.ResetMatrix();
-        Canvas?.Scale(
+        Canvas?.Scale
+        (
             scale,
             scale
         );
@@ -105,11 +112,13 @@ public class SkiaRenderer : IDisposable
         for (var unit = 0; unit < TextureUnitsToReset; unit++)
         {
             GL.ActiveTexture(TextureUnit.Texture0 + unit);
-            GL.BindTexture(
+            GL.BindTexture
+            (
                 TextureTarget.Texture2D,
                 0
             );
-            GL.BindSampler(
+            GL.BindSampler
+            (
                 (uint)unit,
                 0
             );

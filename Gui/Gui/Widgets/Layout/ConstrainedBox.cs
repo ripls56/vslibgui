@@ -9,12 +9,14 @@ namespace Gui.Widgets.Layout;
 /// </summary>
 public class ConstrainedBox : SingleChildWidget
 {
-    public ConstrainedBox(
+    public ConstrainedBox
+    (
         LayoutConstraints constraints,
         Widget? child = null,
         Framework.Key? key = null
     )
-        : base(
+        : base
+        (
             child,
             key
         )
@@ -29,7 +31,8 @@ public class ConstrainedBox : SingleChildWidget
 
     public override RenderObject CreateRenderObject() => new RenderConstrainedBox(Constraints);
 
-    public override void UpdateRenderObject(
+    public override void UpdateRenderObject
+    (
         RenderObject renderObject
     )
     {

@@ -1,12 +1,11 @@
 using System;
 using System.Globalization;
-using Gui.Core.Framework;
+using Gui.Sound;
 using Gui.Widgets.Basic;
 using Gui.Widgets.Events;
 using Gui.Widgets.Framework;
 using Gui.Widgets.Layout;
 using Gui.Widgets.Painting;
-using OpenTK.Mathematics;
 
 namespace Gui.Widgets.Input;
 
@@ -190,7 +189,13 @@ internal class StepperButtonState : State<StepperButton>
             child: new GestureDetector
             (
                 onTap: Widget.OnTap,
-                onPress: _ => SetState(() => _isPressed = true),
+                onPress: _ => SetState
+                (() =>
+                    {
+                        _isPressed = true;
+                        this.Step();
+                    }
+                ),
                 onRelease: _ => SetState(() => _isPressed = false),
                 onEnter: _ => SetState(() => _isHovered = true),
                 onExit: _ => SetState

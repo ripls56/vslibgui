@@ -16,7 +16,8 @@ public class AnimatedRotation : ImplicitlyAnimatedWidget
     ///     Creates an animated rotation widget that transitions between angle
     ///     values over the given <paramref name="duration" />.
     /// </summary>
-    public AnimatedRotation(
+    public AnimatedRotation
+    (
         float angle,
         TimeSpan duration,
         Curve? curve = null,
@@ -25,7 +26,8 @@ public class AnimatedRotation : ImplicitlyAnimatedWidget
         Widget? child = null,
         Framework.Key? key = null
     )
-        : base(
+        : base
+        (
             duration,
             curve,
             onEnd,
@@ -59,14 +61,17 @@ internal class AnimatedRotationState
     private FloatTween? _angleTween;
 
     /// <inheritdoc />
-    protected override void ForEachTween(
+    protected override void ForEachTween
+    (
         TweenVisitor visitor
     )
     {
-        _angleTween = (FloatTween)visitor.Visit(
+        _angleTween = (FloatTween)visitor.Visit
+        (
             _angleTween,
             Widget.Angle,
-            v => new FloatTween(
+            v => new FloatTween
+            (
                 v,
                 v
             )
@@ -74,12 +79,14 @@ internal class AnimatedRotationState
     }
 
     /// <inheritdoc />
-    public override Widget Build(
+    public override Widget Build
+    (
         BuildContext context
     )
     {
         var angle = _angleTween!.Evaluate(Animation);
-        return new Transform(
+        return new Transform
+        (
             Widget.Child,
             SKMatrix.CreateRotation(angle),
             Widget.Alignment

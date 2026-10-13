@@ -8,7 +8,8 @@ namespace Gui.Widgets.Framework;
 /// </summary>
 public abstract class StatelessWidget : Widget
 {
-    protected StatelessWidget(
+    protected StatelessWidget
+    (
         Key? key = null
     ) : base(key)
     {
@@ -19,7 +20,8 @@ public abstract class StatelessWidget : Widget
     ///     element needs to rebuild. Must be a pure function of this widget's fields and
     ///     <paramref name="context" /> — do not read or write external mutable state here.
     /// </summary>
-    public abstract Widget Build(
+    public abstract Widget Build
+    (
         BuildContext context
     );
 

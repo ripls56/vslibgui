@@ -7,7 +7,8 @@ namespace Gui.Widgets.Layout;
 
 public class Viewport : SingleChildWidget
 {
-    public Viewport(
+    public Viewport
+    (
         Vector2 offset,
         Widget? child = null,
         Axis scrollDirection = Axis.Vertical,
@@ -23,12 +24,13 @@ public class Viewport : SingleChildWidget
     /// <summary>The axis along which this viewport scrolls.</summary>
     public Axis ScrollDirection { get; }
 
-    public override RenderObject CreateRenderObject()
+    public override RenderObject CreateRenderObject() => new RenderViewport
     {
-        return new RenderViewport { Offset = Offset, ScrollDirection = ScrollDirection };
-    }
+        Offset = Offset, ScrollDirection = ScrollDirection
+    };
 
-    public override void UpdateRenderObject(
+    public override void UpdateRenderObject
+    (
         RenderObject renderObject
     )
     {

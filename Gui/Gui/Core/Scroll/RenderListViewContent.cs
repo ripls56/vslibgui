@@ -14,7 +14,8 @@ internal class RenderListViewContent : RenderObject
 {
     private readonly Action<float, float> _onLayout;
 
-    public RenderListViewContent(
+    public RenderListViewContent
+    (
         Action<float, float> onLayout
     )
     {
@@ -50,7 +51,8 @@ internal class RenderListViewContent : RenderObject
             PerformFixedLayout();
         }
 
-        _onLayout(
+        _onLayout
+        (
             ViewportHeight,
             TotalHeight
         );
@@ -92,7 +94,8 @@ internal class RenderListViewContent : RenderObject
         {
             child.Layout(itemConstraints);
 
-            if (!ChildIndexMap.TryGetValue(
+            if (!ChildIndexMap.TryGetValue
+                (
                     child,
                     out var index
                 ))

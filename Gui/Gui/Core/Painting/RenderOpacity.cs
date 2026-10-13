@@ -19,7 +19,8 @@ public class RenderOpacity : RenderProxyBox
     } = 1.0f;
 
     /// <inheritdoc />
-    public override void Paint(
+    public override void Paint
+    (
         PaintingContext context
     )
     {
@@ -45,7 +46,8 @@ public class RenderOpacity : RenderProxyBox
             paint.BlendMode = SKBlendMode.SrcOver;
             paint.Shader = null;
             paint.ImageFilter = null;
-            context.Canvas.SaveLayer(paint);
+            // Bound the offscreen layer to this widget's box, not the whole clip (window).
+            context.Canvas.SaveLayer(new SKRect(0, 0, Size.X, Size.Y), paint);
             base.Paint(context);
             context.Canvas.Restore();
         }

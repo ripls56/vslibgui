@@ -32,7 +32,8 @@ public class VtmlText : StatefulWidget
     /// </param>
     /// <param name="overflow">Overflow behavior when maxLines is exceeded.</param>
     /// <param name="key">Optional widget key for reconciliation.</param>
-    public VtmlText(
+    public VtmlText
+    (
         string vtml,
         TextStyle? baseStyle = null,
         Action<string>? onLinkClick = null,
@@ -84,26 +85,30 @@ public class VtmlTextState : State<VtmlText>
     private string? _cachedVtml;
 
     /// <inheritdoc />
-    public override Widget Build(
+    public override Widget Build
+    (
         BuildContext context
     )
     {
         if (_cachedElements == null || _cachedVtml != Widget.Vtml)
         {
-            _cachedElements = VtmlConverter.Convert(
+            _cachedElements = VtmlConverter.Convert
+            (
                 Widget.Vtml,
                 Widget.BaseStyle
             );
             _cachedVtml = Widget.Vtml;
         }
 
-        var span = VtmlSpanBuilder.Build(
+        var span = VtmlSpanBuilder.Build
+        (
             _cachedElements,
             Widget.BaseStyle,
             Widget.OnLinkClick
         );
 
-        return new RichText(
+        return new RichText
+        (
             span,
             Widget.BaseStyle,
             Widget.MaxLines,

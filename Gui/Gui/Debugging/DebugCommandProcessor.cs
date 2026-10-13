@@ -4,7 +4,8 @@ public class DebugCommandProcessor
 {
     private readonly DebugSettings _settings;
 
-    public DebugCommandProcessor(
+    public DebugCommandProcessor
+    (
         DebugSettings settings
     )
     {
@@ -15,7 +16,8 @@ public class DebugCommandProcessor
     ///     Processes a debug subcommand. The optional <paramref name="arg" /> is used by commands
     ///     that accept a parameter (e.g. <c>flash</c> accepts a duration in milliseconds).
     /// </summary>
-    public string Process(
+    public string Process
+    (
         string subCommand,
         string? arg = null
     )
@@ -44,7 +46,8 @@ public class DebugCommandProcessor
                 _settings.ShowHeatMap = !_settings.ShowHeatMap;
                 return $"ShowHeatMap: {_settings.ShowHeatMap}";
             case "flash":
-                if (arg != null && double.TryParse(
+                if (arg != null && double.TryParse
+                    (
                         arg,
                         out var ms
                     ) && ms > 0)

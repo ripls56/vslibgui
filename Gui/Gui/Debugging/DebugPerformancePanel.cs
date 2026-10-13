@@ -38,7 +38,8 @@ public class DebugPerformancePanel : StatefulWidget
         public override void InitState()
         {
             base.InitState();
-            _ticker = new AnimationController(
+            _ticker = new AnimationController
+            (
                 TimeSpan.FromMilliseconds(500),
                 Element.Owner!.GetTickerProvider()
             );
@@ -62,47 +63,124 @@ public class DebugPerformancePanel : StatefulWidget
 
             if (metrics == null)
             {
-                return new Text("No metrics", new TextStyle { FontSize = 11, Color = White });
+                return new Text
+                (
+                    "No metrics", new TextStyle
+                    {
+                        FontSize = 11, Color = White
+                    }
+                );
             }
 
-            return new Column(
+            return new Column
+            (
                 crossAxisAlignment: CrossAxisAlignment.Start,
                 spacing: 2,
                 children:
                 [
-                    new Text($"Frame: {metrics.FrameTime:F2} ms",
-                        new TextStyle { FontSize = 11, Color = White }),
-                    new Text($"  Begin:  {metrics.BeginTime:F2} ms",
-                        new TextStyle { FontSize = 11, Color = Yellow }),
-                    new Text($"  Build:  {metrics.BuildTime:F2} ms",
-                        new TextStyle { FontSize = 11, Color = Yellow }),
-                    new Text($"  Layout: {metrics.LayoutTime:F2} ms",
-                        new TextStyle { FontSize = 11, Color = Yellow }),
-                    new Text($"  Paint:  {metrics.PaintTime:F2} ms",
-                        new TextStyle { FontSize = 11, Color = Yellow }),
-                    new Text($"  End:    {metrics.EndTime:F2} ms",
-                        new TextStyle { FontSize = 11, Color = Yellow }),
-                    new Text($"Widgets: {metrics.WidgetCount}",
-                        new TextStyle { FontSize = 11, Color = White }),
-                    new Text($"Layout Calls: {metrics.LayoutCalls}",
-                        new TextStyle { FontSize = 11, Color = White }),
-                    new Text($"Paint Calls:  {metrics.PaintCalls}",
-                        new TextStyle { FontSize = 11, Color = White }),
-                    new Text(
+                    new Text
+                    (
+                        $"Frame: {metrics.FrameTime:F2} ms",
+                        new TextStyle
+                        {
+                            FontSize = 11, Color = White
+                        }
+                    ),
+                    new Text
+                    (
+                        $"  Begin:  {metrics.BeginTime:F2} ms",
+                        new TextStyle
+                        {
+                            FontSize = 11, Color = Yellow
+                        }
+                    ),
+                    new Text
+                    (
+                        $"  Build:  {metrics.BuildTime:F2} ms",
+                        new TextStyle
+                        {
+                            FontSize = 11, Color = Yellow
+                        }
+                    ),
+                    new Text
+                    (
+                        $"  Layout: {metrics.LayoutTime:F2} ms",
+                        new TextStyle
+                        {
+                            FontSize = 11, Color = Yellow
+                        }
+                    ),
+                    new Text
+                    (
+                        $"  Paint:  {metrics.PaintTime:F2} ms",
+                        new TextStyle
+                        {
+                            FontSize = 11, Color = Yellow
+                        }
+                    ),
+                    new Text
+                    (
+                        $"  End:    {metrics.EndTime:F2} ms",
+                        new TextStyle
+                        {
+                            FontSize = 11, Color = Yellow
+                        }
+                    ),
+                    new Text
+                    (
+                        $"Widgets: {metrics.WidgetCount}",
+                        new TextStyle
+                        {
+                            FontSize = 11, Color = White
+                        }
+                    ),
+                    new Text
+                    (
+                        $"Layout Calls: {metrics.LayoutCalls}",
+                        new TextStyle
+                        {
+                            FontSize = 11, Color = White
+                        }
+                    ),
+                    new Text
+                    (
+                        $"Paint Calls:  {metrics.PaintCalls}",
+                        new TextStyle
+                        {
+                            FontSize = 11, Color = White
+                        }
+                    ),
+                    new Text
+                    (
                         $"Boundary Hits:   {metrics.RepaintBoundaryHits}",
-                        new TextStyle { FontSize = 11, Color = White }
+                        new TextStyle
+                        {
+                            FontSize = 11, Color = White
+                        }
                     ),
-                    new Text(
+                    new Text
+                    (
                         $"Boundary Misses: {metrics.RepaintBoundaryMisses}",
-                        new TextStyle { FontSize = 11, Color = White }
+                        new TextStyle
+                        {
+                            FontSize = 11, Color = White
+                        }
                     ),
-                    new Text(
+                    new Text
+                    (
                         $"Alloc/Frame: {metrics.AllocationsThisFrame / 1024f:F1} KB",
-                        new TextStyle { FontSize = 11, Color = Red }
+                        new TextStyle
+                        {
+                            FontSize = 11, Color = Red
+                        }
                     ),
-                    new Text(
+                    new Text
+                    (
                         $"Total Mem:   {metrics.TotalAllocatedMemory / 1024f / 1024f:F1} MB",
-                        new TextStyle { FontSize = 11, Color = Red }
+                        new TextStyle
+                        {
+                            FontSize = 11, Color = Red
+                        }
                     )
                 ]
             );

@@ -7,7 +7,8 @@ namespace Gui.Widgets.Layout;
 
 public class Padding : SingleChildWidget
 {
-    public Padding(
+    public Padding
+    (
         EdgeInsets edgeInsets,
         Widget? child = null,
         Framework.Key? key = null
@@ -18,12 +19,13 @@ public class Padding : SingleChildWidget
 
     public EdgeInsets EdgeInsets { get; }
 
-    public override RenderObject CreateRenderObject()
+    public override RenderObject CreateRenderObject() => new RenderPadding
     {
-        return new RenderPadding { Padding = EdgeInsets };
-    }
+        Padding = EdgeInsets
+    };
 
-    public override void UpdateRenderObject(
+    public override void UpdateRenderObject
+    (
         RenderObject renderObject
     )
     {

@@ -22,7 +22,8 @@ public class SpotlightHover : StatefulWidget
     /// <param name="cornerRadius">Corner radius of the spotlight border in pixels.</param>
     /// <param name="fadeDuration">Fade in/out duration. Defaults to 150 ms.</param>
     /// <param name="cursor">Cursor shown while hovering. Optional.</param>
-    public SpotlightHover(
+    public SpotlightHover
+    (
         Widget child,
         Vector4 glowColor,
         float cornerRadius = 0f,
@@ -95,24 +96,30 @@ internal class SpotlightHoverState : State<SpotlightHover>
         var content = Widget.Child;
         if (intensity > 0f)
         {
-            content = new Stack([
-                Widget.Child,
-                new Positioned(
-                    0,
-                    0,
-                    0,
-                    0,
-                    child: new SpotlightBorder(
-                        intensity,
-                        Widget.GlowColor,
-                        _pointer,
-                        Widget.CornerRadius
+            content = new Stack
+            (
+                [
+                    Widget.Child,
+                    new Positioned
+                    (
+                        0,
+                        0,
+                        0,
+                        0,
+                        child: new SpotlightBorder
+                        (
+                            intensity,
+                            Widget.GlowColor,
+                            _pointer,
+                            Widget.CornerRadius
+                        )
                     )
-                )
-            ]);
+                ]
+            );
         }
 
-        return new MouseRegion(
+        return new MouseRegion
+        (
             cursor: Widget.Cursor,
             onEnter: _onEnter,
             onExit: _onExit,

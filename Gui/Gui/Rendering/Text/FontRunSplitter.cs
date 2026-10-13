@@ -24,7 +24,8 @@ public static class FontRunSplitter
     ///     Resolves the run breakdown for <paramref name="text" /> using
     ///     <paramref name="primary" />.
     /// </summary>
-    public static IReadOnlyList<FontRun> Split(
+    public static IReadOnlyList<FontRun> Split
+    (
         string text,
         SKTypeface primary,
         FontWeight weight
@@ -75,7 +76,8 @@ public static class FontRunSplitter
         LruOrder.Clear();
     }
 
-    private static SKTypeface ResolveTypeface(
+    private static SKTypeface ResolveTypeface
+    (
         int codepoint,
         SKTypeface primary,
         FontWeight weight
@@ -97,7 +99,8 @@ public static class FontRunSplitter
         else
         {
             var (skWeight, skSlant) = WeightToSk(weight);
-            chosen = SKFontManager.Default.MatchCharacter(
+            chosen = SKFontManager.Default.MatchCharacter
+            (
                 null,
                 skWeight,
                 (int)SKFontStyleWidth.Normal,
@@ -116,7 +119,8 @@ public static class FontRunSplitter
         return chosen;
     }
 
-    private static (int Weight, SKFontStyleSlant Slant) WeightToSk(
+    private static (int Weight, SKFontStyleSlant Slant) WeightToSk
+    (
         FontWeight weight
     )
     {
@@ -138,7 +142,16 @@ public static class FontRunSplitter
         }
     }
 
-    private readonly record struct CacheKey(int Codepoint, IntPtr PrimaryHandle, FontWeight Weight);
+    private readonly record struct CacheKey
+    (
+        int Codepoint,
+        IntPtr PrimaryHandle,
+        FontWeight Weight
+    );
 
-    private sealed record CacheEntry(CacheKey Key, SKTypeface Typeface);
+    private sealed record CacheEntry
+    (
+        CacheKey Key,
+        SKTypeface Typeface
+    );
 }

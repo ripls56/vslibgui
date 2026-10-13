@@ -65,7 +65,7 @@ internal sealed class CustomizeTabState : State<CustomizeTab>
             EdgeInsets.All(24),
             new Column
             (
-                spacing: 24,
+                24,
                 crossAxisAlignment: CrossAxisAlignment.Stretch,
                 children:
                 [
@@ -75,7 +75,7 @@ internal sealed class CustomizeTabState : State<CustomizeTab>
                         new TabView
                         (
                             CategoryTabs(baseTheme),
-                            position: TabPosition.Left
+                            TabPosition.Left
                         )
                         {
                             TabWidth = 130
@@ -105,7 +105,7 @@ internal sealed class CustomizeTabState : State<CustomizeTab>
                 },
                 new Column
                 (
-                    spacing: 12,
+                    12,
                     crossAxisAlignment: CrossAxisAlignment.Start,
                     mainAxisSize: MainAxisSize.Min,
                     children:
@@ -113,11 +113,11 @@ internal sealed class CustomizeTabState : State<CustomizeTab>
                         new Text("Live preview", themedData.TextTheme.Label),
                         new Row
                         (
-                            spacing: 12,
+                            12,
                             crossAxisAlignment: CrossAxisAlignment.Center,
                             children:
                             [
-                                new Button(new Text("Primary Action"), ButtonVariant.Primary),
+                                new Button(new Text("Primary Action")),
                                 new Button(new Text("Secondary"), ButtonVariant.Secondary),
                                 new Expanded(child: new TextField())
                             ]
@@ -138,10 +138,13 @@ internal sealed class CustomizeTabState : State<CustomizeTab>
             }
         );
 
-        Widget Scrolled(Widget editor) => new SingleChildScrollView
-        (
-            new Padding(EdgeInsets.Only(left: 20), editor)
-        );
+        Widget Scrolled(Widget editor)
+        {
+            return new SingleChildScrollView
+            (
+                new Padding(EdgeInsets.Only(left: 20), editor)
+            );
+        }
 
         return new List<TabItem>
         {

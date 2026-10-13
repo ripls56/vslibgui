@@ -11,12 +11,14 @@ namespace Gui.Widgets.Spans;
 public sealed class ClearSpan : InlineSpan
 {
     /// <inheritdoc />
-    internal override void CollectRuns(
+    internal override void CollectRuns
+    (
         TextStyle inherited,
         List<PlacedRun> runs
     )
     {
-        runs.Add(
+        runs.Add
+        (
             new PlacedRun
             {
                 Text = "",

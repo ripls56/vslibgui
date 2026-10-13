@@ -8,7 +8,8 @@ namespace Gui.Widgets.Layout;
 public class Row : Flex
 {
     /// <summary>Creates a horizontal flex layout.</summary>
-    public Row(
+    public Row
+    (
         float spacing = 0,
         MainAxisAlignment mainAxisAlignment = MainAxisAlignment.Start,
         CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.Start,
@@ -16,7 +17,8 @@ public class Row : Flex
         IEnumerable<Widget>? children = null,
         Framework.Key? key = null
     )
-        : base(
+        : base
+        (
             FlexDirection.Horizontal,
             spacing,
             mainAxisAlignment,

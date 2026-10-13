@@ -28,7 +28,8 @@ public readonly struct ShapedRun
     public float Descent { get; }
 
     /// <summary>Creates a new shaped run.</summary>
-    public ShapedRun(
+    public ShapedRun
+    (
         SKFont font,
         ushort[] glyphs,
         SKPoint[] points,

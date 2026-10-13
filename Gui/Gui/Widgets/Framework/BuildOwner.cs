@@ -15,10 +15,12 @@ namespace Gui.Widgets.Framework;
 /// </summary>
 public class BuildOwner
 {
+    private static readonly Comparison<Element> DepthComparison =
+        (a, b) => a.Depth.CompareTo(b.Depth);
     private readonly List<Element> _buildBuffer = [];
     private readonly HashSet<Element> _dirtyElements = [];
-    private readonly List<(Element Element, Exception Ex)> _pendingErrors = [];
     private readonly Dictionary<GlobalKey, Element> _globalKeys = new();
+    private readonly List<(Element Element, Exception Ex)> _pendingErrors = [];
     private IClipboard? _clipboard;
     private ISoundPlayer? _soundPlayer;
     private ITickerProvider? _tickerProvider;
@@ -42,7 +44,8 @@ public class BuildOwner
     /// </summary>
     public Action? OnElementUnmounted { get; set; }
 
-    public void SetTickerProvider(
+    public void SetTickerProvider
+    (
         ITickerProvider provider
     ) =>
         _tickerProvider = provider;
@@ -51,7 +54,8 @@ public class BuildOwner
     {
         if (_tickerProvider == null)
         {
-            throw new InvalidOperationException(
+            throw new InvalidOperationException
+            (
                 "TickerProvider not set in BuildOwner. UI must be opened via GuiBase."
             );
         }
@@ -59,7 +63,8 @@ public class BuildOwner
         return _tickerProvider;
     }
 
-    public void SetClipboard(
+    public void SetClipboard
+    (
         IClipboard clipboard
     ) =>
         _clipboard = clipboard;
@@ -69,7 +74,8 @@ public class BuildOwner
     {
         if (_clipboard == null)
         {
-            throw new InvalidOperationException(
+            throw new InvalidOperationException
+            (
                 "Clipboard not set in BuildOwner. UI must be opened via GuiBase."
             );
         }
@@ -77,24 +83,21 @@ public class BuildOwner
         return _clipboard;
     }
 
-    public void SetSoundPlayer(
+    public void SetSoundPlayer
+    (
         ISoundPlayer player
     ) =>
         _soundPlayer = player;
 
-    public ISoundPlayer GetSoundPlayer()
-    {
-        if (_soundPlayer == null)
-        {
-            throw new InvalidOperationException(
-                "SoundPlayer not set in BuildOwner. UI must be opened via GuiBase."
-            );
-        }
+    /// <summary>
+    ///     Returns the <see cref="ISoundPlayer" /> registered for this build owner, or a
+    ///     silent one when none was set (headless tests, or a UI not opened via
+    ///     <c>GuiBase</c>). Silence is preferable to throwing from an input callback.
+    /// </summary>
+    public ISoundPlayer GetSoundPlayer() => _soundPlayer ?? NullSoundPlayer.Instance;
 
-        return _soundPlayer;
-    }
-
-    internal void RegisterGlobalKey(
+    internal void RegisterGlobalKey
+    (
         GlobalKey key,
         Element element
     )
@@ -103,7 +106,8 @@ public class BuildOwner
         key.CurrentElement = element;
     }
 
-    internal void UnregisterGlobalKey(
+    internal void UnregisterGlobalKey
+    (
         GlobalKey key
     )
     {
@@ -116,7 +120,8 @@ public class BuildOwner
     ///     <see cref="BuildDirtyElements" /> call. Called automatically by
     ///     <see cref="Element.MarkNeedsBuild" />.
     /// </summary>
-    public void ScheduleBuildFor(
+    public void ScheduleBuildFor
+    (
         Element element
     ) =>
         _dirtyElements.Add(element);
@@ -140,11 +145,7 @@ public class BuildOwner
             // Skip sort for 0-1 elements since it's a no-op.
             if (_buildBuffer.Count > 1)
             {
-                _buildBuffer.Sort((
-                        a,
-                        b
-                    ) => a.Depth.CompareTo(b.Depth)
-                );
+                _buildBuffer.Sort(DepthComparison);
             }
 
             foreach (var element in _buildBuffer)
@@ -189,7 +190,8 @@ public class BuildOwner
         }
     }
 
-    private static StatefulElement? FindErrorBoundaryAncestor(
+    private static StatefulElement? FindErrorBoundaryAncestor
+    (
         Element element
     )
     {

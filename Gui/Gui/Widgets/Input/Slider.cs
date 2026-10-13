@@ -3,6 +3,7 @@ using Gui.Core.Framework;
 using Gui.Core.Input;
 using Gui.Rendering;
 using Gui.Rendering.Text;
+using Gui.Sound;
 using Gui.Widgets.Basic;
 using Gui.Widgets.Events;
 using Gui.Widgets.Framework;
@@ -37,7 +38,8 @@ namespace Gui.Widgets.Input;
 public class Slider : StatefulWidget
 {
     /// <summary>Creates a new slider widget.</summary>
-    public Slider(
+    public Slider
+    (
         float value,
         Action<float>? onChanged = null,
         Action<float>? onChangeEnd = null,
@@ -58,7 +60,8 @@ public class Slider : StatefulWidget
         Framework.Key? key = null
     ) : base(key)
     {
-        Value = Math.Clamp(
+        Value = Math.Clamp
+        (
             value,
             min,
             max
@@ -178,7 +181,8 @@ internal class SliderState : State<Slider>
         _currentValue = Widget.Value;
     }
 
-    public override void UpdateWidget(
+    public override void UpdateWidget
+    (
         Slider oldWidget
     )
     {
@@ -189,7 +193,8 @@ internal class SliderState : State<Slider>
         }
     }
 
-    public override Widget Build(
+    public override Widget Build
+    (
         BuildContext context
     )
     {
@@ -210,12 +215,14 @@ internal class SliderState : State<Slider>
             ? (_currentValue - Widget.Min) / (Widget.Max - Widget.Min)
             : 0f;
 
-        Widget track = new SliderTrackWidget(
+        Widget track = new SliderTrackWidget
+        (
             ratio,
             activeColor,
             inactiveColor,
             _isHovered || _isDragging
-                ? new Vector4(
+                ? new Vector4
+                (
                     thumbColor.X * 1.1f,
                     thumbColor.Y * 1.1f,
                     thumbColor.Z * 1.1f,
@@ -234,7 +241,8 @@ internal class SliderState : State<Slider>
                 _trackWidth = width;
                 _trackRenderObject = ro;
             },
-            new GestureDetector(
+            new GestureDetector
+            (
                 onPress: _OnPress,
                 onMove: _OnMove,
                 onRelease: _OnRelease,
@@ -247,9 +255,11 @@ internal class SliderState : State<Slider>
         if (Widget.ShowValueLabel)
         {
             var tooltipContent = Widget.ValueLabelBuilder?.Invoke(_currentValue)
-                                 ?? new Padding(
+                                 ?? new Padding
+                                 (
                                      EdgeInsets.All(4),
-                                     new Text(
+                                     new Text
+                                     (
                                          _FormatValue(_currentValue),
                                          new TextStyle
                                          {
@@ -262,7 +272,8 @@ internal class SliderState : State<Slider>
             var usable = _trackWidth - thumbWidth;
             var thumbCenterX = usable * ratio + thumbWidth / 2f;
 
-            track = new Tooltip(
+            track = new Tooltip
+            (
                 track,
                 tooltipContent,
                 TimeSpan.Zero,
@@ -273,12 +284,14 @@ internal class SliderState : State<Slider>
 
         if (Widget.Label != null)
         {
-            return new Row(
+            return new Row
+            (
                 mainAxisAlignment: MainAxisAlignment.Start,
                 crossAxisAlignment: CrossAxisAlignment.Center,
                 children:
                 [
-                    new Text(
+                    new Text
+                    (
                         Widget.Label,
                         new TextStyle
                         {
@@ -294,7 +307,8 @@ internal class SliderState : State<Slider>
         return track;
     }
 
-    private string _FormatValue(
+    private string _FormatValue
+    (
         float value
     )
     {
@@ -306,7 +320,8 @@ internal class SliderState : State<Slider>
         return value.ToString("F2");
     }
 
-    private float _ToLocalX(
+    private float _ToLocalX
+    (
         PointerEvent e
     )
     {
@@ -315,8 +330,10 @@ internal class SliderState : State<Slider>
             return e.X;
         }
 
-        return _trackRenderObject.GlobalToLocal(
-                new Vector2(
+        return _trackRenderObject.GlobalToLocal
+            (
+                new Vector2
+                (
                     e.X,
                     e.Y
                 )
@@ -324,7 +341,8 @@ internal class SliderState : State<Slider>
             .X;
     }
 
-    private float _ComputeValueFromX(
+    private float _ComputeValueFromX
+    (
         float localX
     )
     {
@@ -334,7 +352,8 @@ internal class SliderState : State<Slider>
             return Widget.Min;
         }
 
-        var ratio = Math.Clamp(
+        var ratio = Math.Clamp
+        (
             (localX - _thumbWidth / 2f) / usable,
             0f,
             1f
@@ -343,11 +362,13 @@ internal class SliderState : State<Slider>
         return _SnapValue(rawValue);
     }
 
-    private float _SnapValue(
+    private float _SnapValue
+    (
         float rawValue
     )
     {
-        rawValue = Math.Clamp(
+        rawValue = Math.Clamp
+        (
             rawValue,
             Widget.Min,
             Widget.Max
@@ -357,7 +378,8 @@ internal class SliderState : State<Slider>
             var step = (Widget.Max - Widget.Min) / Widget.Divisions.Value;
             rawValue = MathF.Round((rawValue - Widget.Min) / step) * step
                        + Widget.Min;
-            rawValue = Math.Clamp(
+            rawValue = Math.Clamp
+            (
                 rawValue,
                 Widget.Min,
                 Widget.Max
@@ -367,17 +389,20 @@ internal class SliderState : State<Slider>
         return rawValue;
     }
 
-    private void _OnPress(
+    private void _OnPress
+    (
         PointerEvent e
     )
     {
         _isDragging = true;
+        this.Tick();
         var localX = _ToLocalX(e);
         var newValue = _ComputeValueFromX(localX);
         _UpdateValue(newValue);
     }
 
-    private void _OnMove(
+    private void _OnMove
+    (
         PointerEvent e
     )
     {
@@ -391,7 +416,8 @@ internal class SliderState : State<Slider>
         _UpdateValue(newValue);
     }
 
-    private void _OnRelease(
+    private void _OnRelease
+    (
         PointerEvent e
     )
     {
@@ -405,17 +431,20 @@ internal class SliderState : State<Slider>
         SetState(() => { });
     }
 
-    private void _OnEnter(
+    private void _OnEnter
+    (
         PointerEvent e
     ) =>
         SetState(() => _isHovered = true);
 
-    private void _OnExit(
+    private void _OnExit
+    (
         PointerEvent e
     ) =>
         SetState(() => _isHovered = false);
 
-    private void _OnWheel(
+    private void _OnWheel
+    (
         PointerEvent e
     )
     {
@@ -430,11 +459,17 @@ internal class SliderState : State<Slider>
         }
 
         var newValue = _SnapValue(_currentValue + e.Delta * step);
+        if (Math.Abs(newValue - _currentValue) > 0.0001f)
+        {
+            this.Tick();
+        }
+
         _UpdateValue(newValue);
         e.Handled = true;
     }
 
-    private void _UpdateValue(
+    private void _UpdateValue
+    (
         float newValue
     )
     {
@@ -450,7 +485,8 @@ internal class SliderState : State<Slider>
 
 internal class SliderTrackWidget : SingleChildWidget
 {
-    public SliderTrackWidget(
+    public SliderTrackWidget
+    (
         float ratio,
         Vector4 activeColor,
         Vector4 inactiveColor,
@@ -501,7 +537,8 @@ internal class SliderTrackWidget : SingleChildWidget
     }
 
     /// <inheritdoc />
-    public override void UpdateRenderObject(
+    public override void UpdateRenderObject
+    (
         RenderObject renderObject
     )
     {

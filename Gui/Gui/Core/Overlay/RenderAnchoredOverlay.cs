@@ -74,7 +74,8 @@ internal class RenderAnchoredOverlay : RenderFollower
     ///     Recomputes placement every frame so flip and clamp follow the live
     ///     trigger through scrolls instead of the layout-time snapshot.
     /// </summary>
-    public override void Paint(
+    public override void Paint
+    (
         PaintingContext context
     )
     {
@@ -100,9 +101,12 @@ internal class RenderAnchoredOverlay : RenderFollower
         var gap = VerticalGap;
 
         var tY = target != null ? targetPos.Y : TriggerGlobalY;
-        var tH = target != null ? target.Size.Y : TriggerHeight;
+        var span = target != null ? TargetSpan(target) : Vector2.Zero;
+        var tH = target != null ? span.Y : TriggerHeight;
         var aX = target != null
-            ? (Horizontal == HorizontalAnchor.Center ? targetPos.X + target.Size.X * 0.5f : targetPos.X)
+            ? Horizontal == HorizontalAnchor.Center
+                ? targetPos.X + span.X * 0.5f
+                : targetPos.X
             : AnchorX;
 
         var side = ResolveSide(tY, tH, screenH, childH, gap);
@@ -117,7 +121,8 @@ internal class RenderAnchoredOverlay : RenderFollower
         return targetPos;
     }
 
-    private OverlaySide ResolveSide(
+    private OverlaySide ResolveSide
+    (
         float tY,
         float tH,
         float screenH,
@@ -130,9 +135,18 @@ internal class RenderAnchoredOverlay : RenderFollower
         var fitsAbove = roomAbove - gap - childH >= 0f;
         var fitsBelow = roomBelow - gap - childH >= 0f;
 
-        if (PreferredSide == OverlaySide.Top && !fitsAbove && fitsBelow) return OverlaySide.Bottom;
-        if (PreferredSide == OverlaySide.Bottom && !fitsBelow && fitsAbove) return OverlaySide.Top;
-        if (!fitsAbove && !fitsBelow) return roomAbove >= roomBelow ? OverlaySide.Top : OverlaySide.Bottom;
+        if (PreferredSide == OverlaySide.Top && !fitsAbove && fitsBelow)
+        {
+            return OverlaySide.Bottom;
+        }
+        if (PreferredSide == OverlaySide.Bottom && !fitsBelow && fitsAbove)
+        {
+            return OverlaySide.Top;
+        }
+        if (!fitsAbove && !fitsBelow)
+        {
+            return roomAbove >= roomBelow ? OverlaySide.Top : OverlaySide.Bottom;
+        }
 
         return PreferredSide;
     }

@@ -17,7 +17,13 @@ public class SlideshowCrossfade : StatelessWidget
     /// <param name="incoming">Stack fading in.</param>
     /// <param name="t">Blend factor in [0, 1]; 0 = fully outgoing, 1 = fully incoming.</param>
     /// <param name="size">Icon width and height in pixels.</param>
-    public SlideshowCrossfade(ItemStack outgoing, ItemStack incoming, float t, float size)
+    public SlideshowCrossfade
+    (
+        ItemStack outgoing,
+        ItemStack incoming,
+        float t,
+        float size
+    )
     {
         Outgoing = outgoing;
         Incoming = incoming;
@@ -39,8 +45,16 @@ public class SlideshowCrossfade : StatelessWidget
 
     /// <inheritdoc />
     public override Widget Build(BuildContext context) =>
-        new Stack([
-            new Opacity(1f - T, new ItemStackDisplay(Outgoing, Size, Size, (int)(Size * 2))),
-            new Opacity(T, new ItemStackDisplay(Incoming, Size, Size, (int)(Size * 2))),
-        ]);
+        new Stack
+        (
+            [
+                new Opacity
+                (
+                    1f - T,
+                    new ItemStackDisplay
+                        (Outgoing, Size, Size, (int)(Size * 2), showTooltip: false)
+                ),
+                new Opacity(T, new ItemStackDisplay(Incoming, Size, Size, (int)(Size * 2)))
+            ]
+        );
 }

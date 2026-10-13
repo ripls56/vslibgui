@@ -6,13 +6,15 @@ namespace Gui.Widgets.Layout;
 
 public class SizedBox : SingleChildWidget
 {
-    public SizedBox(
+    public SizedBox
+    (
         float? width = null,
         float? height = null,
         Widget? child = null,
         Framework.Key? key = null
     )
-        : base(
+        : base
+        (
             child,
             key
         )
@@ -32,7 +34,8 @@ public class SizedBox : SingleChildWidget
         };
     }
 
-    public override void UpdateRenderObject(
+    public override void UpdateRenderObject
+    (
         RenderObject renderObject
     )
     {

@@ -14,7 +14,8 @@ public static class ColorHsvExtensions
     ///     Converts an RGB color to HSV. Returns hue in degrees [0, 360),
     ///     saturation and value in [0, 1]. The alpha channel is ignored.
     /// </summary>
-    public static (float H, float S, float V) ToHsv(
+    public static (float H, float S, float V) ToHsv
+    (
         this Vector4 rgb
     )
     {
@@ -22,16 +23,20 @@ public static class ColorHsvExtensions
         var g = rgb.Y;
         var b = rgb.Z;
 
-        var max = MathF.Max(
+        var max = MathF.Max
+        (
             r,
-            MathF.Max(
+            MathF.Max
+            (
                 g,
                 b
             )
         );
-        var min = MathF.Min(
+        var min = MathF.Min
+        (
             r,
-            MathF.Min(
+            MathF.Min
+            (
                 g,
                 b
             )
@@ -45,7 +50,7 @@ public static class ColorHsvExtensions
         }
         else if (max == r)
         {
-            h = 60f * (((g - b) / delta) % 6f);
+            h = 60f * ((g - b) / delta % 6f);
         }
         else if (max == g)
         {
@@ -74,17 +79,18 @@ public static class ColorHsvExtensions
     ///     Converts HSV to RGBA. Hue is in degrees (wrapped to [0, 360)),
     ///     saturation and value in [0, 1]. Alpha defaults to opaque.
     /// </summary>
-    public static Vector4 FromHsv(
+    public static Vector4 FromHsv
+    (
         float h,
         float s,
         float v,
         float a = 1f
     )
     {
-        h = ((h % 360f) + 360f) % 360f;
+        h = (h % 360f + 360f) % 360f;
 
         var c = v * s;
-        var x = c * (1f - MathF.Abs((h / 60f) % 2f - 1f));
+        var x = c * (1f - MathF.Abs(h / 60f % 2f - 1f));
         var m = v - c;
 
         float r;
@@ -128,7 +134,8 @@ public static class ColorHsvExtensions
             b = x;
         }
 
-        return new Vector4(
+        return new Vector4
+        (
             r + m,
             g + m,
             b + m,

@@ -14,7 +14,8 @@ internal class RenderScrollbarTrack : RenderProxyBox
     private readonly Action<float, RenderObject> _onLayout;
 
     /// <summary>Creates a new scrollbar track render object.</summary>
-    public RenderScrollbarTrack(
+    public RenderScrollbarTrack
+    (
         Action<float, RenderObject> onLayout
     )
     {
@@ -25,7 +26,8 @@ internal class RenderScrollbarTrack : RenderProxyBox
     public bool Reverse
     {
         get;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref field,
             value,
             true
@@ -36,7 +38,8 @@ internal class RenderScrollbarTrack : RenderProxyBox
     public float ScrollOffset
     {
         get;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref field,
             value,
             true
@@ -47,7 +50,8 @@ internal class RenderScrollbarTrack : RenderProxyBox
     public float ContentSize
     {
         get;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref field,
             value,
             true
@@ -58,7 +62,8 @@ internal class RenderScrollbarTrack : RenderProxyBox
     public float ViewportSize
     {
         get;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref field,
             value,
             true
@@ -69,7 +74,8 @@ internal class RenderScrollbarTrack : RenderProxyBox
     public Vector4 TrackColor
     {
         get;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref field,
             value,
             true
@@ -80,7 +86,8 @@ internal class RenderScrollbarTrack : RenderProxyBox
     public Vector4 ThumbColor
     {
         get;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref field,
             value,
             true
@@ -91,7 +98,8 @@ internal class RenderScrollbarTrack : RenderProxyBox
     public float ThumbRadius
     {
         get;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref field,
             value,
             true
@@ -101,29 +109,34 @@ internal class RenderScrollbarTrack : RenderProxyBox
     /// <inheritdoc />
     protected override void PerformLayout()
     {
-        Size = new Vector2(
+        Size = new Vector2
+        (
             Constraints.MaxWidth,
             Constraints.MaxHeight
         );
 
         foreach (var child in Children)
         {
-            child.Layout(
-                LayoutConstraints.Tight(
+            child.Layout
+            (
+                LayoutConstraints.Tight
+                (
                     Size.X,
                     Size.Y
                 )
             );
         }
 
-        _onLayout(
+        _onLayout
+        (
             Size.Y,
             this
         );
     }
 
     /// <inheritdoc />
-    protected override void PaintInternal(
+    protected override void PaintInternal
+    (
         PaintingContext context
     )
     {
@@ -132,7 +145,8 @@ internal class RenderScrollbarTrack : RenderProxyBox
             return;
         }
 
-        context.DrawBox(
+        context.DrawBox
+        (
             Vector2.Zero,
             Size,
             TrackColor,
@@ -141,13 +155,15 @@ internal class RenderScrollbarTrack : RenderProxyBox
             Vector4.Zero
         );
 
-        var maxOffset = Math.Max(
+        var maxOffset = Math.Max
+        (
             0,
             ContentSize - ViewportSize
         );
         if (maxOffset > 0 && ContentSize > 0)
         {
-            var thumbHeight = Math.Max(
+            var thumbHeight = Math.Max
+            (
                 20,
                 ViewportSize / ContentSize * Size.Y
             );
@@ -162,12 +178,15 @@ internal class RenderScrollbarTrack : RenderProxyBox
 
             var thumbY = ratio * maxTravel;
 
-            context.DrawBox(
-                new Vector2(
+            context.DrawBox
+            (
+                new Vector2
+                (
                     2,
                     thumbY
                 ),
-                new Vector2(
+                new Vector2
+                (
                     Math.Max(0f, Size.X - 4),
                     thumbHeight
                 ),

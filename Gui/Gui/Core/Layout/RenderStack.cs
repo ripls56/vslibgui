@@ -15,7 +15,8 @@ public class RenderStack : RenderObject
         float maxH = 0;
         var hasUnpositioned = false;
 
-        var looseConstraints = LayoutConstraints.Loose(
+        var looseConstraints = LayoutConstraints.Loose
+        (
             Constraints.MaxWidth,
             Constraints.MaxHeight
         );
@@ -32,11 +33,13 @@ public class RenderStack : RenderObject
             child.X = 0;
             child.Y = 0;
             child.Layout(looseConstraints);
-            maxW = Math.Max(
+            maxW = Math.Max
+            (
                 maxW,
                 child.Size.X
             );
-            maxH = Math.Max(
+            maxH = Math.Max
+            (
                 maxH,
                 child.Size.Y
             );
@@ -50,8 +53,10 @@ public class RenderStack : RenderObject
             maxH = Constraints.MaxHeight;
         }
 
-        Size = Constraints.Constrain(
-            new Vector2(
+        Size = Constraints.Constrain
+        (
+            new Vector2
+            (
                 maxW,
                 maxH
             )
@@ -85,8 +90,10 @@ public class RenderStack : RenderObject
                     minH = maxHChild = pd.Height.Value;
                 }
 
-                child.Layout(
-                    new LayoutConstraints(
+                child.Layout
+                (
+                    new LayoutConstraints
+                    (
                         minW,
                         maxWChild,
                         minH,

@@ -13,7 +13,8 @@ public class RenderPadding : RenderBox
     public EdgeInsets Padding
     {
         get => _padding;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref _padding,
             value,
             relayout: true
@@ -35,20 +36,25 @@ public class RenderPadding : RenderBox
             var horizontalPadding = left + right;
             var verticalPadding = top + bottom;
 
-            var childConstraints = new LayoutConstraints(
-                Math.Max(
+            var childConstraints = new LayoutConstraints
+            (
+                Math.Max
+                (
                     0,
                     Constraints.MinWidth - horizontalPadding
                 ),
-                Math.Max(
+                Math.Max
+                (
                     0,
                     Constraints.MaxWidth - horizontalPadding
                 ),
-                Math.Max(
+                Math.Max
+                (
                     0,
                     Constraints.MinHeight - verticalPadding
                 ),
-                Math.Max(
+                Math.Max
+                (
                     0,
                     Constraints.MaxHeight - verticalPadding
                 )
@@ -58,8 +64,10 @@ public class RenderPadding : RenderBox
             child.X = left;
             child.Y = top;
 
-            Size = Constraints.Constrain(
-                new Vector2(
+            Size = Constraints.Constrain
+            (
+                new Vector2
+                (
                     child.Size.X + horizontalPadding,
                     child.Size.Y + verticalPadding
                 )
@@ -67,8 +75,10 @@ public class RenderPadding : RenderBox
         }
         else
         {
-            Size = Constraints.Constrain(
-                new Vector2(
+            Size = Constraints.Constrain
+            (
+                new Vector2
+                (
                     left + right,
                     top + bottom
                 )
@@ -76,18 +86,21 @@ public class RenderPadding : RenderBox
         }
     }
 
-    public override Vector2 GlobalToChild(
+    public override Vector2 GlobalToChild
+    (
         RenderObject child,
         Vector2 position
     )
     {
-        return position - new Vector2(
+        return position - new Vector2
+        (
             _padding.Left,
             _padding.Top
         );
     }
 
-    public override float GetMinIntrinsicWidth(
+    public override float GetMinIntrinsicWidth
+    (
         float height
     )
     {
@@ -95,8 +108,10 @@ public class RenderPadding : RenderBox
         var vp = _padding.Top + _padding.Bottom;
         return hp + (Children.Count > 0
             ? Children[0]
-                .GetMinIntrinsicWidth(
-                    Math.Max(
+                .GetMinIntrinsicWidth
+                (
+                    Math.Max
+                    (
                         0,
                         height - vp
                     )
@@ -104,7 +119,8 @@ public class RenderPadding : RenderBox
             : 0f);
     }
 
-    public override float GetMaxIntrinsicWidth(
+    public override float GetMaxIntrinsicWidth
+    (
         float height
     )
     {
@@ -112,8 +128,10 @@ public class RenderPadding : RenderBox
         var vp = _padding.Top + _padding.Bottom;
         return hp + (Children.Count > 0
             ? Children[0]
-                .GetMaxIntrinsicWidth(
-                    Math.Max(
+                .GetMaxIntrinsicWidth
+                (
+                    Math.Max
+                    (
                         0,
                         height - vp
                     )
@@ -121,7 +139,8 @@ public class RenderPadding : RenderBox
             : 0f);
     }
 
-    public override float GetMinIntrinsicHeight(
+    public override float GetMinIntrinsicHeight
+    (
         float width
     )
     {
@@ -129,8 +148,10 @@ public class RenderPadding : RenderBox
         var vp = _padding.Top + _padding.Bottom;
         return vp + (Children.Count > 0
             ? Children[0]
-                .GetMinIntrinsicHeight(
-                    Math.Max(
+                .GetMinIntrinsicHeight
+                (
+                    Math.Max
+                    (
                         0,
                         width - hp
                     )
@@ -138,7 +159,8 @@ public class RenderPadding : RenderBox
             : 0f);
     }
 
-    public override float GetMaxIntrinsicHeight(
+    public override float GetMaxIntrinsicHeight
+    (
         float width
     )
     {
@@ -146,8 +168,10 @@ public class RenderPadding : RenderBox
         var vp = _padding.Top + _padding.Bottom;
         return vp + (Children.Count > 0
             ? Children[0]
-                .GetMaxIntrinsicHeight(
-                    Math.Max(
+                .GetMaxIntrinsicHeight
+                (
+                    Math.Max
+                    (
                         0,
                         width - hp
                     )

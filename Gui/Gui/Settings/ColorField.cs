@@ -39,7 +39,10 @@ public sealed class ColorField : StatefulWidget
     public static bool TryParseHex(string text, out Vector4 color)
     {
         color = Vector4.Zero;
-        if (string.IsNullOrWhiteSpace(text)) return false;
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return false;
+        }
         try
         {
             color = text.Trim().FromHex();
@@ -57,11 +60,11 @@ public sealed class ColorField : StatefulWidget
 
 internal sealed class ColorFieldState : State<ColorField>
 {
-    private TextEditingController? _hex;
     private readonly LayerLink _link = new();
     private OverlayEntry? _barrierEntry;
-    private OverlayEntry? _overlayEntry;
+    private TextEditingController? _hex;
     private bool _isOpen;
+    private OverlayEntry? _overlayEntry;
 
     /// <inheritdoc />
     public override void InitState()
@@ -88,7 +91,7 @@ internal sealed class ColorFieldState : State<ColorField>
 
         var editor = new Row
         (
-            spacing: 12,
+            12,
             crossAxisAlignment: CrossAxisAlignment.Center,
             children:
             [
@@ -107,7 +110,7 @@ internal sealed class ColorFieldState : State<ColorField>
                                 BorderThickness = 1,
                                 CornerRadius = new Vector4(4)
                             },
-                            child: new SizedBox(width: 28, height: 28)
+                            new SizedBox(28, 28)
                         )
                     )
                 ),
@@ -115,7 +118,7 @@ internal sealed class ColorFieldState : State<ColorField>
                 (
                     new TextField
                     (
-                        controller: _hex,
+                        _hex,
                         onSubmitted: SubmitHex,
                         onChanged: text =>
                         {
@@ -136,7 +139,7 @@ internal sealed class ColorFieldState : State<ColorField>
 
         return new Column
         (
-            spacing: 8,
+            8,
             children:
             [
                 new Text(Widget._label, theme.TextTheme.Label),
@@ -157,10 +160,7 @@ internal sealed class ColorFieldState : State<ColorField>
         }
     }
 
-    private void Commit(Vector4 color)
-    {
-        Widget._onChanged(color);
-    }
+    private void Commit(Vector4 color) => Widget._onChanged(color);
 
     /// <inheritdoc />
     public override void Dispose()
@@ -199,16 +199,18 @@ internal sealed class ColorFieldState : State<ColorField>
         var globalPos = ro.LocalToGlobal(Vector2.Zero) + ro.GetScreenOffset();
 
         _barrierEntry = new OverlayEntry(BuildBarrier());
-        _overlayEntry = new OverlayEntry(
-            new AnchoredOverlay(
+        _overlayEntry = new OverlayEntry
+        (
+            new AnchoredOverlay
+            (
                 globalPos.X,
                 globalPos.Y,
                 size.Y,
                 8f,
                 OverlaySide.Bottom,
                 HorizontalAnchor.Start,
-                link: _link,
-                child: BuildPicker(context)
+                _link,
+                BuildPicker(context)
             )
         );
         overlay.Insert(_barrierEntry);
@@ -232,14 +234,17 @@ internal sealed class ColorFieldState : State<ColorField>
 
     private Widget BuildBarrier()
     {
-        return new Positioned(
+        return new Positioned
+        (
             0,
             0,
             0,
             0,
-            child: new GestureDetector(
+            child: new GestureDetector
+            (
                 onTap: _ => ClosePicker(),
-                child: new Container(
+                child: new Container
+                (
                     new BoxStyle
                     {
                         HitTestBehavior = HitTestBehavior.Opaque
@@ -252,7 +257,8 @@ internal sealed class ColorFieldState : State<ColorField>
     private Widget BuildPicker(BuildContext context)
     {
         var theme = Theme.Of(context);
-        return new Container(
+        return new Container
+        (
             new BoxStyle
             {
                 Color = theme.ColorScheme.Surface,
@@ -261,10 +267,11 @@ internal sealed class ColorFieldState : State<ColorField>
                 CornerRadius = new Vector4(8),
                 Padding = EdgeInsets.All(8)
             },
-            child: new ColorPicker(
-                value: Widget._value,
-                onChanged: Commit,
-                onChangeEnd: Commit
+            new ColorPicker
+            (
+                Widget._value,
+                Commit,
+                Commit
             )
         );
     }
@@ -284,7 +291,13 @@ internal sealed class OverrideFieldCard : StatelessWidget
     private readonly string _label;
     private readonly Action _onReset;
 
-    public OverrideFieldCard(string label, Widget editor, bool hasOverride, Action onReset)
+    public OverrideFieldCard
+    (
+        string label,
+        Widget editor,
+        bool hasOverride,
+        Action onReset
+    )
     {
         _label = label;
         _editor = editor;
@@ -303,17 +316,17 @@ internal sealed class OverrideFieldCard : StatelessWidget
                 BorderColor = theme.ColorScheme.OutlineVariant,
                 BorderThickness = 1f,
                 CornerRadius = new Vector4(8f),
-                Padding = EdgeInsets.Symmetric(vertical: 8f, horizontal: 12f)
+                Padding = EdgeInsets.Symmetric(8f, 12f)
             },
             new Row
             (
-                spacing: 12,
+                12,
                 crossAxisAlignment: CrossAxisAlignment.Center,
                 children:
                 [
                     new SizedBox
                     (
-                        width: LabelWidth,
+                        LabelWidth,
                         child: new Text(_label, theme.TextTheme.Label)
                     ),
                     new Expanded(_editor),
@@ -349,8 +362,8 @@ internal sealed class ClearButton : StatelessWidget
             (
                 new Icon("gui", "textures/icons/undo-2.svg", 12),
                 ButtonVariant.Ghost,
-                onTap: _ => _onClear(),
-                enabled: _enabled,
+                _ => _onClear(),
+                _enabled,
                 style: style
             ),
             new Text("Reset to inherited value")
@@ -358,7 +371,7 @@ internal sealed class ClearButton : StatelessWidget
     }
 }
 
-/// <summary>Binds a <see cref="ColorField"/> to a nullable override, with a clear button.</summary>
+/// <summary>Binds a <see cref="ColorField" /> to a nullable override, with a clear button.</summary>
 public sealed class ColorOverrideField : StatelessWidget
 {
     private readonly Vector4 _fallback;
@@ -366,7 +379,10 @@ public sealed class ColorOverrideField : StatelessWidget
     private readonly Action<Vector4?> _onChanged;
     private readonly Vector4? _value;
 
-    /// <summary>Creates a nullable color override field. <paramref name="fallback"/> is shown when the override is null.</summary>
+    /// <summary>
+    ///     Creates a nullable color override field. <paramref name="fallback" /> is shown when the
+    ///     override is null.
+    /// </summary>
     public ColorOverrideField
     (
         string label,
@@ -390,15 +406,14 @@ public sealed class ColorOverrideField : StatelessWidget
             _value ?? _fallback,
             c => _onChanged(c),
             _label,
-            showLabel: false
+            false
         ),
         _value.HasValue,
         () => _onChanged(null)
     );
-
 }
 
-/// <summary>Binds a <see cref="NumericField"/> to a nullable float override, with a clear button.</summary>
+/// <summary>Binds a <see cref="NumericField" /> to a nullable float override, with a clear button.</summary>
 public sealed class FloatOverrideField : StatelessWidget
 {
     private readonly float _fallback;
@@ -409,7 +424,10 @@ public sealed class FloatOverrideField : StatelessWidget
     private readonly float _step;
     private readonly float? _value;
 
-    /// <summary>Creates a nullable float override field. <paramref name="fallback"/> is shown when the override is null.</summary>
+    /// <summary>
+    ///     Creates a nullable float override field. <paramref name="fallback" /> is shown when the
+    ///     override is null.
+    /// </summary>
     public FloatOverrideField
     (
         string label,
@@ -436,16 +454,16 @@ public sealed class FloatOverrideField : StatelessWidget
         _label,
         new NumericField
         (
-            initialValue: _value ?? _fallback,
-            step: _step,
-            onChanged: f => _onChanged(f)
+            _value ?? _fallback,
+            _step,
+            f => _onChanged(f)
         ),
         _value.HasValue,
         () => _onChanged(null)
     );
 }
 
-/// <summary>Binds a <see cref="Dropdown{T}"/> to a nullable enum override, with a clear button.</summary>
+/// <summary>Binds a <see cref="Dropdown{T}" /> to a nullable enum override, with a clear button.</summary>
 public sealed class EnumOverrideField<T> : StatelessWidget where T : struct, Enum
 {
     private readonly T _fallback;
@@ -453,7 +471,10 @@ public sealed class EnumOverrideField<T> : StatelessWidget where T : struct, Enu
     private readonly Action<T?> _onChanged;
     private readonly T? _value;
 
-    /// <summary>Creates a nullable enum override field. <paramref name="fallback"/> is shown when the override is null.</summary>
+    /// <summary>
+    ///     Creates a nullable enum override field. <paramref name="fallback" /> is shown when the
+    ///     override is null.
+    /// </summary>
     public EnumOverrideField
     (
         string label,
@@ -488,9 +509,9 @@ public sealed class EnumOverrideField<T> : StatelessWidget where T : struct, Enu
             _label,
             new Dropdown<T>
             (
-                value: _value ?? _fallback,
-                items: items,
-                onChanged: v => _onChanged(v)
+                _value ?? _fallback,
+                items,
+                v => _onChanged(v)
             ),
             _value.HasValue,
             () => _onChanged(null)
@@ -498,7 +519,10 @@ public sealed class EnumOverrideField<T> : StatelessWidget where T : struct, Enu
     }
 }
 
-/// <summary>Binds four <see cref="NumericField"/>s to a nullable <see cref="EdgeInsets"/> override, with a clear button.</summary>
+/// <summary>
+///     Binds four <see cref="NumericField" />s to a nullable <see cref="EdgeInsets" /> override,
+///     with a clear button.
+/// </summary>
 public sealed class EdgeInsetsOverrideField : StatelessWidget
 {
     private readonly EdgeInsets _fallback;
@@ -506,7 +530,10 @@ public sealed class EdgeInsetsOverrideField : StatelessWidget
     private readonly Action<EdgeInsets?> _onChanged;
     private readonly EdgeInsets? _value;
 
-    /// <summary>Creates a nullable EdgeInsets override field. <paramref name="fallback"/> is shown when the override is null.</summary>
+    /// <summary>
+    ///     Creates a nullable EdgeInsets override field. <paramref name="fallback" /> is shown when
+    ///     the override is null.
+    /// </summary>
     public EdgeInsetsOverrideField
     (
         string label,
@@ -527,7 +554,7 @@ public sealed class EdgeInsetsOverrideField : StatelessWidget
         _label,
         new Row
         (
-            spacing: 8,
+            8,
             children:
             [
                 CreateEdgeField
@@ -583,7 +610,7 @@ public sealed class EdgeInsetsOverrideField : StatelessWidget
         (
             new Row
             (
-                spacing: 4,
+                4,
                 crossAxisAlignment: CrossAxisAlignment.Center,
                 children:
                 [
@@ -592,10 +619,10 @@ public sealed class EdgeInsetsOverrideField : StatelessWidget
                     (
                         new NumericField
                         (
-                            initialValue: value,
-                            step: 1,
-                            onChanged: onChanged,
-                            style: new BoxStyle
+                            value,
+                            1,
+                            onChanged,
+                            new BoxStyle
                             {
                                 Height = 32
                             }
@@ -612,8 +639,5 @@ public sealed class EdgeInsetsOverrideField : StatelessWidget
         float top,
         float right,
         float bottom
-    )
-    {
-        _onChanged(new EdgeInsets(left, top, right, bottom));
-    }
+    ) => _onChanged(new EdgeInsets(left, top, right, bottom));
 }

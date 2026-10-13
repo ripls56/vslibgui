@@ -18,7 +18,8 @@ public readonly struct FontRun
     public SKTypeface Typeface { get; }
 
     /// <summary>Creates a new font run.</summary>
-    public FontRun(
+    public FontRun
+    (
         int start,
         int length,
         SKTypeface typeface

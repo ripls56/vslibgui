@@ -1,5 +1,6 @@
 using System;
 using Gui.Rendering;
+using Gui.Theming;
 using Gui.Widgets.Framework;
 using OpenTK.Mathematics;
 
@@ -20,7 +21,7 @@ public class GuiConfig
     ///     User-defined theme overrides layered on top of the selected preset.
     ///     Null means no custom overrides (preset applies unchanged).
     /// </summary>
-    public Gui.Theming.ThemeOverridesSection? Custom { get; set; }
+    public ThemeOverridesSection? Custom { get; set; }
 
     /// <summary>
     ///     True once the player has completed first-run onboarding. When false, the settings

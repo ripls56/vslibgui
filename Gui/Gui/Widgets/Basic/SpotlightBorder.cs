@@ -28,7 +28,8 @@ public sealed class SpotlightBorder : RenderObjectWidget
     ///     the glow.
     /// </param>
     /// <param name="cornerRadius">Corner radius of the border in pixels.</param>
-    public SpotlightBorder(
+    public SpotlightBorder
+    (
         float intensity,
         Vector4 glowColor,
         ValueNotifier<Vector2?>? pointerPosition,
@@ -151,7 +152,8 @@ internal sealed class RenderSpotlightBorder : RenderBox
     /// <inheritdoc />
     protected override void PerformLayout()
     {
-        Size = Constraints.Constrain(
+        Size = Constraints.Constrain
+        (
             new Vector2(Constraints.MaxWidth, Constraints.MaxHeight)
         );
     }
@@ -198,7 +200,7 @@ internal sealed class RenderSpotlightBorder : RenderBox
         var r = (byte)(_glowColor.X * 255f);
         var g = (byte)(_glowColor.Y * 255f);
         var b = (byte)(_glowColor.Z * 255f);
-        var rgb = (r << 16) | (g << 8) | b;
+        var rgb = r << 16 | g << 8 | b;
 
         if (_shader != null
             && _shaderCenter == center
@@ -214,7 +216,8 @@ internal sealed class RenderSpotlightBorder : RenderBox
         _gradientColors[0] = new SKColor(r, g, b, peak);
         _gradientColors[1] = new SKColor(r, g, b, (byte)(peak * 0.3f));
         _gradientColors[2] = new SKColor(r, g, b, 0);
-        _shader = SKShader.CreateRadialGradient(
+        _shader = SKShader.CreateRadialGradient
+        (
             center,
             radius,
             _gradientColors,
@@ -242,7 +245,8 @@ internal sealed class RenderSpotlightBorder : RenderBox
         }
 
         var local = GlobalToLocal(global);
-        return new SKPoint(
+        return new SKPoint
+        (
             MathF.Round(Math.Clamp(local.X, 0f, Size.X)),
             MathF.Round(Math.Clamp(local.Y, 0f, Size.Y))
         );

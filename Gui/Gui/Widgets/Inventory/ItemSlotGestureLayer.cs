@@ -18,7 +18,8 @@ namespace Gui.Widgets.Inventory;
 public class ItemSlotGestureLayer : StatefulWidget
 {
     /// <summary>Creates a gesture layer that builds its visual child via <paramref name="childBuilder" />.</summary>
-    public ItemSlotGestureLayer(
+    public ItemSlotGestureLayer
+    (
         Func<Widget> childBuilder,
         ItemSlot? slot = null,
         SlotController? controller = null,
@@ -70,12 +71,14 @@ public class ItemSlotGestureLayer : StatefulWidget
         private SlotChangeFilter _changeFilter;
         private CurvedAnimation _hoverAnimation = null!;
         private AnimationController _hoverController = null!;
+        private bool _isHovered;
         private float _itemScale = 1f;
 
         public override void InitState()
         {
             base.InitState();
-            _hoverController = new AnimationController(
+            _hoverController = new AnimationController
+            (
                 TimeSpan.FromMilliseconds(150),
                 Element.Owner!.GetTickerProvider()
             );
@@ -106,16 +109,22 @@ public class ItemSlotGestureLayer : StatefulWidget
             var itemStack = Widget.Slot?.Itemstack;
             var hasTooltip = itemStack?.Collectible != null;
 
-            Widget slotContent = new ItemSlotHoverData(
+            Widget slotContent = new ItemSlotHoverData
+            (
                 _hoverAnimation,
                 Widget.ChildBuilder(),
                 Widget.IsHighlighted?.Value ?? false,
                 _itemScale,
                 _onPunchEnd
-            ) { PointerPosition = _pointerGlobal };
+            )
+            {
+                PointerPosition = _pointerGlobal
+            };
 
-            return new Tooltip(
-                new GestureDetector(
+            return new Tooltip
+            (
+                new GestureDetector
+                (
                     onPress: _onPress,
                     onRelease: _onRelease,
                     onWheel: _onWheel,
@@ -182,8 +191,11 @@ public class ItemSlotGestureLayer : StatefulWidget
                 return;
             }
 
-            if (Widget.Controller.WheelSlot(Widget.Slot, e.Delta > 0 ? 1 : -1,
-                    Widget.OuterInventory))
+            if (Widget.Controller.WheelSlot
+                (
+                    Widget.Slot, e.Delta > 0 ? 1 : -1,
+                    Widget.OuterInventory
+                ))
             {
                 e.Handled = true;
             }
@@ -195,6 +207,7 @@ public class ItemSlotGestureLayer : StatefulWidget
             {
                 Widget.Controller.DragEnterSlot(Widget.Slot, Widget.OuterInventory);
                 Widget.Controller.EnterSlot(Widget.Slot);
+                _isHovered = true;
             }
 
             _pointerGlobal.Value = new Vector2(e.X, e.Y);
@@ -210,7 +223,7 @@ public class ItemSlotGestureLayer : StatefulWidget
 
         private void _onExit(PointerEvent e)
         {
-            Widget.Controller?.LeaveSlot();
+            _leaveSlot();
             _hoverController.Reverse();
             // Keep the last pointer position so the spotlight fades out where the cursor
             // left instead of snapping to the slot centre for a frame. It is overwritten
@@ -218,8 +231,22 @@ public class ItemSlotGestureLayer : StatefulWidget
             SetState(() => { });
         }
 
+        private void _leaveSlot()
+        {
+            if (!_isHovered)
+            {
+                return;
+            }
+
+            _isHovered = false;
+            Widget.Controller?.LeaveSlot(Widget.Slot);
+        }
+
         public override void Dispose()
         {
+            // Safety net: if the element is unmounted while hovered (dialog closed without a
+            // pointer-exit reaching the tree) the vanilla hover suppression would stay on.
+            _leaveSlot();
             _hoverController.OnValueChanged -= _onAnimationTick;
             Widget.Controller?.RemoveListener(_onControllerChanged);
             Widget.IsHighlighted?.RemoveListener(_onHighlightChanged);
@@ -249,12 +276,12 @@ internal struct SlotChangeFilter
     {
         if (_initialized)
         {
-            var same = (current == null && _lastSnapshot == null)
-                       || (world != null
-                           && current != null
-                           && _lastSnapshot != null
-                           && current.StackSize == _lastSnapshot.StackSize
-                           && current.Equals(world, _lastSnapshot));
+            var same = current == null && _lastSnapshot == null
+                       || world != null
+                       && current != null
+                       && _lastSnapshot != null
+                       && current.StackSize == _lastSnapshot.StackSize
+                       && current.Equals(world, _lastSnapshot);
 
             if (same)
             {

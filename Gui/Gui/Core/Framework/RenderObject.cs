@@ -4,6 +4,7 @@ using Gui.Core.Painting;
 using Gui.Debugging;
 using Gui.Rendering;
 using Gui.Widgets.Framework;
+using Gui.Widgets.Layout;
 using OpenTK.Mathematics;
 using SkiaSharp;
 
@@ -114,7 +115,8 @@ public abstract class RenderObject : IDisposable
     public virtual ClipBehavior ClipBehavior
     {
         get;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref field,
             value,
             true
@@ -197,6 +199,83 @@ public abstract class RenderObject : IDisposable
 
     public bool IsRepaintBoundary { get; protected set; } = false;
 
+    /// <summary>
+    ///     Registry of stale paint layers for the window owning this tree. Set by
+    ///     <c>FramePipeline</c> on the root only; resolved by walking to the root.
+    ///     When present, <see cref="MarkNeedsPaint" /> stops propagating at the first
+    ///     enclosing repaint boundary and registers that boundary here instead of
+    ///     dirtying the root layer.
+    /// </summary>
+    internal PaintLayerRegistry? LayerRegistry { get; set; }
+
+    /// <summary>
+    ///     How far beyond <see cref="Size" /> this node's own painting may reach, in
+    ///     local pixels. Nodes that legitimately paint outside their box (outer shadows)
+    ///     report their reach here so an enclosing <see cref="RenderRepaintBoundary" />
+    ///     does not cull them — Skia discards recorded ops outside the recording bounds.
+    /// </summary>
+    internal virtual float PaintOverflowExtent => 0f;
+
+    /// <summary>
+    ///     Local-space bounds actually touched by this node and its subtree, used to size
+    ///     a <see cref="RenderRepaintBoundary" /> layer recording. Starts from
+    ///     <see cref="Size" /> inflated by <see cref="PaintOverflowExtent" /> and unions
+    ///     every child's bounds translated into this node's space.
+    ///     <para>
+    ///         Nodes that transform their children (<c>RenderTransform</c>,
+    ///         <c>RenderFittedBox</c>) must override this to map the child union through
+    ///         their matrix, otherwise the transformed artwork gets culled.
+    ///     </para>
+    /// </summary>
+    internal virtual SKRect ComputePaintBounds()
+    {
+        var extent = PaintOverflowExtent;
+        var bounds = new SKRect
+        (
+            -extent,
+            -extent,
+            Size.X + extent,
+            Size.Y + extent
+        );
+
+        // A clip confines the subtree to this box, so children cannot widen the bounds.
+        if (ClipBehavior == ClipBehavior.None)
+        {
+            UnionChildPaintBounds(ref bounds);
+        }
+
+        return bounds;
+    }
+
+    /// <summary>
+    ///     Unions every child's <see cref="ComputePaintBounds" /> — offset by the child's
+    ///     position — into <paramref name="bounds" />. Nested repaint boundaries
+    ///     contribute their own layer bounds, since they replay an independent recording.
+    /// </summary>
+    protected void UnionChildPaintBounds
+    (
+        ref SKRect bounds
+    )
+    {
+        foreach (var child in _children)
+        {
+            var childBounds = child.ComputePaintBounds();
+            childBounds.Offset
+            (
+                child.X,
+                child.Y
+            );
+            bounds.Union(childBounds);
+        }
+    }
+
+    /// <summary>
+    ///     Registers this node's paint layer as stale. Returns <c>false</c> when no
+    ///     <see cref="PaintLayerRegistry" /> is reachable (tests, detached trees), in
+    ///     which case <see cref="MarkNeedsPaint" /> keeps propagating to the root.
+    /// </summary>
+    internal virtual bool TryRegisterDirtyLayer() => false;
+
 
     /// <summary>
     ///     Screen-space offset of the window that owns this render tree.
@@ -227,9 +306,11 @@ public abstract class RenderObject : IDisposable
         var g = (float)rnd.NextDouble();
         var b = (float)rnd.NextDouble();
 
-        var max = Math.Max(
+        var max = Math.Max
+        (
             r,
-            Math.Max(
+            Math.Max
+            (
                 g,
                 b
             )
@@ -237,15 +318,18 @@ public abstract class RenderObject : IDisposable
         if (max < 0.7f && max > 0.001f)
         {
             var scale = 0.7f / max;
-            r = Math.Min(
+            r = Math.Min
+            (
                 1.0f,
                 r * scale
             );
-            g = Math.Min(
+            g = Math.Min
+            (
                 1.0f,
                 g * scale
             );
-            b = Math.Min(
+            b = Math.Min
+            (
                 1.0f,
                 b * scale
             );
@@ -257,7 +341,8 @@ public abstract class RenderObject : IDisposable
             b = 0.7f;
         }
 
-        return new Vector4(
+        return new Vector4
+        (
             r,
             g,
             b,
@@ -265,7 +350,8 @@ public abstract class RenderObject : IDisposable
         );
     }
 
-    public virtual void AddChild(
+    public virtual void AddChild
+    (
         RenderObject child
     )
     {
@@ -280,7 +366,8 @@ public abstract class RenderObject : IDisposable
         MarkNeedsLayout();
     }
 
-    public virtual void RemoveChild(
+    public virtual void RemoveChild
+    (
         RenderObject child
     )
     {
@@ -297,7 +384,8 @@ public abstract class RenderObject : IDisposable
     ///     Reorders existing children to match <paramref name="newOrder" />.
     ///     Every element in <paramref name="newOrder" /> must already be a child.
     /// </summary>
-    internal void ReorderChildren(
+    internal void ReorderChildren
+    (
         List<RenderObject> newOrder
     )
     {
@@ -309,7 +397,8 @@ public abstract class RenderObject : IDisposable
         var same = true;
         for (var i = 0; i < _children.Count; i++)
         {
-            if (!ReferenceEquals(
+            if (!ReferenceEquals
+                (
                     _children[i],
                     newOrder[i]
                 ))
@@ -360,6 +449,12 @@ public abstract class RenderObject : IDisposable
     ///     Marks this render object as needing repaint and propagates
     ///     <c>ChildNeedsPaint</c> up the ancestor chain. Call this from any property
     ///     setter that affects appearance but not size (e.g. color, border color).
+    ///     <para>
+    ///         Propagation stops at the first ancestor that is a repaint boundary with a
+    ///         recorded paint layer: that boundary registers itself in the window's
+    ///         <see cref="PaintLayerRegistry" /> and gets re-recorded on its own, leaving
+    ///         the root layer — and every layer above the boundary — untouched.
+    ///     </para>
     /// </summary>
     public void MarkNeedsPaint()
     {
@@ -373,10 +468,29 @@ public abstract class RenderObject : IDisposable
         NeedsPaint = true;
         OnMarkNeedsPaint();
 
-        var curr = Parent;
-        while (curr != null && !curr.ChildNeedsPaint)
+        if (IsRepaintBoundary && TryRegisterDirtyLayer())
         {
+            return;
+        }
+
+        var curr = Parent;
+        while (curr != null)
+        {
+            var alreadyDirty = curr.ChildNeedsPaint;
             curr.ChildNeedsPaint = true;
+
+            // Attempt registration even when the flag was already set: an earlier mark
+            // may have passed through this boundary before it had a composited layer.
+            if (curr.IsRepaintBoundary && curr.TryRegisterDirtyLayer())
+            {
+                return;
+            }
+
+            if (alreadyDirty)
+            {
+                return;
+            }
+
             curr = curr.Parent;
         }
     }
@@ -390,14 +504,16 @@ public abstract class RenderObject : IDisposable
     ///     needing repaint and/or relayout. Returns true if the value
     ///     actually changed.
     /// </summary>
-    protected bool SetProperty<T>(
+    protected bool SetProperty<T>
+    (
         ref T field,
         T value,
         bool repaint = false,
         bool relayout = false
     )
     {
-        if (EqualityComparer<T>.Default.Equals(
+        if (EqualityComparer<T>.Default.Equals
+            (
                 field,
                 value
             ))
@@ -423,12 +539,14 @@ public abstract class RenderObject : IDisposable
     ///     Sets <see cref="HasLayoutViolation" /> and invokes <see cref="OnLayoutViolation" />
     ///     if a handler is registered (i.e. violation logging is enabled).
     /// </summary>
-    protected void ReportLayoutViolation(
+    protected void ReportLayoutViolation
+    (
         string message
     )
     {
         HasLayoutViolation = true;
-        OnLayoutViolation?.Invoke(
+        OnLayoutViolation?.Invoke
+        (
             this,
             message
         );
@@ -439,7 +557,8 @@ public abstract class RenderObject : IDisposable
     ///     no dirty flags are set. Otherwise stores <paramref name="constraints" />, calls
     ///     <see cref="PerformLayout" />, and clamps <see cref="Size" /> to the constraints.
     /// </summary>
-    public virtual void Layout(
+    public virtual void Layout
+    (
         LayoutConstraints constraints
     )
     {
@@ -469,7 +588,8 @@ public abstract class RenderObject : IDisposable
         ChildNeedsLayout = false;
     }
 
-    private void ValidateIncomingConstraints(
+    private void ValidateIncomingConstraints
+    (
         LayoutConstraints c
     )
     {
@@ -499,7 +619,8 @@ public abstract class RenderObject : IDisposable
         if (error != null)
         {
             HasLayoutViolation = true;
-            OnLayoutViolation!.Invoke(
+            OnLayoutViolation!.Invoke
+            (
                 this,
                 $"{GetType().Name} received invalid constraints: {error}"
             );
@@ -519,7 +640,8 @@ public abstract class RenderObject : IDisposable
             HasLayoutViolation = true;
             var axis = widthViolation && heightViolation ? "both axes"
                 : widthViolation ? "width" : "height";
-            OnLayoutViolation!.Invoke(
+            OnLayoutViolation!.Invoke
+            (
                 this,
                 $"{GetType().Name} computed size ({Size.X:F1}, {Size.Y:F1}) violates " +
                 $"constraints [{Constraints}] on {axis}. Size will be clamped."
@@ -534,25 +656,29 @@ public abstract class RenderObject : IDisposable
     protected abstract void PerformLayout();
 
     /// <summary>Returns the minimum width this object needs to display without clipping, given a height.</summary>
-    public virtual float GetMinIntrinsicWidth(
+    public virtual float GetMinIntrinsicWidth
+    (
         float height
     ) =>
         0f;
 
     /// <summary>Returns the maximum useful width (single-line width for text), given a height.</summary>
-    public virtual float GetMaxIntrinsicWidth(
+    public virtual float GetMaxIntrinsicWidth
+    (
         float height
     ) =>
         0f;
 
     /// <summary>Returns the minimum height this object needs to display without clipping, given a width.</summary>
-    public virtual float GetMinIntrinsicHeight(
+    public virtual float GetMinIntrinsicHeight
+    (
         float width
     ) =>
         0f;
 
     /// <summary>Returns the maximum useful height, given a width.</summary>
-    public virtual float GetMaxIntrinsicHeight(
+    public virtual float GetMaxIntrinsicHeight
+    (
         float width
     ) =>
         0f;
@@ -561,8 +687,9 @@ public abstract class RenderObject : IDisposable
     ///     Returns the distance from the top of this render object to its text baseline,
     ///     or <c>null</c> if this object has no baseline (falls back to bottom of box).
     /// </summary>
-    public virtual float? GetDistanceToBaseline(
-        Gui.Widgets.Layout.TextBaseline baseline
+    public virtual float? GetDistanceToBaseline
+    (
+        TextBaseline baseline
     ) =>
         null;
 
@@ -622,7 +749,8 @@ public abstract class RenderObject : IDisposable
     ///         child-traversal logic.
     ///     </para>
     /// </summary>
-    public virtual void Paint(
+    public virtual void Paint
+    (
         PaintingContext context
     )
     {
@@ -639,7 +767,8 @@ public abstract class RenderObject : IDisposable
             if (ClipBehavior != ClipBehavior.None)
             {
                 var rect = Size.ToSkRect(Vector2.Zero);
-                context.Canvas.ClipRect(
+                context.Canvas.ClipRect
+                (
                     rect,
                     SKClipOperation.Intersect,
                     ClipBehavior == ClipBehavior.AntiAlias
@@ -665,7 +794,8 @@ public abstract class RenderObject : IDisposable
     ///     <see cref="Paint" /> should call this once per paint instead of duplicating
     ///     the bookkeeping inline.
     /// </summary>
-    protected void RecordPaintEvent(
+    protected void RecordPaintEvent
+    (
         PaintingContext context
     )
     {
@@ -686,7 +816,8 @@ public abstract class RenderObject : IDisposable
     ///     Subclasses overriding <see cref="Paint" /> can reuse this to delegate child
     ///     traversal back to the base implementation.
     /// </summary>
-    protected void PaintChildren(
+    protected void PaintChildren
+    (
         PaintingContext context
     )
     {
@@ -699,7 +830,8 @@ public abstract class RenderObject : IDisposable
         {
             using (context.Canvas.SaveScope())
             {
-                context.Canvas.Translate(
+                context.Canvas.Translate
+                (
                     child.X,
                     child.Y
                 );
@@ -723,7 +855,8 @@ public abstract class RenderObject : IDisposable
     ///         BEFORE the clip is applied.
     ///     </para>
     /// </summary>
-    protected virtual void PaintInternal(
+    protected virtual void PaintInternal
+    (
         PaintingContext context
     )
     {
@@ -743,29 +876,34 @@ public abstract class RenderObject : IDisposable
         return cur.ScreenOffset;
     }
 
-    public virtual Vector2 LocalToGlobal(
+    public virtual Vector2 LocalToGlobal
+    (
         Vector2 localPoint
     )
     {
-        var point = localPoint + new Vector2(
+        var point = localPoint + new Vector2
+        (
             X,
             Y
         );
         return Parent?.LocalToGlobal(point) ?? point;
     }
 
-    public virtual Vector2 GlobalToLocal(
+    public virtual Vector2 GlobalToLocal
+    (
         Vector2 globalPoint
     )
     {
         var parentLocal = Parent?.GlobalToLocal(globalPoint) ?? globalPoint;
-        return parentLocal - new Vector2(
+        return parentLocal - new Vector2
+        (
             X,
             Y
         );
     }
 
-    public virtual void VisitChildren(
+    public virtual void VisitChildren
+    (
         Action<RenderObject> visitor
     )
     {
@@ -775,19 +913,22 @@ public abstract class RenderObject : IDisposable
         }
     }
 
-    public virtual void DebugDump(
+    public virtual void DebugDump
+    (
         Action<string> printer,
         int indent = 0
     )
     {
-        var spaces = new string(
+        var spaces = new string
+        (
             ' ',
             indent * 2
         );
         printer($"{spaces}{GetType().Name} ({X},{Y}) {Size}");
         foreach (var child in _children)
         {
-            child.DebugDump(
+            child.DebugDump
+            (
                 printer,
                 indent + 1
             );
@@ -799,7 +940,8 @@ public abstract class RenderObject : IDisposable
     ///     to <paramref name="child" />'s coordinate space.
     ///     By default, only subtracts the child's X and Y.
     /// </summary>
-    public virtual Vector2 GlobalToChild(
+    public virtual Vector2 GlobalToChild
+    (
         RenderObject child,
         Vector2 position
     )
@@ -809,7 +951,8 @@ public abstract class RenderObject : IDisposable
             return position;
         }
 
-        return position - new Vector2(
+        return position - new Vector2
+        (
             child.X,
             child.Y
         );
@@ -836,7 +979,8 @@ public abstract class RenderObject : IDisposable
     ///     mapping required for event dispatch. This method only decides whether THIS node
     ///     itself counts as a hit.
     /// </summary>
-    public virtual bool HitTest(
+    public virtual bool HitTest
+    (
         HitTestResult result,
         Vector2 position,
         Element element

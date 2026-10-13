@@ -34,7 +34,7 @@ public sealed class ColorsCategoryEditor : StatelessWidget
         var o = _draft.Colors;
         return new Column
         (
-            spacing: 12,
+            12,
             children:
             [
                 Field

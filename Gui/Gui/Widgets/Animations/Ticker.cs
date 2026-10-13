@@ -7,7 +7,8 @@ public class Ticker : IDisposable
     private readonly Action<TimeSpan> _onTick;
     private bool _muted = true;
 
-    public Ticker(
+    public Ticker
+    (
         Action<TimeSpan> onTick
     )
     {
@@ -31,7 +32,8 @@ public class Ticker : IDisposable
     ///     Called each frame by <see cref="TickerScheduler" />. <paramref name="frameDelta" />
     ///     is the time elapsed since the last frame — not the time since <see cref="Start" />.
     /// </summary>
-    public void Tick(
+    public void Tick
+    (
         TimeSpan frameDelta
     )
     {

@@ -24,7 +24,8 @@ internal class RenderProgressBar : RenderProxyBox
         get => _value;
         set
         {
-            var clamped = Math.Clamp(
+            var clamped = Math.Clamp
+            (
                 value,
                 0f,
                 1f
@@ -41,7 +42,8 @@ internal class RenderProgressBar : RenderProxyBox
     public float TrackHeight
     {
         get => _trackHeight;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref _trackHeight,
             value,
             relayout: true
@@ -52,7 +54,8 @@ internal class RenderProgressBar : RenderProxyBox
     public float CornerRadius
     {
         get => _cornerRadius;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref _cornerRadius,
             value,
             true
@@ -63,7 +66,8 @@ internal class RenderProgressBar : RenderProxyBox
     public float FillPadding
     {
         get => _fillPadding;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref _fillPadding,
             value,
             true
@@ -74,7 +78,8 @@ internal class RenderProgressBar : RenderProxyBox
     public Vector4 FillColor
     {
         get => _fillColor;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref _fillColor,
             value,
             true
@@ -85,7 +90,8 @@ internal class RenderProgressBar : RenderProxyBox
     public Vector4 TrackColor
     {
         get => _trackColor;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref _trackColor,
             value,
             true
@@ -98,24 +104,28 @@ internal class RenderProgressBar : RenderProxyBox
         var width = Constraints.MaxWidth;
         var height = float.IsPositiveInfinity(Constraints.MaxHeight)
             ? _trackHeight
-            : Math.Min(
+            : Math.Min
+            (
                 Constraints.MaxHeight,
                 _trackHeight
             );
-        Size = new Vector2(
+        Size = new Vector2
+        (
             width,
             height
         );
     }
 
     /// <inheritdoc />
-    protected override void PaintInternal(
+    protected override void PaintInternal
+    (
         PaintingContext context
     )
     {
         var radii = new Vector4(_cornerRadius);
 
-        context.DrawBox(
+        context.DrawBox
+        (
             Vector2.Zero,
             Size,
             _trackColor,
@@ -129,20 +139,25 @@ internal class RenderProgressBar : RenderProxyBox
         var fillWidth = _value * availWidth;
         if (fillWidth > 0 && availWidth > 0)
         {
-            var fillHeight = Math.Max(
+            var fillHeight = Math.Max
+            (
                 0,
                 Size.Y - p * 2
             );
-            var fillRadius = Math.Max(
+            var fillRadius = Math.Max
+            (
                 0,
                 _cornerRadius - p
             );
-            context.DrawBox(
-                new Vector2(
+            context.DrawBox
+            (
+                new Vector2
+                (
                     p,
                     p
                 ),
-                new Vector2(
+                new Vector2
+                (
                     fillWidth,
                     fillHeight
                 ),

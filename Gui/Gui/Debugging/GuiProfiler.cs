@@ -17,11 +17,10 @@ public sealed class GuiProfiler
     public const int Window = 60;
 
     private const int StaleAfterFrames = 120;
+    private readonly Dictionary<RenderObject, DirtyEntry> _dirty = new();
 
     private readonly bool[] _reRecorded = new bool[Window];
-    private readonly Dictionary<RenderObject, DirtyEntry> _dirty = new();
     private int _cursor;
-    private int _filled;
 
     /// <summary>
     ///     Master gate. When <see langword="false" />, <see cref="Current" /> is never
@@ -36,7 +35,7 @@ public sealed class GuiProfiler
     internal static GuiProfiler? Current { get; set; }
 
     /// <summary>Filled length of the rolling window (capped at <see cref="Window" />).</summary>
-    public int FramesSampled => _filled;
+    public int FramesSampled { get; private set; }
 
     /// <summary>Number of re-recorded frames within the current window.</summary>
     public int ReRecordsInWindow
@@ -44,7 +43,7 @@ public sealed class GuiProfiler
         get
         {
             var count = 0;
-            for (var i = 0; i < _filled; i++)
+            for (var i = 0; i < FramesSampled; i++)
             {
                 if (_reRecorded[i])
                 {
@@ -58,20 +57,21 @@ public sealed class GuiProfiler
 
     /// <summary>Fraction of sampled frames that re-recorded the SKPicture (0..1).</summary>
     public float RepaintFrequency =>
-        _filled == 0
+        FramesSampled == 0
             ? 0f
-            : (float)ReRecordsInWindow / _filled;
+            : (float)ReRecordsInWindow / FramesSampled;
 
     /// <summary>Records whether the window re-recorded its SKPicture this frame.</summary>
-    public void RecordFrame(
+    public void RecordFrame
+    (
         bool reRecorded
     )
     {
         _reRecorded[_cursor] = reRecorded;
         _cursor = (_cursor + 1) % Window;
-        if (_filled < Window)
+        if (FramesSampled < Window)
         {
-            _filled++;
+            FramesSampled++;
         }
 
         PruneStale();
@@ -82,7 +82,8 @@ public sealed class GuiProfiler
     ///     per frame (keyed by <see cref="RenderObject.CurrentFrameId" />), so a node
     ///     dirtied repeatedly within one frame still counts as a single initiation.
     /// </summary>
-    public void RecordDirtyInitiator(
+    public void RecordDirtyInitiator
+    (
         RenderObject node
     )
     {
@@ -102,15 +103,15 @@ public sealed class GuiProfiler
         {
             _dirty[node] = new DirtyEntry
             {
-                Count = 1,
-                LastFrameId = frame
+                Count = 1, LastFrameId = frame
             };
         }
     }
 
     /// <summary>The top dirty initiators by frame count, descending.</summary>
     /// <param name="count">The maximum number of hotspots to return.</param>
-    public IReadOnlyList<DirtyHotspot> TopDirtyInitiators(
+    public IReadOnlyList<DirtyHotspot> TopDirtyInitiators
+    (
         int count
     )
     {
@@ -157,7 +158,7 @@ public sealed class GuiProfiler
     {
         Array.Clear(_reRecorded, 0, _reRecorded.Length);
         _cursor = 0;
-        _filled = 0;
+        FramesSampled = 0;
         _dirty.Clear();
     }
 

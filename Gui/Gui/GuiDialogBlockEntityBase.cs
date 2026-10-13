@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Gui.Rendering;
 using Gui.Shared;
-using JetBrains.Annotations;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
@@ -23,9 +22,11 @@ public abstract class GuiDialogBlockEntityBase : GuiBase, IClosableDialog
     /// <param name="capi">The client API.</param>
     protected GuiDialogBlockEntityBase(BlockPos pos, ICoreClientAPI capi) : base(capi)
     {
-        IsDuplicate = IsDuplicateOpen(
+        IsDuplicate = IsDuplicateOpen
+        (
             capi.ModLoader.GetModSystem<GuiModSystem>().OpenWindows,
-            pos);
+            pos
+        );
         if (IsDuplicate)
         {
             return;
@@ -38,18 +39,22 @@ public abstract class GuiDialogBlockEntityBase : GuiBase, IClosableDialog
     /// <param name="pos">The block entity position.</param>
     /// <param name="inventory">The inventory the dialog displays.</param>
     /// <param name="capi">The client API.</param>
-    protected GuiDialogBlockEntityBase(
+    protected GuiDialogBlockEntityBase
+    (
         BlockPos pos,
         InventoryBase? inventory,
-        ICoreClientAPI capi) : base(capi)
+        ICoreClientAPI capi
+    ) : base(capi)
     {
         IsDuplicate = inventory != null
                       && capi.World.Player.InventoryManager.Inventories.ContainsValue(inventory);
         if (!IsDuplicate)
         {
-            IsDuplicate = IsDuplicateOpen(
+            IsDuplicate = IsDuplicateOpen
+            (
                 capi.ModLoader.GetModSystem<GuiModSystem>().OpenWindows,
-                pos);
+                pos
+            );
         }
 
         if (IsDuplicate)
@@ -123,10 +128,12 @@ public abstract class GuiDialogBlockEntityBase : GuiBase, IClosableDialog
 
             return field ??= new WorldAnchor
             {
-                WorldPos = new Vec3d(
+                WorldPos = new Vec3d
+                (
                     BlockEntityPos.X + 0.5,
                     BlockEntityPos.Y + FloatyDialogPosition,
-                    BlockEntityPos.Z + 0.5),
+                    BlockEntityPos.Z + 0.5
+                ),
                 Align = FloatyDialogAlign
             };
         }
@@ -145,9 +152,11 @@ public abstract class GuiDialogBlockEntityBase : GuiBase, IClosableDialog
     /// </summary>
     /// <param name="openWindows">List of currently open dialogs to scan.</param>
     /// <param name="target">The block position to check for an existing dialog.</param>
-    internal static bool IsDuplicateOpen(
+    internal static bool IsDuplicateOpen
+    (
         IReadOnlyList<GuiBase> openWindows,
-        BlockPos target)
+        BlockPos target
+    )
     {
         for (var i = 0; i < openWindows.Count; i++)
         {
@@ -169,20 +178,24 @@ public abstract class GuiDialogBlockEntityBase : GuiBase, IClosableDialog
     /// <param name="playerPos">The player's world position.</param>
     /// <param name="blockPos">The target block position.</param>
     /// <param name="range">Maximum interaction distance in blocks.</param>
-    internal static bool IsOutOfRange(
+    internal static bool IsOutOfRange
+    (
         Vec3d? playerPos,
         BlockPos? blockPos,
-        double range)
+        double range
+    )
     {
         if (playerPos == null || blockPos == null)
         {
             return false;
         }
 
-        var blockCenter = new Vec3d(
+        var blockCenter = new Vec3d
+        (
             blockPos.X + 0.5,
             blockPos.Y + 0.5,
-            blockPos.Z + 0.5);
+            blockPos.Z + 0.5
+        );
         return playerPos.DistanceTo(blockCenter) > range;
     }
 
@@ -198,11 +211,13 @@ public abstract class GuiDialogBlockEntityBase : GuiBase, IClosableDialog
             return;
         }
 
-        capi.Network.SendBlockEntityPacket(
+        capi.Network.SendBlockEntityPacket
+        (
             BlockEntityPos.X,
             BlockEntityPos.InternalY,
             BlockEntityPos.Z,
-            payload);
+            payload
+        );
     }
 
     /// <summary>
@@ -287,14 +302,16 @@ public abstract class GuiDialogBlockEntityBase : GuiBase, IClosableDialog
         var anchor = Anchor;
         if (anchor != null && capi.Settings.Bool["immersiveMouseMode"])
         {
-            if (anchor.TryProject(
+            if (anchor.TryProject
+                (
                     capi.Render.PerspectiveProjectionMat,
                     capi.Render.PerspectiveViewMat,
                     capi.Render.FrameWidth,
                     capi.Render.FrameHeight,
                     RuntimeEnv.GUIScale,
                     WindowSize,
-                    out var projected))
+                    out var projected
+                ))
             {
                 WindowPos = projected;
             }

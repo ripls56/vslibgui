@@ -4,11 +4,13 @@ namespace Gui.Widgets.Animations;
 
 public abstract class Simulation
 {
-    public abstract float X(
+    public abstract float X
+    (
         float time
     );
 
-    public abstract float Dx(
+    public abstract float Dx
+    (
         float time
     );
 }
@@ -19,7 +21,8 @@ public class FrictionSimulation : Simulation
     private readonly float _initialPosition;
     private readonly float _initialVelocity;
 
-    public FrictionSimulation(
+    public FrictionSimulation
+    (
         float drag,
         float initialPosition,
         float initialVelocity
@@ -30,7 +33,8 @@ public class FrictionSimulation : Simulation
         _initialVelocity = initialVelocity;
     }
 
-    public override float X(
+    public override float X
+    (
         float time
     )
     {
@@ -43,7 +47,8 @@ public class FrictionSimulation : Simulation
         return _initialPosition + _initialVelocity * (1 - (float)Math.Exp(-_drag * time)) / _drag;
     }
 
-    public override float Dx(
+    public override float Dx
+    (
         float time
     )
     {

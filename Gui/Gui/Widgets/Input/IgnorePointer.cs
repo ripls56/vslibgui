@@ -15,12 +15,14 @@ namespace Gui.Widgets.Input;
 /// </summary>
 public class IgnorePointer : SingleChildWidget
 {
-    public IgnorePointer(
+    public IgnorePointer
+    (
         bool ignoring = true,
         Widget? child = null,
         Framework.Key? key = null
     )
-        : base(
+        : base
+        (
             child,
             key
         )
@@ -35,7 +37,8 @@ public class IgnorePointer : SingleChildWidget
 
     public override RenderObject CreateRenderObject() => new RenderProxyBox();
 
-    public override void UpdateRenderObject(
+    public override void UpdateRenderObject
+    (
         RenderObject renderObject
     )
     {
@@ -44,20 +47,23 @@ public class IgnorePointer : SingleChildWidget
 
 internal class IgnorePointerElement : SingleChildElement
 {
-    public IgnorePointerElement(
+    public IgnorePointerElement
+    (
         Widget widget
     ) : base(widget)
     {
     }
 
-    public override bool HitTest(
+    public override bool HitTest
+    (
         HitTestResult result,
         Vector2 position
     )
     {
         return ((IgnorePointer)Widget).Ignoring
             ? false
-            : base.HitTest(
+            : base.HitTest
+            (
                 result,
                 position
             );

@@ -6,7 +6,8 @@ namespace Gui.Widgets.Layout;
 
 public class IntrinsicHeight : SingleChildWidget
 {
-    public IntrinsicHeight(
+    public IntrinsicHeight
+    (
         Widget? child = null,
         Framework.Key? key = null
     ) : base(child, key)

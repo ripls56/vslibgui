@@ -6,7 +6,12 @@ namespace Gui.Theming;
 public sealed record ThemePreset
 {
     /// <summary>Creates a preset.</summary>
-    public ThemePreset(string id, string displayName, ColorScheme scheme)
+    public ThemePreset
+    (
+        string id,
+        string displayName,
+        ColorScheme scheme
+    )
     {
         Id = id;
         DisplayName = displayName;

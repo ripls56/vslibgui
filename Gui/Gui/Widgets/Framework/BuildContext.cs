@@ -9,7 +9,8 @@ public readonly struct BuildContext
     public Widget Widget { get; }
     public Element Element { get; }
 
-    public BuildContext(
+    public BuildContext
+    (
         Widget widget,
         Element element
     )

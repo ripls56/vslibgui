@@ -32,7 +32,7 @@ public sealed class InputsCategoryEditor : StatelessWidget
     {
         return new Column
         (
-            spacing: 24,
+            24,
             children:
             [
                 TextFieldSection(),
@@ -55,7 +55,7 @@ public sealed class InputsCategoryEditor : StatelessWidget
         var s = _baseTheme.TextFieldStyle;
         return new Column
         (
-            spacing: 8,
+            8,
             children:
             [
                 new Text("TextField", _baseTheme.TextTheme.Title),
@@ -118,7 +118,7 @@ public sealed class InputsCategoryEditor : StatelessWidget
         var s = _baseTheme.CheckboxStyle;
         return new Column
         (
-            spacing: 8,
+            8,
             children:
             [
                 new Text("Checkbox", _baseTheme.TextTheme.Title),
@@ -173,7 +173,7 @@ public sealed class InputsCategoryEditor : StatelessWidget
         var s = _baseTheme.RadioButtonStyle;
         return new Column
         (
-            spacing: 8,
+            8,
             children:
             [
                 new Text("RadioButton", _baseTheme.TextTheme.Title),
@@ -220,7 +220,7 @@ public sealed class InputsCategoryEditor : StatelessWidget
         var s = _baseTheme.SliderStyle;
         return new Column
         (
-            spacing: 8,
+            8,
             children:
             [
                 new Text("Slider", _baseTheme.TextTheme.Title),
@@ -291,7 +291,7 @@ public sealed class InputsCategoryEditor : StatelessWidget
         var s = _baseTheme.DropdownStyle;
         return new Column
         (
-            spacing: 8,
+            8,
             children:
             [
                 new Text("Dropdown", _baseTheme.TextTheme.Title),
@@ -354,7 +354,7 @@ public sealed class InputsCategoryEditor : StatelessWidget
                 ),
                 new FloatOverrideField
                 (
-                    "Visible Item Count", (float?)o.VisibleItemCount, 1, 20, 1, s.VisibleItemCount,
+                    "Visible Item Count", o.VisibleItemCount, 1, 20, 1, s.VisibleItemCount,
                     v =>
                     {
                         o.VisibleItemCount = (int?)v;

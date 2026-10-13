@@ -16,7 +16,8 @@ namespace Gui.Widgets.Layout;
 /// </summary>
 public class Flexible : SingleChildWidget
 {
-    public Flexible(
+    public Flexible
+    (
         Widget child,
         int flex = 1,
         FlexFit fit = FlexFit.Loose,
@@ -38,7 +39,8 @@ public class Flexible : SingleChildWidget
 
     public override RenderObject CreateRenderObject() => new RenderProxyBox();
 
-    public override void UpdateRenderObject(
+    public override void UpdateRenderObject
+    (
         RenderObject renderObject
     )
     {

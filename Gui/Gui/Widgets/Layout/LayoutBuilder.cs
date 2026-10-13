@@ -16,7 +16,8 @@ public class LayoutBuilder : RenderObjectWidget
     /// <summary>
     ///     Creates a <see cref="LayoutBuilder" /> with the given constraint-aware builder callback.
     /// </summary>
-    public LayoutBuilder(
+    public LayoutBuilder
+    (
         Func<BuildContext, LayoutConstraints, Widget> builder,
         Framework.Key? key = null
     ) : base(key)
@@ -34,7 +35,8 @@ public class LayoutBuilder : RenderObjectWidget
     public override RenderObject CreateRenderObject() => new RenderLayoutBuilder();
 
     /// <inheritdoc />
-    public override void UpdateRenderObject(
+    public override void UpdateRenderObject
+    (
         RenderObject renderObject
     )
     {
@@ -55,7 +57,8 @@ public class LayoutBuilderElement : RenderObjectElement
     private LayoutConstraints _lastBuiltConstraints;
 
     /// <summary>Creates a new <see cref="LayoutBuilderElement" /> for the given widget.</summary>
-    public LayoutBuilderElement(
+    public LayoutBuilderElement
+    (
         LayoutBuilder widget
     ) : base(widget)
     {
@@ -67,7 +70,8 @@ public class LayoutBuilderElement : RenderObjectElement
         (RenderLayoutBuilder)RenderObject!;
 
     /// <inheritdoc />
-    public override void Mount(
+    public override void Mount
+    (
         Element? parent
     )
     {
@@ -78,7 +82,8 @@ public class LayoutBuilderElement : RenderObjectElement
     }
 
     /// <inheritdoc />
-    public override void Update(
+    public override void Update
+    (
         Widget newWidget
     )
     {
@@ -98,8 +103,10 @@ public class LayoutBuilderElement : RenderObjectElement
 
         _lastBuiltConstraints = constraints;
 
-        var newWidget = LayoutBuilderWidget.Builder(
-            new BuildContext(
+        var newWidget = LayoutBuilderWidget.Builder
+        (
+            new BuildContext
+            (
                 Widget,
                 this
             ),
@@ -107,7 +114,8 @@ public class LayoutBuilderElement : RenderObjectElement
         );
 
         var oldRo = _builtElement?.RenderObject;
-        _builtElement = UpdateChild(
+        _builtElement = UpdateChild
+        (
             _builtElement,
             newWidget
         );
@@ -149,7 +157,8 @@ public class LayoutBuilderElement : RenderObjectElement
     }
 
     /// <inheritdoc />
-    public override void VisitChildren(
+    public override void VisitChildren
+    (
         Action<Element> visitor
     )
     {

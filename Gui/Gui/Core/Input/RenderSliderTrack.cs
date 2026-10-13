@@ -21,7 +21,8 @@ internal class RenderSliderTrack : RenderProxyBox
     private float _thumbWidth = 12;
     private float _trackHeight = 8;
 
-    public RenderSliderTrack(
+    public RenderSliderTrack
+    (
         Action<float, RenderObject> onLayout
     )
     {
@@ -31,7 +32,8 @@ internal class RenderSliderTrack : RenderProxyBox
     public float Ratio
     {
         get => _ratio;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref _ratio,
             value,
             true
@@ -41,7 +43,8 @@ internal class RenderSliderTrack : RenderProxyBox
     public Vector4 ActiveColor
     {
         get => _activeColor;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref _activeColor,
             value,
             true
@@ -51,7 +54,8 @@ internal class RenderSliderTrack : RenderProxyBox
     public Vector4 InactiveColor
     {
         get => _inactiveColor;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref _inactiveColor,
             value,
             true
@@ -61,7 +65,8 @@ internal class RenderSliderTrack : RenderProxyBox
     public Vector4 ThumbColor
     {
         get => _thumbColor;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref _thumbColor,
             value,
             true
@@ -71,7 +76,8 @@ internal class RenderSliderTrack : RenderProxyBox
     public float TrackHeight
     {
         get => _trackHeight;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref _trackHeight,
             value,
             relayout: true
@@ -81,7 +87,8 @@ internal class RenderSliderTrack : RenderProxyBox
     public float ThumbWidth
     {
         get => _thumbWidth;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref _thumbWidth,
             value,
             relayout: true
@@ -91,7 +98,8 @@ internal class RenderSliderTrack : RenderProxyBox
     public float ThumbHeight
     {
         get => _thumbHeight;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref _thumbHeight,
             value,
             relayout: true
@@ -101,7 +109,8 @@ internal class RenderSliderTrack : RenderProxyBox
     public float ThumbRadius
     {
         get => _thumbRadius;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref _thumbRadius,
             value,
             true
@@ -115,29 +124,34 @@ internal class RenderSliderTrack : RenderProxyBox
         var height = float.IsPositiveInfinity(Constraints.MaxHeight)
             ? _thumbHeight
             : Constraints.MaxHeight;
-        Size = new Vector2(
+        Size = new Vector2
+        (
             width,
             height
         );
 
         foreach (var child in Children)
         {
-            child.Layout(
-                LayoutConstraints.Tight(
+            child.Layout
+            (
+                LayoutConstraints.Tight
+                (
                     Size.X,
                     Size.Y
                 )
             );
         }
 
-        _onLayout(
+        _onLayout
+        (
             Size.X,
             this
         );
     }
 
     /// <inheritdoc />
-    protected override void PaintInternal(
+    protected override void PaintInternal
+    (
         PaintingContext context
     )
     {
@@ -148,12 +162,15 @@ internal class RenderSliderTrack : RenderProxyBox
         var usable = Size.X - _thumbWidth;
         var thumbX = usable * _ratio;
 
-        context.DrawBox(
-            new Vector2(
+        context.DrawBox
+        (
+            new Vector2
+            (
                 0,
                 trackTop
             ),
-            new Vector2(
+            new Vector2
+            (
                 Size.X,
                 _trackHeight
             ),
@@ -166,12 +183,15 @@ internal class RenderSliderTrack : RenderProxyBox
         var activeWidth = thumbX + _thumbWidth / 2f;
         if (activeWidth > 0)
         {
-            context.DrawBox(
-                new Vector2(
+            context.DrawBox
+            (
+                new Vector2
+                (
                     0,
                     trackTop
                 ),
-                new Vector2(
+                new Vector2
+                (
                     activeWidth,
                     _trackHeight
                 ),
@@ -183,19 +203,23 @@ internal class RenderSliderTrack : RenderProxyBox
         }
 
         var thumbTop = centerY - _thumbHeight / 2f;
-        context.DrawBox(
-            new Vector2(
+        context.DrawBox
+        (
+            new Vector2
+            (
                 thumbX,
                 thumbTop
             ),
-            new Vector2(
+            new Vector2
+            (
                 _thumbWidth,
                 _thumbHeight
             ),
             _thumbColor,
             new Vector4(_thumbRadius),
             1f,
-            new Vector4(
+            new Vector4
+            (
                 _thumbColor.X * 0.7f,
                 _thumbColor.Y * 0.7f,
                 _thumbColor.Z * 0.7f,

@@ -80,7 +80,7 @@ internal sealed class SettingsContentState : State<SettingsContent>
                     Widget.InitialOverrides,
                     Widget.SelectedPreset,
                     Widget.OnOverridesChanged,
-                    key: new ValueKey<string>($"customize-{_resetNonce}")
+                    new ValueKey<string>($"customize-{_resetNonce}")
                 )
             }
         };
@@ -89,9 +89,9 @@ internal sealed class SettingsContentState : State<SettingsContent>
         (
             new BoxStyle
             {
-                Color = colors.Background,
+                Color = colors.Background
             },
-            child: new Column
+            new Column
             (
                 crossAxisAlignment: CrossAxisAlignment.Stretch,
                 spacing: 0,
@@ -118,7 +118,7 @@ internal sealed class SettingsContentState : State<SettingsContent>
             (
                 new Text("Skip", theme.TextTheme.Label),
                 ButtonVariant.Ghost,
-                onTap: _ => Widget.OnSkip()
+                _ => Widget.OnSkip()
             )
         };
 
@@ -131,7 +131,7 @@ internal sealed class SettingsContentState : State<SettingsContent>
                 (
                     new Text("Reset to preset", theme.TextTheme.Label),
                     ButtonVariant.Ghost,
-                    onTap: _ =>
+                    _ =>
                     {
                         Widget.OnOverridesChanged(new ThemeOverrides());
                         SetState(() => _resetNonce++);
@@ -153,7 +153,7 @@ internal sealed class SettingsContentState : State<SettingsContent>
                     }
                 ),
                 ButtonVariant.Primary,
-                onTap: _ => Widget.OnConfirm()
+                _ => Widget.OnConfirm()
             )
         );
 
@@ -166,8 +166,8 @@ internal sealed class SettingsContentState : State<SettingsContent>
                 new Divider(color: colors.OutlineVariant),
                 new Padding
                 (
-                    edgeInsets: EdgeInsets.Ltrb(24, 16, 24, 16),
-                    child: new Row
+                    EdgeInsets.Ltrb(24, 16, 24, 16),
+                    new Row
                     (
                         children: buttons,
                         spacing: 12

@@ -8,7 +8,8 @@ namespace Gui.Debugging;
 /// </summary>
 /// <param name="Node">The render object that called MarkNeedsPaint/MarkNeedsLayout.</param>
 /// <param name="InitiatedFrames">Distinct frames the node initiated dirtying.</param>
-public readonly record struct DirtyHotspot(
+public readonly record struct DirtyHotspot
+(
     RenderObject Node,
     int InitiatedFrames
 );

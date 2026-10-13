@@ -26,7 +26,7 @@ public sealed class ColorOverrides
     public Vector4? StateSelected { get; set; }
     public Vector4? OutlineVariant { get; set; }
 
-    /// <summary>Returns a copy of <paramref name="scheme"/> with every non-null field replaced.</summary>
+    /// <summary>Returns a copy of <paramref name="scheme" /> with every non-null field replaced.</summary>
     public ColorScheme ApplyTo(ColorScheme scheme) => new()
     {
         Primary = Primary ?? scheme.Primary,
@@ -77,7 +77,7 @@ public sealed class TypographyOverrides
     public FontWeight? CaptionWeight { get; set; }
     public Vector4? CaptionColor { get; set; }
 
-    /// <summary>Returns a copy of <paramref name="theme"/> with overridden text styles replaced.</summary>
+    /// <summary>Returns a copy of <paramref name="theme" /> with overridden text styles replaced.</summary>
     public TextTheme ApplyTo(TextTheme theme) => new()
     {
         Display = ApplyTextStyle(theme.Display, DisplayFontSize, DisplayWeight, DisplayColor),
@@ -89,12 +89,27 @@ public sealed class TypographyOverrides
         Caption = ApplyTextStyle(theme.Caption, CaptionFontSize, CaptionWeight, CaptionColor)
     };
 
-    private static TextStyle ApplyTextStyle(TextStyle style, float? size, FontWeight? weight, Vector4? color)
+    private static TextStyle ApplyTextStyle
+    (
+        TextStyle style,
+        float? size,
+        FontWeight? weight,
+        Vector4? color
+    )
     {
         var result = style;
-        if (size.HasValue) result.FontSize = size.Value;
-        if (weight.HasValue) result.Weight = weight.Value;
-        if (color.HasValue) result.Color = color.Value;
+        if (size.HasValue)
+        {
+            result.FontSize = size.Value;
+        }
+        if (weight.HasValue)
+        {
+            result.Weight = weight.Value;
+        }
+        if (color.HasValue)
+        {
+            result.Color = color.Value;
+        }
         return result;
     }
 
@@ -112,7 +127,7 @@ public sealed class ButtonVariantOverrides
     public float? BorderThickness { get; set; }
     public float? CornerRadius { get; set; }
 
-    /// <summary>Returns a copy of <paramref name="style"/> with overridden fields replaced.</summary>
+    /// <summary>Returns a copy of <paramref name="style" /> with overridden fields replaced.</summary>
     public ButtonVariantStyle ApplyTo(ButtonVariantStyle style) => new()
     {
         BackgroundColor = BackgroundColor ?? style.BackgroundColor,
@@ -136,7 +151,7 @@ public sealed class ButtonOverrides
     public ButtonVariantOverrides? Danger { get; set; }
     public ButtonVariantOverrides? Ghost { get; set; }
 
-    /// <summary>Returns a copy of <paramref name="style"/> with overridden fields replaced.</summary>
+    /// <summary>Returns a copy of <paramref name="style" /> with overridden fields replaced.</summary>
     public ButtonStyle ApplyTo(ButtonStyle style) => new()
     {
         Padding = Padding ?? style.Padding,
@@ -167,7 +182,7 @@ public sealed class TextFieldOverrides
     public float? Height { get; set; }
     public Vector4? CornerRadius { get; set; }
 
-    /// <summary>Returns a copy of <paramref name="style"/> with overridden fields replaced.</summary>
+    /// <summary>Returns a copy of <paramref name="style" /> with overridden fields replaced.</summary>
     public TextFieldStyle ApplyTo(TextFieldStyle style) => new()
     {
         FillColor = FillColor ?? style.FillColor,
@@ -192,7 +207,7 @@ public sealed class CheckboxOverrides
     public float? BorderThickness { get; set; }
     public float? CornerRadius { get; set; }
 
-    /// <summary>Returns a copy of <paramref name="style"/> with overridden fields replaced.</summary>
+    /// <summary>Returns a copy of <paramref name="style" /> with overridden fields replaced.</summary>
     public CheckboxStyle ApplyTo(CheckboxStyle style) => new()
     {
         CheckColor = CheckColor ?? style.CheckColor,
@@ -215,7 +230,7 @@ public sealed class RadioButtonOverrides
     public Vector4? BorderColor { get; set; }
     public float? BorderThickness { get; set; }
 
-    /// <summary>Returns a copy of <paramref name="style"/> with overridden fields replaced.</summary>
+    /// <summary>Returns a copy of <paramref name="style" /> with overridden fields replaced.</summary>
     public RadioButtonStyle ApplyTo(RadioButtonStyle style) => new()
     {
         DotColor = DotColor ?? style.DotColor,
@@ -240,7 +255,7 @@ public sealed class SliderOverrides
     public float? ThumbHeight { get; set; }
     public float? ThumbRadius { get; set; }
 
-    /// <summary>Returns a copy of <paramref name="style"/> with overridden fields replaced.</summary>
+    /// <summary>Returns a copy of <paramref name="style" /> with overridden fields replaced.</summary>
     public SliderStyle ApplyTo(SliderStyle style) => new()
     {
         ActiveColor = ActiveColor ?? style.ActiveColor,
@@ -279,7 +294,7 @@ public sealed class DropdownOverrides
     public float? MenuGap { get; set; }
     public Vector4? SelectionAccentColor { get; set; }
 
-    /// <summary>Returns a copy of <paramref name="style"/> with overridden fields replaced.</summary>
+    /// <summary>Returns a copy of <paramref name="style" /> with overridden fields replaced.</summary>
     public DropdownStyle ApplyTo(DropdownStyle style) => new()
     {
         ButtonHeight = ButtonHeight ?? style.ButtonHeight,
@@ -319,7 +334,7 @@ public sealed class ProgressBarOverrides
     public Vector4? BorderColor { get; set; }
     public float? FillPadding { get; set; }
 
-    /// <summary>Returns a copy of <paramref name="style"/> with overridden fields replaced.</summary>
+    /// <summary>Returns a copy of <paramref name="style" /> with overridden fields replaced.</summary>
     public ProgressBarStyle ApplyTo(ProgressBarStyle style) => new()
     {
         Height = Height ?? style.Height,
@@ -379,19 +394,21 @@ public sealed class ThemeOverrides
         && Checkbox is null && RadioButton is null && Slider is null && Dropdown is null
         && ProgressBar is null && Focus is null;
 
-    /// <summary>Returns a new <paramref name="baseTheme"/> with every set override applied.</summary>
-    public ThemeData ApplyOnto(ThemeData baseTheme) => new(
-        colorScheme: Colors?.ApplyTo(baseTheme.ColorScheme) ?? baseTheme.ColorScheme,
-        textTheme: Typography?.ApplyTo(baseTheme.TextTheme) ?? baseTheme.TextTheme,
-        progressBarStyle: ProgressBar?.ApplyTo(baseTheme.ProgressBarStyle) ?? baseTheme.ProgressBarStyle,
-        itemSlotStyle: baseTheme.ItemSlotStyle,
-        hotkeyBadgeStyle: baseTheme.HotkeyBadgeStyle,
-        dropdownStyle: Dropdown?.ApplyTo(baseTheme.DropdownStyle) ?? baseTheme.DropdownStyle,
-        checkboxStyle: Checkbox?.ApplyTo(baseTheme.CheckboxStyle) ?? baseTheme.CheckboxStyle,
-        radioButtonStyle: RadioButton?.ApplyTo(baseTheme.RadioButtonStyle) ?? baseTheme.RadioButtonStyle,
-        sliderStyle: Slider?.ApplyTo(baseTheme.SliderStyle) ?? baseTheme.SliderStyle,
-        buttonStyle: Button?.ApplyTo(baseTheme.ButtonStyle) ?? baseTheme.ButtonStyle,
-        textFieldStyle: TextField?.ApplyTo(baseTheme.TextFieldStyle) ?? baseTheme.TextFieldStyle)
+    /// <summary>Returns a new <paramref name="baseTheme" /> with every set override applied.</summary>
+    public ThemeData ApplyOnto(ThemeData baseTheme) => new
+    (
+        Colors?.ApplyTo(baseTheme.ColorScheme) ?? baseTheme.ColorScheme,
+        Typography?.ApplyTo(baseTheme.TextTheme) ?? baseTheme.TextTheme,
+        ProgressBar?.ApplyTo(baseTheme.ProgressBarStyle) ?? baseTheme.ProgressBarStyle,
+        baseTheme.ItemSlotStyle,
+        baseTheme.HotkeyBadgeStyle,
+        Dropdown?.ApplyTo(baseTheme.DropdownStyle) ?? baseTheme.DropdownStyle,
+        Checkbox?.ApplyTo(baseTheme.CheckboxStyle) ?? baseTheme.CheckboxStyle,
+        RadioButton?.ApplyTo(baseTheme.RadioButtonStyle) ?? baseTheme.RadioButtonStyle,
+        Slider?.ApplyTo(baseTheme.SliderStyle) ?? baseTheme.SliderStyle,
+        Button?.ApplyTo(baseTheme.ButtonStyle) ?? baseTheme.ButtonStyle,
+        TextField?.ApplyTo(baseTheme.TextFieldStyle) ?? baseTheme.TextFieldStyle
+    )
     {
         FocusOutlineColor = Focus?.OutlineColor ?? baseTheme.FocusOutlineColor,
         FocusOutlineWidth = Focus?.OutlineWidth ?? baseTheme.FocusOutlineWidth

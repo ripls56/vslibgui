@@ -19,25 +19,29 @@ public abstract class ScrollPhysics
     /// </summary>
     public abstract float MinVelocity { get; }
 
-    public virtual Simulation CreateFlingSimulation(
+    public virtual Simulation CreateFlingSimulation
+    (
         float position,
         float velocity
     )
     {
-        return new FrictionSimulation(
+        return new FrictionSimulation
+        (
             Drag,
             position,
             velocity
         );
     }
 
-    public virtual float ApplyPhysicsToOffset(
+    public virtual float ApplyPhysicsToOffset
+    (
         float offset,
         float min,
         float max
     )
     {
-        return Math.Clamp(
+        return Math.Clamp
+        (
             offset,
             min,
             max

@@ -16,7 +16,8 @@ public class RenderIcon : RenderObject
     private float _iconSize = 24f;
     private SKSvg? _svgData;
 
-    private Vector4 _tintColor = new(
+    private Vector4 _tintColor = new
+    (
         0f,
         0f,
         0f,
@@ -29,7 +30,8 @@ public class RenderIcon : RenderObject
     public SKSvg? SvgData
     {
         get => _svgData;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref _svgData,
             value,
             relayout: true
@@ -39,7 +41,8 @@ public class RenderIcon : RenderObject
     public float IconSize
     {
         get => _iconSize;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref _iconSize,
             value,
             relayout: true
@@ -49,7 +52,8 @@ public class RenderIcon : RenderObject
     public Vector4 TintColor
     {
         get => _tintColor;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref _tintColor,
             value,
             true
@@ -60,7 +64,8 @@ public class RenderIcon : RenderObject
     public SKBlendMode BlendMode
     {
         get => _blendMode;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref _blendMode,
             value,
             true
@@ -71,15 +76,18 @@ public class RenderIcon : RenderObject
 
     protected override void PerformLayout()
     {
-        Size = Constraints.Constrain(
-            new Vector2(
+        Size = Constraints.Constrain
+        (
+            new Vector2
+            (
                 _iconSize,
                 _iconSize
             )
         );
     }
 
-    protected override void PaintInternal(
+    protected override void PaintInternal
+    (
         PaintingContext context
     )
     {
@@ -96,23 +104,27 @@ public class RenderIcon : RenderObject
         var canvas = context.Canvas;
         var paint = context.SharedPaint;
 
-        var canvasMin = Math.Min(
+        var canvasMin = Math.Min
+        (
             Size.X,
             Size.Y
         );
-        var svgMax = Math.Max(
+        var svgMax = Math.Max
+        (
             _svgData.Picture.CullRect.Width,
             _svgData.Picture.CullRect.Height
         );
         var scale = canvasMin / svgMax;
-        var matrix = SKMatrix.CreateScale(
+        var matrix = SKMatrix.CreateScale
+        (
             scale,
             scale
         );
         if (_tintColor != _cachedTintKey)
         {
             _cachedTintFilter?.Dispose();
-            _cachedTintFilter = SKColorFilter.CreateBlendMode(
+            _cachedTintFilter = SKColorFilter.CreateBlendMode
+            (
                 _tintColor.ToSkColor(),
                 _blendMode
             );
@@ -127,7 +139,8 @@ public class RenderIcon : RenderObject
         {
             using (canvas.SaveScope())
             {
-                canvas.DrawPicture(
+                canvas.DrawPicture
+                (
                     _svgData.Picture,
                     matrix,
                     paint

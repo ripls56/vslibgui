@@ -35,14 +35,16 @@ public class DebugWindow : GuiBase
     /// <inheritdoc />
     protected override Widget Build()
     {
-        return new WindowFrame(
+        return new WindowFrame
+        (
             "UI Debugger",
             onClose: () =>
             {
                 _settings.ShowWindow = false;
                 TryClose();
             },
-            child: new ListenableBuilder(
+            child: new ListenableBuilder
+            (
                 _settings,
                 _ => new DebugPanel(_settings)
             )

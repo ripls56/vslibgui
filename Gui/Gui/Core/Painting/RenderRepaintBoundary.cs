@@ -5,22 +5,60 @@ using SkiaSharp;
 
 namespace Gui.Core.Painting;
 
+/// <summary>
+///     Isolates its subtree into its own composited <see cref="PaintLayer" />.
+///     <para>
+///         The layer is drawn into the parent recording as a live drawable handle, so a
+///         dirty subtree only re-records this layer — the parent layer, and the window
+///         root layer, keep their recording. <see cref="RenderObject.MarkNeedsPaint" />
+///         therefore stops propagating here (see <see cref="TryRegisterDirtyLayer" />)
+///         and registers this boundary with the window's <see cref="PaintLayerRegistry" />.
+///     </para>
+/// </summary>
 public class RenderRepaintBoundary : RenderProxyBox
 {
-    private SKPicture? _cache;
+    private readonly PaintLayer _layer = new();
 
-    public RenderRepaintBoundary()
+    /// <summary>
+    ///     <c>true</c> once the parent recording holds a reference to this boundary's
+    ///     layer host, which is the precondition for an out-of-band layer re-record to
+    ///     become visible without re-recording the parent.
+    /// </summary>
+    private bool _composited;
+
+    public RenderRepaintBoundary() => IsRepaintBoundary = true;
+
+    /// <inheritdoc />
+    internal override bool TryRegisterDirtyLayer()
     {
-        IsRepaintBoundary = true;
+        if (!_composited || !_layer.HasContent)
+        {
+            return false;
+        }
+
+        var registry = FindLayerRegistry();
+        if (registry == null)
+        {
+            return false;
+        }
+
+        registry.MarkDirty(this);
+        return true;
     }
 
-    protected override void OnMarkNeedsPaint()
+    private PaintLayerRegistry? FindLayerRegistry()
     {
-        _cache?.Dispose();
-        _cache = null;
+        var curr = (RenderObject)this;
+        while (curr.LayerRegistry == null && curr.Parent != null)
+        {
+            curr = curr.Parent;
+        }
+
+        return curr.LayerRegistry;
     }
 
-    public override void Paint(
+    public override void Paint
+    (
         PaintingContext context
     )
     {
@@ -38,18 +76,51 @@ public class RenderRepaintBoundary : RenderProxyBox
             return;
         }
 
-        // Optimization: If we are not dirty AND children are not dirty AND we have a cache, just draw it.
-        if (!NeedsPaint && !ChildNeedsPaint && _cache != null)
+        var canvas = context.Canvas;
+
+        // Optimization: if neither we nor our children are dirty, replay the layer.
+        if (!NeedsPaint && !ChildNeedsPaint && _layer.HasContent)
         {
             // CACHE HIT: record hit frame ID only — distinct from a dirty paint.
             RepaintRecord.CacheHitFrameId = CurrentFrameId;
             RepaintRecord.LastEventTimestampMs = context.CurrentTime;
             GuiModSystem.Instance?.PerformanceMetrics?.IncrementRepaintBoundaryHit();
-            context.Canvas.DrawPicture(_cache);
+            DrawLayer(canvas);
             return;
         }
 
-        // CACHE MISS: record dirty paint frame ID here, not at the top of the method.
+        RecordLayer(context);
+        DrawLayer(canvas);
+    }
+
+    /// <summary>
+    ///     Re-records this boundary's layer without drawing it anywhere. Called by
+    ///     <see cref="PaintLayerRegistry" /> for boundaries that went dirty while every
+    ///     enclosing layer stayed clean: the parent recording already references the
+    ///     layer host, so replacing the content is enough to make the new pixels appear.
+    /// </summary>
+    internal void RepaintLayer
+    (
+        PaintingContext context
+    )
+    {
+        // A boundary detached since it was registered no longer reaches the window's
+        // registry — re-recording it would paint an orphaned subtree for nobody.
+        if (!_composited || !_layer.HasContent || FindLayerRegistry() == null)
+        {
+            return;
+        }
+
+        MarkPainted();
+        RecordLayer(context);
+    }
+
+    private void RecordLayer
+    (
+        PaintingContext context
+    )
+    {
+        // CACHE MISS: record dirty paint frame ID here, not at the top of Paint.
         RepaintRecord.DirtyPaintedFrameId = CurrentFrameId;
         RepaintRecord.DirtyPaintCount++;
         RepaintRecord.LastEventTimestampMs = context.CurrentTime;
@@ -57,15 +128,7 @@ public class RenderRepaintBoundary : RenderProxyBox
         GuiModSystem.Instance?.PerformanceMetrics?.IncrementRepaintBoundaryMiss();
         OnAnyPaint?.Invoke(this);
 
-        // If we or our children are dirty, re-record.
-        _cache?.Dispose();
-
-        using var recorder = new SKPictureRecorder();
-        var recordingBounds = ComputeRecordingBounds();
-        var recordingCanvas = recorder.BeginRecording(recordingBounds);
-
-        var originalCanvas = context.Canvas;
-        // After PopCanvas(), context.Canvas returns to originalCanvas (the real GL surface).
+        var recordingCanvas = _layer.BeginRecording(ComputeRecordingBounds());
         context.PushCanvas(recordingCanvas);
 
         // Call PaintInternal directly instead of base.Paint to avoid base.Paint resetting
@@ -77,7 +140,8 @@ public class RenderRepaintBoundary : RenderProxyBox
         foreach (var child in Children)
         {
             recordingCanvas.Save();
-            recordingCanvas.Translate(
+            recordingCanvas.Translate
+            (
                 child.X,
                 child.Y
             );
@@ -86,72 +150,72 @@ public class RenderRepaintBoundary : RenderProxyBox
         }
 
         context.PopCanvas();
-        _cache = recorder.EndRecording();
+        _layer.EndRecording();
 
         NeedsPaint = false;
         ChildNeedsPaint = false;
-        originalCanvas.DrawPicture(_cache);
+    }
+
+    private void DrawLayer
+    (
+        SKCanvas canvas
+    )
+    {
+        canvas.DrawDrawable
+        (
+            _layer.Host,
+            0,
+            0
+        );
+        _composited = true;
     }
 
     /// <summary>
-    ///     Computes recording bounds inflated by the maximum outer shadow extent
-    ///     of any RenderBox descendant so outer shadows are not clipped by the picture.
-    ///     Walks the subtree because wrapper widgets (Clip, SizedBox, Padding) may
-    ///     sit between the boundary and the shadowed RenderBox.
+    ///     Recording bounds for this layer: the subtree's real paint bounds
+    ///     (<see cref="RenderObject.ComputePaintBounds" />), not just <see cref="Size" />.
+    ///     Skia culls recorded draw ops against these bounds, so anything that paints
+    ///     outside the box — outer shadows, scale transforms, overflowing children —
+    ///     would silently vanish if the rect were tight to the box.
     /// </summary>
     private SKRect ComputeRecordingBounds()
     {
-        var extent = 0f;
-        CollectMaxShadowExtent(
-            this,
-            ref extent
-        );
-        return new SKRect(
-            -extent,
-            -extent,
-            Size.X + extent,
-            Size.Y + extent
-        );
-    }
+        var bounds = ComputePaintBounds();
 
-    private static void CollectMaxShadowExtent(
-        RenderObject node,
-        ref float extent
-    )
-    {
-        if (node is RenderBox rb && rb.Shadows != null)
+        // Guard against a degenerate rect on a zero-size boundary: an empty recording
+        // would cull everything, including content a child paints at its own origin.
+        if (bounds.Width <= 0f || bounds.Height <= 0f)
         {
-            foreach (var shadow in rb.Shadows)
-            {
-                if (!shadow.Inset)
-                {
-                    extent = MathF.Max(
-                        extent,
-                        shadow.Extent
-                    );
-                }
-            }
-        }
-
-        foreach (var child in node.Children)
-        {
-            // Stop at nested repaint boundaries — they manage their own recording
-            if (child.IsRepaintBoundary)
-            {
-                continue;
-            }
-
-            CollectMaxShadowExtent(
-                child,
-                ref extent
+            bounds = new SKRect
+            (
+                MathF.Min(bounds.Left, 0f),
+                MathF.Min(bounds.Top, 0f),
+                MathF.Max(bounds.Right, MathF.Max(Size.X, 1f)),
+                MathF.Max(bounds.Bottom, MathF.Max(Size.Y, 1f))
             );
         }
+
+        return bounds;
     }
 
     public override void Dispose()
     {
-        _cache?.Dispose();
-        _cache = null;
+        var registry = FindLayerRegistry();
+        if (registry != null)
+        {
+            registry.Remove(this);
+            if (_composited)
+            {
+                // The live root recording still references our layer host; free it only
+                // after the next root re-record drops that reference.
+                registry.Retire(_layer);
+                _composited = false;
+                base.Dispose();
+                return;
+            }
+        }
+
+        _composited = false;
+        _layer.Dispose();
         base.Dispose();
     }
 }

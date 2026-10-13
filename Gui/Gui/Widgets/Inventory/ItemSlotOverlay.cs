@@ -23,11 +23,17 @@ namespace Gui.Widgets.Inventory;
 /// </summary>
 public class ItemSlotOverlay : StatelessWidget
 {
-    /// <summary>Key of the root <see cref="Stack" /> — use with <see cref="IWidgetTransformer" /> to intercept it.</summary>
+    /// <summary>
+    ///     Key of the root <see cref="Stack" /> — use with <see cref="IWidgetTransformer" /> to
+    ///     intercept it.
+    /// </summary>
     public static readonly Framework.Key RootStackKey = new ValueKey<string>
         ("item_slot_overlay.root_stack");
 
-    /// <summary>Key of the <see cref="Positioned" /> wrapper anchoring the durability bar — use with <see cref="IWidgetTransformer" /> to replace it.</summary>
+    /// <summary>
+    ///     Key of the <see cref="Positioned" /> wrapper anchoring the durability bar — use with
+    ///     <see cref="IWidgetTransformer" /> to replace it.
+    /// </summary>
     public static readonly Framework.Key DurabilityBarKey = new ValueKey<string>
         ("item_slot_overlay.durability_bar");
 
@@ -82,7 +88,7 @@ public class ItemSlotOverlay : StatelessWidget
         {
             var iconChildren = new List<Widget>
             {
-                new ItemStackDisplay(itemStack, Size, Size, (int)Size)
+                new ItemStackDisplay(itemStack, Size, Size, (int)Size, showTooltip: false)
             };
 
             if (itemStack.Collectible != null)

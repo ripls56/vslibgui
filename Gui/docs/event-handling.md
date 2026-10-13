@@ -290,6 +290,40 @@ on drag, and on resize to keep the bounds in sync.
 > are not arriving at a custom `GuiBase` subclass — check that the dialog's `WindowPos` and
 > `WindowSize` are set correctly at open time.
 
+## Hover across windows
+
+`GuiManager.OnMouseMove` walks `LoadedGuis` in order and **stops at the first dialog that
+sets `args.Handled`**. One dialog owns each move event, so a window in front starves every
+window behind it. Hover state in a starved window then goes stale: the item slot keeps its
+highlight, and a `Tooltip` that was already open stays on screen because its `onExit` never
+fires. This is most visible with a HUD that draws item slots and a dialog opened on top of
+them.
+
+`GuiBase` closes the gap in two places:
+
+1. **Blocked move.** When `IsBlockedByFrontDialog` reports that a focused dialog in front
+   covers the cursor, `OnMouseMove` cancels hover instead of updating it.
+2. **Starved window.** `PointerWatchdog` records the cursor position hover was last synced
+   for. `OnRenderGUI` (which the engine calls on every open dialog, every frame) compares it
+   with `capi.Input.MouseX/MouseY`. If the pointer moved without this window being told, and
+   the pointer is now outside the window or over a window in front, hover is cancelled.
+
+The watchdog only cancels — it never claims hover for a window that did not receive the move
+event. It also stands down while the window is being dragged or resized, and while a widget
+holds pointer capture (an active drag keeps owning the pointer outside its bounds).
+
+`Tooltip` adds a widget-level guard on top of that: while it is armed or visible, a ticker
+compares `GlobalPointer.LogicalPosition` with the trigger's screen rect
+(`LocalToGlobal(0) + GetScreenOffset()`, size `RenderObject.Size`) and closes the tooltip when
+the cursor is no longer over the trigger. The tooltip panel itself is not part of that rect —
+it is non-interactive (`RenderFollower.IsHitTestTarget` is `false`), so moving the cursor onto
+the bubble closes it, exactly as an exit event would.
+
+`GlobalPointer.LogicalPosition` is the only supported way to read the cursor without a pointer
+event. It returns logical (UI-scaled) screen units, the same space as `WindowPos`, and `null`
+when the game input is unavailable — callers treat `null` as "unknown" and keep their
+event-driven behavior.
+
 ## HitTestBehavior
 
 `BoxStyle.HitTestBehavior` controls how a container participates in hit-testing:

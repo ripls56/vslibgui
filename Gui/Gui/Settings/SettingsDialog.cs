@@ -60,7 +60,7 @@ public class SettingsDialog : GuiBase
         {
             Draggable = true,
             Resizable = false,
-            Size = new Vector2(capi.Render.FrameWidth * 0.5f, capi.Render.FrameHeight * 0.7f),
+            Size = new Vector2(capi.Render.FrameWidth * 0.5f, capi.Render.FrameHeight * 0.7f)
         };
     }
 

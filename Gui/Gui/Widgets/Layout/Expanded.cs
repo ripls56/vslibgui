@@ -5,7 +5,8 @@ namespace Gui.Widgets.Layout;
 
 public class Expanded : SingleChildWidget
 {
-    public Expanded(
+    public Expanded
+    (
         Widget child,
         int flex = 1,
         Framework.Key? key = null
@@ -18,7 +19,8 @@ public class Expanded : SingleChildWidget
 
     public override RenderObject CreateRenderObject() => new RenderProxyBox();
 
-    public override void UpdateRenderObject(
+    public override void UpdateRenderObject
+    (
         RenderObject renderObject
     )
     {

@@ -22,7 +22,8 @@ public class RenderText : RenderBox
     public string Text
     {
         get => _text;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref _text,
             value,
             relayout: true
@@ -32,7 +33,8 @@ public class RenderText : RenderBox
     public TextStyle Style
     {
         get => _style;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref _style,
             value,
             relayout: true
@@ -50,7 +52,8 @@ public class RenderText : RenderBox
             return;
         }
 
-        var font = TextLayoutHelper.GetFont(
+        var font = TextLayoutHelper.GetFont
+        (
             _style.FontFamily,
             _style.FontSize,
             _style.Weight
@@ -77,7 +80,8 @@ public class RenderText : RenderBox
         {
             if (shouldWrap)
             {
-                _visualLines = TextLayoutHelper.BreakIntoLines(
+                _visualLines = TextLayoutHelper.BreakIntoLines
+                (
                     _text,
                     font,
                     maxWidth
@@ -93,7 +97,8 @@ public class RenderText : RenderBox
             // MaxLines truncation with optional ellipsis
             if (_style.MaxLines > 0 && _visualLines.Count > _style.MaxLines)
             {
-                _visualLines.RemoveRange(
+                _visualLines.RemoveRange
+                (
                     _style.MaxLines,
                     _visualLines.Count - _style.MaxLines
                 );
@@ -105,16 +110,19 @@ public class RenderText : RenderBox
                     var targetW = maxWidth - ellipsisW;
                     if (targetW > 0)
                     {
-                        long fits = font.BreakText(
+                        long fits = font.BreakText
+                        (
                             lastLine.AsSpan(),
                             targetW,
                             out _
                         );
-                        var count = (int)Math.Min(
+                        var count = (int)Math.Min
+                        (
                             fits,
                             lastLine.Length
                         );
-                        _visualLines[last] = lastLine.Substring(
+                        _visualLines[last] = lastLine.Substring
+                            (
                                 0,
                                 count
                             )
@@ -137,7 +145,8 @@ public class RenderText : RenderBox
         {
             var w = font.MeasureText(line);
             _lineWidths.Add(w);
-            maxLineWidth = Math.Max(
+            maxLineWidth = Math.Max
+            (
                 maxLineWidth,
                 w
             );
@@ -145,15 +154,18 @@ public class RenderText : RenderBox
 
         font.Embolden = originalEmbolden;
 
-        Size = Constraints.Constrain(
-            new Vector2(
+        Size = Constraints.Constrain
+        (
+            new Vector2
+            (
                 maxLineWidth,
                 _visualLines.Count * _lineHeight
             )
         );
     }
 
-    public override float GetMinIntrinsicWidth(
+    public override float GetMinIntrinsicWidth
+    (
         float height
     )
     {
@@ -162,21 +174,24 @@ public class RenderText : RenderBox
             return 0f;
         }
 
-        var font = TextLayoutHelper.GetFont(
+        var font = TextLayoutHelper.GetFont
+        (
             _style.FontFamily,
             _style.FontSize,
             _style.Weight
         );
         // Minimum width = longest word (cannot break further)
         float maxWordWidth = 0;
-        foreach (var word in _text.Split(
+        foreach (var word in _text.Split
+                 (
                      ' ',
                      '\n'
                  ))
         {
             if (word.Length > 0)
             {
-                maxWordWidth = Math.Max(
+                maxWordWidth = Math.Max
+                (
                     maxWordWidth,
                     font.MeasureText(word)
                 );
@@ -186,7 +201,8 @@ public class RenderText : RenderBox
         return maxWordWidth;
     }
 
-    public override float GetMaxIntrinsicWidth(
+    public override float GetMaxIntrinsicWidth
+    (
         float height
     )
     {
@@ -195,7 +211,8 @@ public class RenderText : RenderBox
             return 0f;
         }
 
-        return TextLayoutHelper.MeasureText(
+        return TextLayoutHelper.MeasureText
+            (
                 _text,
                 _style.FontFamily,
                 _style.FontSize,
@@ -205,7 +222,8 @@ public class RenderText : RenderBox
             .X;
     }
 
-    public override float GetMinIntrinsicHeight(
+    public override float GetMinIntrinsicHeight
+    (
         float width
     )
     {
@@ -214,7 +232,8 @@ public class RenderText : RenderBox
             return 0f;
         }
 
-        var font = TextLayoutHelper.GetFont(
+        var font = TextLayoutHelper.GetFont
+        (
             _style.FontFamily,
             _style.FontSize,
             _style.Weight
@@ -239,7 +258,8 @@ public class RenderText : RenderBox
 
             if (_style.MaxLines > 0)
             {
-                hardLines = Math.Min(
+                hardLines = Math.Min
+                (
                     hardLines,
                     _style.MaxLines
                 );
@@ -248,7 +268,8 @@ public class RenderText : RenderBox
             return hardLines * lh;
         }
 
-        var lines = TextLayoutHelper.BreakIntoLines(
+        var lines = TextLayoutHelper.BreakIntoLines
+        (
             _text,
             font,
             width
@@ -256,7 +277,8 @@ public class RenderText : RenderBox
         var lineCount = lines.Count;
         if (_style.MaxLines > 0)
         {
-            lineCount = Math.Min(
+            lineCount = Math.Min
+            (
                 lineCount,
                 _style.MaxLines
             );
@@ -265,13 +287,15 @@ public class RenderText : RenderBox
         return lineCount * lh;
     }
 
-    public override float GetMaxIntrinsicHeight(
+    public override float GetMaxIntrinsicHeight
+    (
         float width
     ) =>
         GetMinIntrinsicHeight(width);
 
     /// <inheritdoc />
-    public override float? GetDistanceToBaseline(
+    public override float? GetDistanceToBaseline
+    (
         TextBaseline baseline
     )
     {
@@ -280,7 +304,8 @@ public class RenderText : RenderBox
             return null;
         }
 
-        var font = TextLayoutHelper.GetFont(
+        var font = TextLayoutHelper.GetFont
+        (
             _style.FontFamily,
             _style.FontSize,
             _style.Weight
@@ -295,7 +320,8 @@ public class RenderText : RenderBox
         return -metrics.Ascent;
     }
 
-    protected override void PaintInternal(
+    protected override void PaintInternal
+    (
         PaintingContext context
     )
     {
@@ -304,7 +330,8 @@ public class RenderText : RenderBox
             return;
         }
 
-        var font = TextLayoutHelper.GetFont(
+        var font = TextLayoutHelper.GetFont
+        (
             _style.FontFamily,
             _style.FontSize,
             _style.Weight
@@ -328,9 +355,11 @@ public class RenderText : RenderBox
                 }
             }
 
-            context.Canvas.DrawText(
+            context.Canvas.DrawText
+            (
                 _visualLines[i],
-                new Vector2(
+                new Vector2
+                (
                     x,
                     y
                 ),

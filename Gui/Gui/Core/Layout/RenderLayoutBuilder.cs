@@ -1,6 +1,7 @@
 using Gui.Core.Framework;
 using Gui.Widgets.Framework;
 using Gui.Widgets.Layout;
+using OpenTK.Mathematics;
 
 namespace Gui.Core.Layout;
 
@@ -25,7 +26,8 @@ public class RenderLayoutBuilder : RenderBox
     /// <inheritdoc />
     protected override void PerformLayout()
     {
-        var constraintsChanged = _lastConstraints == null || !_lastConstraints.Value.Equals(Constraints);
+        var constraintsChanged =
+            _lastConstraints == null || !_lastConstraints.Value.Equals(Constraints);
 
         if (constraintsChanged)
         {
@@ -43,8 +45,9 @@ public class RenderLayoutBuilder : RenderBox
         }
         else
         {
-            Size = Constraints.Constrain(
-                new OpenTK.Mathematics.Vector2(0, 0)
+            Size = Constraints.Constrain
+            (
+                new Vector2(0, 0)
             );
         }
     }

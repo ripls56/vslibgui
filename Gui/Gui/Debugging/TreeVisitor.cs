@@ -7,12 +7,14 @@ namespace Gui.Debugging;
 
 public static class TreeVisitor
 {
-    public static List<string> GetTreeDebugStrings(
+    public static List<string> GetTreeDebugStrings
+    (
         Element root
     )
     {
         var result = new List<string>();
-        Visit(
+        Visit
+        (
             root,
             result,
             0
@@ -20,7 +22,8 @@ public static class TreeVisitor
         return result;
     }
 
-    private static void Visit(
+    private static void Visit
+    (
         Element element,
         List<string> result,
         int depth
@@ -31,7 +34,8 @@ public static class TreeVisitor
             return;
         }
 
-        var indent = new string(
+        var indent = new string
+        (
             ' ',
             depth * 2
         );
@@ -67,11 +71,15 @@ public static class TreeVisitor
             flags = $"{lFlag}{pFlag}{rFlag}";
         }
 
-        result.Add(
-            $"{indent}{element.Widget.GetType().Name} ({element.GetType().Name}){roInfo} Flags:{flags}");
+        result.Add
+        (
+            $"{indent}{element.Widget.GetType().Name} ({element.GetType().Name}){roInfo} Flags:{flags}"
+        );
 
         // Visit children using the non-reflective mechanism
-        element.VisitChildren(child => Visit(
+        element.VisitChildren
+        (child => Visit
+            (
                 child,
                 result,
                 depth + 1

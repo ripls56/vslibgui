@@ -13,14 +13,16 @@ namespace Gui.Widgets.Painting;
 public class ShaderMask : SingleChildWidget
 {
     /// <summary>Creates a new ShaderMask widget.</summary>
-    public ShaderMask(
+    public ShaderMask
+    (
         SKShader? shader,
         SKBlendMode blendMode,
         Widget? child = null,
         float offsetX = 0f,
         float offsetY = 0f,
         Framework.Key? key = null
-    ) : base(
+    ) : base
+    (
         child,
         key
     )
@@ -47,7 +49,8 @@ public class ShaderMask : SingleChildWidget
     public override RenderObject CreateRenderObject() => new RenderShaderMask();
 
     /// <inheritdoc />
-    public override void UpdateRenderObject(
+    public override void UpdateRenderObject
+    (
         RenderObject renderObject
     )
     {

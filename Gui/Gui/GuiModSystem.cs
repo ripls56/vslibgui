@@ -87,7 +87,14 @@ public class GuiModSystem : ModSystem
         ICoreClientAPI api
     )
     {
-        NativeLibraryLoader.Register();
+        NativeLibraryLoader.Register(api.Logger);
+        TextShaper.OnShapingUnavailable = e => api.Logger.Error
+        (
+            "[GUI] HarfBuzz is unavailable; falling back to unshaped text rendering "
+            + "(no kerning, ligatures, or complex-script support). {0}",
+            e
+        );
+
         Instance = this;
         Capi = api;
         SkiaRenderer = new SkiaRenderer();
@@ -477,7 +484,7 @@ public class GuiModSystem : ModSystem
             Capi!, presets, isFirstRun, preset =>
             {
                 ThemeApplier.Apply(preset);
-                PersistConfig(ThemeApplier.BuildPersistedConfig(preset, onboarded: true));
+                PersistConfig(ThemeApplier.BuildPersistedConfig(preset, true));
             }
         );
     }

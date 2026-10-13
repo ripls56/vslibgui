@@ -7,7 +7,8 @@ namespace Gui.Widgets.Layout;
 
 public class FittedBox : SingleChildWidget
 {
-    public FittedBox(
+    public FittedBox
+    (
         Widget child,
         BoxFit fit = BoxFit.Contain,
         Alignment? alignment = null,
@@ -32,7 +33,8 @@ public class FittedBox : SingleChildWidget
         };
     }
 
-    public override void UpdateRenderObject(
+    public override void UpdateRenderObject
+    (
         RenderObject renderObject
     )
     {

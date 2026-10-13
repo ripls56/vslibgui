@@ -7,7 +7,8 @@ namespace Gui.Widgets.Painting;
 /// <summary>Applies a fractional opacity to its child.</summary>
 public class Opacity : SingleChildWidget
 {
-    public Opacity(
+    public Opacity
+    (
         float opacity,
         Widget? child = null
     ) : base(child)
@@ -19,7 +20,8 @@ public class Opacity : SingleChildWidget
 
     public override RenderObject CreateRenderObject() => new RenderOpacity();
 
-    public override void UpdateRenderObject(
+    public override void UpdateRenderObject
+    (
         RenderObject renderObject
     ) =>
         ((RenderOpacity)renderObject).Opacity = OpacityValue;

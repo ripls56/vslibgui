@@ -25,7 +25,12 @@ public static class WidgetTransformerRegistry
     /// <param name="key">The widget key to match against.</param>
     /// <param name="transformer">The transformer to register.</param>
     /// <param name="priority">Execution order; lower values run first. Default 0.</param>
-    public static void Register(Key key, IWidgetTransformer transformer, int priority = 0)
+    public static void Register
+    (
+        Key key,
+        IWidgetTransformer transformer,
+        int priority = 0
+    )
     {
         if (!Map.TryGetValue(key, out var list))
         {

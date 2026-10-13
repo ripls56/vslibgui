@@ -1,5 +1,6 @@
 using System;
 using Gui.Rendering;
+using Gui.Sound;
 using Gui.Widgets.Animations;
 using Gui.Widgets.Basic;
 using Gui.Widgets.Events;
@@ -58,6 +59,7 @@ internal class RadioButtonState<T> : FocusableState<RadioButton<T>>, IActivatabl
     {
         if (!Widget.Value.Equals(Widget.GroupValue))
         {
+            this.ToggleOn();
             Widget.OnChanged?.Invoke(Widget.Value);
         }
     }
@@ -188,7 +190,16 @@ internal class RadioButtonState<T> : FocusableState<RadioButton<T>>, IActivatabl
                     _pressed = false;
                 }
             ),
-            onPress: _ => SetState(() => _pressed = true),
+            onPress: _ => SetState
+            (() =>
+                {
+                    _pressed = true;
+                    if (!Widget.Value.Equals(Widget.GroupValue))
+                    {
+                        this.ToggleOn();
+                    }
+                }
+            ),
             onRelease: _ => SetState(() => _pressed = false),
             child: body
         );

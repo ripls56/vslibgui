@@ -23,7 +23,8 @@ public sealed class GuiGlobalOverlay : GuiBase
     /// <summary>
     ///     Creates the global overlay and sets <see cref="Instance" />.
     /// </summary>
-    public GuiGlobalOverlay(
+    public GuiGlobalOverlay
+    (
         ICoreClientAPI capi
     ) : base(capi)
     {
@@ -39,18 +40,18 @@ public sealed class GuiGlobalOverlay : GuiBase
     /// <summary>HUD dialogs render above the game but below menus.</summary>
     public override EnumDialogType DialogType => EnumDialogType.HUD;
 
-    /// <summary>Never intercepts keyboard events.</summary>
-    public override bool ShouldReceiveKeyboardEvents() => false;
-
-    /// <summary>Never intercepts mouse events.</summary>
-    public override bool ShouldReceiveMouseEvents() => false;
-
     /// <summary>
     ///     Pass-through overlay: never register a hit-bounds composer. A full-screen
     ///     composer would make the VS engine treat the entire screen as "inside a dialog",
     ///     defeating HudDropItem's drop-on-click-outside (cursor items would never drop).
     /// </summary>
     protected override bool RegistersHitBounds => false;
+
+    /// <summary>Never intercepts keyboard events.</summary>
+    public override bool ShouldReceiveKeyboardEvents() => false;
+
+    /// <summary>Never intercepts mouse events.</summary>
+    public override bool ShouldReceiveMouseEvents() => false;
 
     /// <inheritdoc />
     protected override WindowConfig CreateWindowConfig()
@@ -63,7 +64,8 @@ public sealed class GuiGlobalOverlay : GuiBase
             Draggable = false,
             Resizable = false,
             Position = Vector2.Zero,
-            Size = new Vector2(
+            Size = new Vector2
+            (
                 screenW,
                 screenH
             )
@@ -77,7 +79,8 @@ public sealed class GuiGlobalOverlay : GuiBase
     ///     Opens the overlay and captures the root <see cref="OverlayState" />
     ///     that <see cref="GuiBase.TryOpen" /> creates automatically.
     /// </summary>
-    public override bool TryOpen(
+    public override bool TryOpen
+    (
         bool withFocus
     )
     {
@@ -91,7 +94,8 @@ public sealed class GuiGlobalOverlay : GuiBase
     }
 
     /// <inheritdoc />
-    public override void OnRenderGUI(
+    public override void OnRenderGUI
+    (
         float deltaTime
     )
     {
@@ -100,7 +104,8 @@ public sealed class GuiGlobalOverlay : GuiBase
         var screenW = capi.Render.FrameWidth / scale;
         var screenH = capi.Render.FrameHeight / scale;
         WindowPos = Vector2.Zero;
-        WindowSize = new Vector2(
+        WindowSize = new Vector2
+        (
             screenW,
             screenH
         );
@@ -112,7 +117,8 @@ public sealed class GuiGlobalOverlay : GuiBase
     /// <summary>
     ///     Inserts an <see cref="OverlayEntry" /> into the global overlay.
     /// </summary>
-    public static void Insert(
+    public static void Insert
+    (
         OverlayEntry entry
     ) =>
         Instance?._overlayState?.Insert(entry);
@@ -120,7 +126,8 @@ public sealed class GuiGlobalOverlay : GuiBase
     /// <summary>
     ///     Removes an <see cref="OverlayEntry" /> from the global overlay.
     /// </summary>
-    public static void Remove(
+    public static void Remove
+    (
         OverlayEntry entry
     ) =>
         Instance?._overlayState?.RemoveEntry(entry);

@@ -5,8 +5,8 @@ using Gui.Widgets.Scroll;
 namespace Gui.Widgets.Input;
 
 /// <summary>
-/// Manages focus state for a single focusable node in the widget tree.
-/// Extends <see cref="ChangeNotifier"/> so listeners are notified when focus changes.
+///     Manages focus state for a single focusable node in the widget tree.
+///     Extends <see cref="ChangeNotifier" /> so listeners are notified when focus changes.
 /// </summary>
 public class FocusNode : ChangeNotifier
 {
@@ -30,9 +30,9 @@ public class FocusNode : ChangeNotifier
     public float? TraversalOrder { get; set; }
 
     /// <summary>
-    /// Whether the focus indicator (outline) should be drawn for this node. True only when
-    /// focus was reached via keyboard traversal; pointer or programmatic focus leaves it
-    /// false, so the element still receives input but shows no outline (:focus-visible).
+    ///     Whether the focus indicator (outline) should be drawn for this node. True only when
+    ///     focus was reached via keyboard traversal; pointer or programmatic focus leaves it
+    ///     false, so the element still receives input but shows no outline (:focus-visible).
     /// </summary>
     public bool ShowsFocusIndicator
     {
@@ -71,7 +71,7 @@ public class FocusNode : ChangeNotifier
         NotifyListeners();
     }
 
-    /// <summary>Requests primary focus for this node via its owning <see cref="FocusManager"/>.</summary>
+    /// <summary>Requests primary focus for this node via its owning <see cref="FocusManager" />.</summary>
     public void RequestFocus()
     {
         var manager = _manager ?? Owner?.Owner?.FocusManager;
@@ -108,9 +108,9 @@ public class FocusNode : ChangeNotifier
     }
 
     /// <summary>
-    /// Resolves the <see cref="FocusNode"/> owned by <paramref name="element"/>, checking
-    /// both the widget (when it implements <see cref="IFocusable"/>) and the state of a
-    /// <see cref="StatefulElement"/>. Returns null when neither exposes a node.
+    ///     Resolves the <see cref="FocusNode" /> owned by <paramref name="element" />, checking
+    ///     both the widget (when it implements <see cref="IFocusable" />) and the state of a
+    ///     <see cref="StatefulElement" />. Returns null when neither exposes a node.
     /// </summary>
     public static FocusNode? Resolve
     (
@@ -133,28 +133,31 @@ public class FocusNode : ChangeNotifier
 }
 
 /// <summary>
-/// A <see cref="FocusNode"/> that marks a scope boundary for focus traversal.
-/// Tab navigation is contained within the scope holding the currently focused node.
+///     A <see cref="FocusNode" /> that marks a scope boundary for focus traversal.
+///     Tab navigation is contained within the scope holding the currently focused node.
 /// </summary>
 public class FocusScopeNode : FocusNode
 {
 }
 
 /// <summary>
-/// Manages which <see cref="FocusNode"/> holds primary focus and drives Tab traversal.
+///     Manages which <see cref="FocusNode" /> holds primary focus and drives Tab traversal.
 /// </summary>
 public class FocusManager
 {
     /// <summary>The node that currently holds primary focus, or null if nothing is focused.</summary>
     public FocusNode? PrimaryFocus { get; private set; }
 
-    /// <summary>The policy used by <see cref="FocusNext"/> and <see cref="FocusPrevious"/> to order focusable nodes.</summary>
+    /// <summary>
+    ///     The policy used by <see cref="FocusNext" /> and <see cref="FocusPrevious" /> to order
+    ///     focusable nodes.
+    /// </summary>
     public FocusTraversalPolicy TraversalPolicy { get; set; } = new ReadingOrderTraversalPolicy();
 
     /// <summary>
-    /// Grants primary focus without showing the focus indicator (pointer/programmatic
-    /// focus). Equivalent to <see cref="RequestFocus(FocusNode?, bool)" /> with
-    /// <c>showIndicator: false</c>.
+    ///     Grants primary focus without showing the focus indicator (pointer/programmatic
+    ///     focus). Equivalent to <see cref="RequestFocus(FocusNode?, bool)" /> with
+    ///     <c>showIndicator: false</c>.
     /// </summary>
     public void RequestFocus
     (
@@ -163,13 +166,13 @@ public class FocusManager
         RequestFocus
         (
             node,
-            showIndicator: false
+            false
         );
 
     /// <summary>
-    /// Grants primary focus to <paramref name="node" /> and controls whether the focus
-    /// indicator is shown. Pass <paramref name="showIndicator" /> true for keyboard
-    /// traversal, false for pointer or programmatic focus.
+    ///     Grants primary focus to <paramref name="node" /> and controls whether the focus
+    ///     indicator is shown. Pass <paramref name="showIndicator" /> true for keyboard
+    ///     traversal, false for pointer or programmatic focus.
     /// </summary>
     public void RequestFocus
     (
@@ -213,18 +216,24 @@ public class FocusManager
         }
     }
 
-    /// <summary>Moves focus to the next traversable node within <paramref name="root"/>'s element subtree.</summary>
+    /// <summary>
+    ///     Moves focus to the next traversable node within <paramref name="root" />'s element
+    ///     subtree.
+    /// </summary>
     public void FocusNext(Element root)
     {
         var nodes = TraversalPolicy.GetTraversalOrder(root, this);
-        MoveFocus(nodes, forward: true);
+        MoveFocus(nodes, true);
     }
 
-    /// <summary>Moves focus to the previous traversable node within <paramref name="root"/>'s element subtree.</summary>
+    /// <summary>
+    ///     Moves focus to the previous traversable node within <paramref name="root" />'s element
+    ///     subtree.
+    /// </summary>
     public void FocusPrevious(Element root)
     {
         var nodes = TraversalPolicy.GetTraversalOrder(root, this);
-        MoveFocus(nodes, forward: false);
+        MoveFocus(nodes, false);
     }
 
     private void MoveFocus(IReadOnlyList<FocusNode> nodes, bool forward)
@@ -259,7 +268,7 @@ public class FocusManager
         RequestFocus
         (
             nodes[next],
-            showIndicator: true
+            true
         );
     }
 }

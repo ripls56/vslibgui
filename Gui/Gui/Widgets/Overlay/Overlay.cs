@@ -10,7 +10,8 @@ public class OverlayEntry : IDisposable
     private bool _isMounted;
     internal OverlayState? State;
 
-    public OverlayEntry(
+    public OverlayEntry
+    (
         Widget widget
     )
     {
@@ -30,7 +31,8 @@ public class Overlay : StatefulWidget
 {
     internal readonly List<OverlayEntry> InitialEntries;
 
-    public Overlay(
+    public Overlay
+    (
         IEnumerable<OverlayEntry>? initialEntries = null
     )
     {
@@ -39,7 +41,8 @@ public class Overlay : StatefulWidget
 
     public override State CreateState() => new OverlayState();
 
-    public static OverlayState? Of(
+    public static OverlayState? Of
+    (
         BuildContext context
     )
     {
@@ -75,20 +78,24 @@ public class OverlayState : State<Overlay>
         }
     }
 
-    public void Insert(
+    public void Insert
+    (
         OverlayEntry entry
     )
     {
         entry.State = this;
-        SetState(() => { _entries.Add(entry); }
+        SetState
+        (() => { _entries.Add(entry); }
         );
     }
 
-    public void RemoveEntry(
+    public void RemoveEntry
+    (
         OverlayEntry entry
     )
     {
-        SetState(() =>
+        SetState
+        (() =>
             {
                 _entries.Remove(entry);
                 entry.State = null;
@@ -96,7 +103,8 @@ public class OverlayState : State<Overlay>
         );
     }
 
-    public override Widget Build(
+    public override Widget Build
+    (
         BuildContext context
     ) =>
         new Stack(_entries.ConvertAll(e => e.Widget));

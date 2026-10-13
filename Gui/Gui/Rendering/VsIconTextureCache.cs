@@ -29,7 +29,12 @@ public class VsIconTextureCache
     ///     Renders and caches on first call. Returns <c>null</c> if the icon is unknown.
     ///     Must be called from the GL thread.
     /// </summary>
-    public SKImage? Get(string iconName, int size, GRContext grContext)
+    public SKImage? Get
+    (
+        string iconName,
+        int size,
+        GRContext grContext
+    )
     {
         var key = (iconName, size);
         if (_cache.TryGetValue(key, out var cached))
@@ -39,7 +44,16 @@ public class VsIconTextureCache
 
         var surface = new ImageSurface(Format.ARGB32, size, size);
         var ctx = new Context(surface);
-        _capi.Gui.Icons.DrawIconInt(ctx, iconName, 0, 0, size, size, new double[] { 1, 1, 1, 1 });
+        _capi.Gui.Icons.DrawIconInt
+        (
+            ctx, iconName, 0, 0, size, size, new double[]
+            {
+                1,
+                1,
+                1,
+                1
+            }
+        );
         surface.Flush();
         ctx.Dispose();
 
@@ -53,7 +67,8 @@ public class VsIconTextureCache
 
         var glInfo = new GRGlTextureInfo(3553u, (uint)textureId, 32856u);
         var backendTexture = new GRBackendTexture(size, size, false, glInfo);
-        var image = SKImage.FromTexture(
+        var image = SKImage.FromTexture
+        (
             grContext,
             backendTexture,
             GRSurfaceOrigin.TopLeft,

@@ -14,7 +14,8 @@ namespace Gui.Widgets.Basic;
 public class VsIcon : RenderObjectWidget
 {
     /// <summary>Creates a VS icon widget.</summary>
-    public VsIcon(
+    public VsIcon
+    (
         string iconName,
         float size = 24f,
         Vector4? color = null,

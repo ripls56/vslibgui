@@ -78,7 +78,8 @@ public class RenderRichText : RenderBox
     private void FlattenRuns()
     {
         _runs.Clear();
-        _root?.CollectRuns(
+        _root?.CollectRuns
+        (
             _defaultStyle,
             _runs
         );
@@ -123,7 +124,8 @@ public class RenderRichText : RenderBox
         // MaxLines truncation
         if (_maxLines > 0 && _visualLines.Count > _maxLines)
         {
-            _visualLines.RemoveRange(
+            _visualLines.RemoveRange
+            (
                 _maxLines,
                 _visualLines.Count - _maxLines
             );
@@ -138,7 +140,8 @@ public class RenderRichText : RenderBox
         foreach (var line in _visualLines)
         {
             totalHeight += line.Height;
-            maxLineWidth = Math.Max(
+            maxLineWidth = Math.Max
+            (
                 maxLineWidth,
                 line.Width
             );
@@ -146,7 +149,8 @@ public class RenderRichText : RenderBox
 
         foreach (var f in _floatsLeft)
         {
-            totalHeight = Math.Max(
+            totalHeight = Math.Max
+            (
                 totalHeight,
                 f.Bottom
             );
@@ -154,21 +158,25 @@ public class RenderRichText : RenderBox
 
         foreach (var f in _floatsRight)
         {
-            totalHeight = Math.Max(
+            totalHeight = Math.Max
+            (
                 totalHeight,
                 f.Bottom
             );
         }
 
-        Size = Constraints.Constrain(
-            new Vector2(
+        Size = Constraints.Constrain
+        (
+            new Vector2
+            (
                 maxLineWidth,
                 totalHeight
             )
         );
     }
 
-    private void AppendEllipsis(
+    private void AppendEllipsis
+    (
         VisualLine lastLine
     )
     {
@@ -180,7 +188,8 @@ public class RenderRichText : RenderBox
                 && frag.Text != null)
             {
                 var style = _runs[frag.RunIndex].Style;
-                var font = TextLayoutHelper.GetFont(
+                var font = TextLayoutHelper.GetFont
+                (
                     style.FontFamily,
                     style.FontSize,
                     style.Weight
@@ -189,16 +198,19 @@ public class RenderRichText : RenderBox
                 var targetW = frag.Width - ellipsisW;
                 if (targetW > 0)
                 {
-                    long fits = font.BreakText(
+                    long fits = font.BreakText
+                    (
                         frag.Text.AsSpan(),
                         targetW,
                         out _
                     );
-                    var count = (int)Math.Min(
+                    var count = (int)Math.Min
+                    (
                         fits,
                         frag.Text.Length
                     );
-                    frag.Text = frag.Text.Substring(
+                    frag.Text = frag.Text.Substring
+                        (
                             0,
                             count
                         )
@@ -237,7 +249,8 @@ public class RenderRichText : RenderBox
             if (run.Type == PlacedRunType.Widget)
             {
                 var childSize = GetWidgetChildSize(run.WidgetChildIndex);
-                fragments.Add(
+                fragments.Add
+                (
                     new VisualFragment
                     {
                         RunIndex = i,
@@ -249,24 +262,28 @@ public class RenderRichText : RenderBox
                     }
                 );
                 totalWidth += childSize.X;
-                maxHeight = Math.Max(
+                maxHeight = Math.Max
+                (
                     maxHeight,
                     childSize.Y
                 );
                 continue;
             }
 
-            var font = TextLayoutHelper.GetFont(
+            var font = TextLayoutHelper.GetFont
+            (
                 run.Style.FontFamily,
                 run.Style.FontSize,
                 run.Style.Weight
             );
             var w = font.MeasureText(run.Text);
-            var h = GetLineHeight(
+            var h = GetLineHeight
+            (
                 font,
                 run.Style.FontSize
             );
-            fragments.Add(
+            fragments.Add
+            (
                 new VisualFragment
                 {
                     RunIndex = i,
@@ -278,7 +295,8 @@ public class RenderRichText : RenderBox
                 }
             );
             totalWidth += w;
-            maxHeight = Math.Max(
+            maxHeight = Math.Max
+            (
                 maxHeight,
                 h
             );
@@ -296,7 +314,8 @@ public class RenderRichText : RenderBox
 
             if (r.Type == PlacedRunType.Widget)
             {
-                PositionWidgetChild(
+                PositionWidgetChild
+                (
                     r.WidgetChildIndex,
                     frag.X,
                     0,
@@ -308,11 +327,15 @@ public class RenderRichText : RenderBox
 
         return
         [
-            new VisualLine { Fragments = fragments, Width = totalWidth, Height = maxHeight, Y = 0 }
+            new VisualLine
+            {
+                Fragments = fragments, Width = totalWidth, Height = maxHeight, Y = 0
+            }
         ];
     }
 
-    private List<VisualLine> WrapRuns(
+    private List<VisualLine> WrapRuns
+    (
         float maxWidth
     )
     {
@@ -322,15 +345,18 @@ public class RenderRichText : RenderBox
         float currentHeight = 0;
         float currentY = 0;
 
-        void FlushLine(
+        void FlushLine
+        (
             float height = -1f
         )
         {
             var h = height >= 0f
                 ? height
                 : currentHeight;
-            lines.Add(
-                EmitLine(
+            lines.Add
+            (
+                EmitLine
+                (
                     currentFragments,
                     currentWidth,
                     h,
@@ -361,7 +387,8 @@ public class RenderRichText : RenderBox
                 float clearY = 0;
                 foreach (var f in _floatsLeft)
                 {
-                    clearY = Math.Max(
+                    clearY = Math.Max
+                    (
                         clearY,
                         f.Bottom
                     );
@@ -369,7 +396,8 @@ public class RenderRichText : RenderBox
 
                 foreach (var f in _floatsRight)
                 {
-                    clearY = Math.Max(
+                    clearY = Math.Max
+                    (
                         clearY,
                         f.Bottom
                     );
@@ -403,7 +431,8 @@ public class RenderRichText : RenderBox
 
                 if (run.Float == VtmlFloat.Left)
                 {
-                    floatRect.X = GetLineStartX(
+                    floatRect.X = GetLineStartX
+                    (
                         currentY,
                         0,
                         maxWidth
@@ -431,17 +460,21 @@ public class RenderRichText : RenderBox
                 var widgetW = childSize.X;
                 var widgetH = childSize.Y;
 
-                var startX = GetLineStartX(
+                var startX = GetLineStartX
+                (
                     currentY,
-                    Math.Max(
+                    Math.Max
+                    (
                         currentHeight,
                         widgetH
                     ),
                     maxWidth
                 );
-                var endX = GetLineEndX(
+                var endX = GetLineEndX
+                (
                     currentY,
-                    Math.Max(
+                    Math.Max
+                    (
                         currentHeight,
                         widgetH
                     ),
@@ -457,7 +490,8 @@ public class RenderRichText : RenderBox
                 if (currentWidth > startX && widgetW > available)
                 {
                     FlushLine();
-                    startX = GetLineStartX(
+                    startX = GetLineStartX
+                    (
                         currentY,
                         widgetH,
                         maxWidth
@@ -465,7 +499,8 @@ public class RenderRichText : RenderBox
                     currentWidth = startX;
                 }
 
-                currentFragments.Add(
+                currentFragments.Add
+                (
                     new VisualFragment
                     {
                         RunIndex = runIdx,
@@ -477,7 +512,8 @@ public class RenderRichText : RenderBox
                     }
                 );
                 currentWidth += widgetW;
-                currentHeight = Math.Max(
+                currentHeight = Math.Max
+                (
                     currentHeight,
                     widgetH
                 );
@@ -490,12 +526,14 @@ public class RenderRichText : RenderBox
                 continue;
             }
 
-            var font = TextLayoutHelper.GetFont(
+            var font = TextLayoutHelper.GetFont
+            (
                 run.Style.FontFamily,
                 run.Style.FontSize,
                 run.Style.Weight
             );
-            var lineH = GetLineHeight(
+            var lineH = GetLineHeight
+            (
                 font,
                 run.Style.FontSize
             );
@@ -506,7 +544,8 @@ public class RenderRichText : RenderBox
             {
                 if (nlIdx >= 0 && nlIdx < pos)
                 {
-                    nlIdx = text.IndexOf(
+                    nlIdx = text.IndexOf
+                    (
                         '\n',
                         pos
                     );
@@ -514,7 +553,8 @@ public class RenderRichText : RenderBox
 
                 if (nlIdx == pos)
                 {
-                    FlushLine(
+                    FlushLine
+                    (
                         currentHeight > 0
                             ? currentHeight
                             : lineH
@@ -528,17 +568,21 @@ public class RenderRichText : RenderBox
                     ? nlIdx
                     : text.Length;
 
-                var startX = GetLineStartX(
+                var startX = GetLineStartX
+                (
                     currentY,
-                    Math.Max(
+                    Math.Max
+                    (
                         currentHeight,
                         lineH
                     ),
                     maxWidth
                 );
-                var endX = GetLineEndX(
+                var endX = GetLineEndX
+                (
                     currentY,
-                    Math.Max(
+                    Math.Max
+                    (
                         currentHeight,
                         lineH
                     ),
@@ -551,17 +595,19 @@ public class RenderRichText : RenderBox
 
                 var available = endX - currentWidth;
 
-                var remainingSpan = text.AsSpan(
+                var remainingSpan = text.AsSpan
+                (
                     pos,
                     segEnd - pos
                 );
                 var remainingWidth = font.MeasureText(remainingSpan);
 
                 if (remainingWidth <= available
-                    || (available >= endX - startX - 0.1f
-                        && remainingWidth <= endX - startX))
+                    || available >= endX - startX - 0.1f
+                    && remainingWidth <= endX - startX)
                 {
-                    currentFragments.Add(
+                    currentFragments.Add
+                    (
                         new VisualFragment
                         {
                             RunIndex = runIdx,
@@ -573,7 +619,8 @@ public class RenderRichText : RenderBox
                         }
                     );
                     currentWidth += remainingWidth;
-                    currentHeight = Math.Max(
+                    currentHeight = Math.Max
+                    (
                         currentHeight,
                         lineH
                     );
@@ -594,12 +641,14 @@ public class RenderRichText : RenderBox
                         continue;
                     }
 
-                    var ch = text.Substring(
+                    var ch = text.Substring
+                    (
                         pos,
                         1
                     );
                     var chW = font.MeasureText(ch);
-                    currentFragments.Add(
+                    currentFragments.Add
+                    (
                         new VisualFragment
                         {
                             RunIndex = runIdx,
@@ -610,8 +659,10 @@ public class RenderRichText : RenderBox
                             Height = lineH
                         }
                     );
-                    lines.Add(
-                        EmitLine(
+                    lines.Add
+                    (
+                        EmitLine
+                        (
                             currentFragments,
                             startX + chW,
                             lineH,
@@ -631,7 +682,8 @@ public class RenderRichText : RenderBox
                     continue;
                 }
 
-                long charsUsed = font.BreakText(
+                long charsUsed = font.BreakText
+                (
                     remainingSpan,
                     available,
                     out _
@@ -641,14 +693,16 @@ public class RenderRichText : RenderBox
                     charsUsed = 1;
                 }
 
-                var count = (int)Math.Min(
+                var count = (int)Math.Min
+                (
                     charsUsed,
                     remainingSpan.Length
                 );
 
                 if (count < remainingSpan.Length && count > 1)
                 {
-                    var lastSpace = remainingSpan.Slice(
+                    var lastSpace = remainingSpan.Slice
+                        (
                             0,
                             count
                         )
@@ -659,14 +713,16 @@ public class RenderRichText : RenderBox
                     }
                 }
 
-                var fragment = remainingSpan.Slice(
+                var fragment = remainingSpan.Slice
+                    (
                         0,
                         count
                     )
                     .TrimEnd()
                     .ToString();
                 var fragWidth = font.MeasureText(fragment);
-                currentFragments.Add(
+                currentFragments.Add
+                (
                     new VisualFragment
                     {
                         RunIndex = runIdx,
@@ -678,7 +734,8 @@ public class RenderRichText : RenderBox
                     }
                 );
                 currentWidth += fragWidth;
-                currentHeight = Math.Max(
+                currentHeight = Math.Max
+                (
                     currentHeight,
                     lineH
                 );
@@ -694,7 +751,8 @@ public class RenderRichText : RenderBox
 
             if (pos >= text.Length && text.Length == 0)
             {
-                currentHeight = Math.Max(
+                currentHeight = Math.Max
+                (
                     currentHeight,
                     lineH
                 );
@@ -703,8 +761,10 @@ public class RenderRichText : RenderBox
 
         if (currentFragments.Count > 0 || lines.Count == 0)
         {
-            lines.Add(
-                EmitLine(
+            lines.Add
+            (
+                EmitLine
+                (
                     currentFragments,
                     currentWidth,
                     currentHeight > 0
@@ -726,8 +786,10 @@ public class RenderRichText : RenderBox
     {
         foreach (var child in Children)
         {
-            child.Layout(
-                LayoutConstraints.Loose(
+            child.Layout
+            (
+                LayoutConstraints.Loose
+                (
                     Constraints.MaxWidth,
                     Constraints.MaxHeight
                 )
@@ -735,7 +797,8 @@ public class RenderRichText : RenderBox
         }
     }
 
-    private Vector2 GetWidgetChildSize(
+    private Vector2 GetWidgetChildSize
+    (
         int widgetChildIndex
     )
     {
@@ -747,7 +810,8 @@ public class RenderRichText : RenderBox
         return Vector2.Zero;
     }
 
-    private void PositionWidgetChild(
+    private void PositionWidgetChild
+    (
         int childIndex,
         float x,
         float lineY,
@@ -775,7 +839,8 @@ public class RenderRichText : RenderBox
         child.X = x;
     }
 
-    private void PositionInlineWidgetChildren(
+    private void PositionInlineWidgetChildren
+    (
         List<VisualLine> lines
     )
     {
@@ -798,7 +863,8 @@ public class RenderRichText : RenderBox
                 continue;
             }
 
-            PositionWidgetChild(
+            PositionWidgetChild
+            (
                 run.WidgetChildIndex,
                 frag.X,
                 line.Y,
@@ -808,7 +874,8 @@ public class RenderRichText : RenderBox
         }
     }
 
-    private WidgetSpan? FindWidgetSpanForChild(
+    private WidgetSpan? FindWidgetSpanForChild
+    (
         int childIndex
     )
     {
@@ -825,7 +892,8 @@ public class RenderRichText : RenderBox
     }
 
 
-    private float GetLineStartX(
+    private float GetLineStartX
+    (
         float y,
         float lineH,
         float maxWidth
@@ -836,7 +904,8 @@ public class RenderRichText : RenderBox
         {
             if (f.Y < y + lineH && f.Bottom > y)
             {
-                x = Math.Max(
+                x = Math.Max
+                (
                     x,
                     f.Right
                 );
@@ -846,7 +915,8 @@ public class RenderRichText : RenderBox
         return x;
     }
 
-    private float GetLineEndX(
+    private float GetLineEndX
+    (
         float y,
         float lineH,
         float maxWidth
@@ -857,7 +927,8 @@ public class RenderRichText : RenderBox
         {
             if (f.Y < y + lineH && f.Bottom > y)
             {
-                end = Math.Min(
+                end = Math.Min
+                (
                     end,
                     f.X
                 );
@@ -867,7 +938,8 @@ public class RenderRichText : RenderBox
         return end;
     }
 
-    private float GetRightFloatWidth(
+    private float GetRightFloatWidth
+    (
         float y
     )
     {
@@ -884,17 +956,19 @@ public class RenderRichText : RenderBox
     }
 
 
-    private VisualLine EmitLine(
+    private VisualLine EmitLine
+    (
         List<VisualFragment> fragments,
         float width,
         float height,
         float y
-    )
+    ) => new()
     {
-        return new VisualLine { Fragments = [..fragments], Width = width, Height = height, Y = y };
-    }
+        Fragments = [..fragments], Width = width, Height = height, Y = y
+    };
 
-    private void StoreBounds(
+    private void StoreBounds
+    (
         List<VisualLine> lines
     )
     {
@@ -923,19 +997,23 @@ public class RenderRichText : RenderBox
             }
             else
             {
-                var right = Math.Max(
+                var right = Math.Max
+                (
                     r.X + r.Width,
                     fx + frag.Width
                 );
-                var bottom = Math.Max(
+                var bottom = Math.Max
+                (
                     r.Y + r.Height,
                     fy + line.Height
                 );
-                r.X = Math.Min(
+                r.X = Math.Min
+                (
                     r.X,
                     fx
                 );
-                r.Y = Math.Min(
+                r.Y = Math.Min
+                (
                     r.Y,
                     fy
                 );
@@ -952,7 +1030,8 @@ public class RenderRichText : RenderBox
     ///     Hit-tests a local point against placed runs and returns the
     ///     source <see cref="InlineSpan" /> at that position, or null.
     /// </summary>
-    public InlineSpan? HitTestRun(
+    public InlineSpan? HitTestRun
+    (
         float localX,
         float localY
     )
@@ -978,7 +1057,8 @@ public class RenderRichText : RenderBox
 
 
     /// <inheritdoc />
-    public override float GetMinIntrinsicWidth(
+    public override float GetMinIntrinsicWidth
+    (
         float height
     )
     {
@@ -1000,7 +1080,8 @@ public class RenderRichText : RenderBox
                 var idx = run.WidgetChildIndex;
                 if (idx >= 0 && idx < Children.Count)
                 {
-                    maxWordWidth = Math.Max(
+                    maxWordWidth = Math.Max
+                    (
                         maxWordWidth,
                         Children[idx].GetMinIntrinsicWidth(height)
                     );
@@ -1014,19 +1095,22 @@ public class RenderRichText : RenderBox
                 continue;
             }
 
-            var font = TextLayoutHelper.GetFont(
+            var font = TextLayoutHelper.GetFont
+            (
                 run.Style.FontFamily,
                 run.Style.FontSize,
                 run.Style.Weight
             );
-            foreach (var word in run.Text.Split(
+            foreach (var word in run.Text.Split
+                     (
                          ' ',
                          '\n'
                      ))
             {
                 if (word.Length > 0)
                 {
-                    maxWordWidth = Math.Max(
+                    maxWordWidth = Math.Max
+                    (
                         maxWordWidth,
                         font.MeasureText(word)
                     );
@@ -1038,7 +1122,8 @@ public class RenderRichText : RenderBox
     }
 
     /// <inheritdoc />
-    public override float GetMaxIntrinsicWidth(
+    public override float GetMaxIntrinsicWidth
+    (
         float height
     )
     {
@@ -1071,7 +1156,8 @@ public class RenderRichText : RenderBox
                 continue;
             }
 
-            var font = TextLayoutHelper.GetFont(
+            var font = TextLayoutHelper.GetFont
+            (
                 run.Style.FontFamily,
                 run.Style.FontSize,
                 run.Style.Weight
@@ -1083,7 +1169,8 @@ public class RenderRichText : RenderBox
     }
 
     /// <inheritdoc />
-    public override float GetMinIntrinsicHeight(
+    public override float GetMinIntrinsicHeight
+    (
         float width
     )
     {
@@ -1114,7 +1201,8 @@ public class RenderRichText : RenderBox
 
         foreach (var f in _floatsLeft)
         {
-            totalHeight = Math.Max(
+            totalHeight = Math.Max
+            (
                 totalHeight,
                 f.Bottom
             );
@@ -1122,7 +1210,8 @@ public class RenderRichText : RenderBox
 
         foreach (var f in _floatsRight)
         {
-            totalHeight = Math.Max(
+            totalHeight = Math.Max
+            (
                 totalHeight,
                 f.Bottom
             );
@@ -1132,13 +1221,15 @@ public class RenderRichText : RenderBox
     }
 
     /// <inheritdoc />
-    public override float GetMaxIntrinsicHeight(
+    public override float GetMaxIntrinsicHeight
+    (
         float width
     ) =>
         GetMinIntrinsicHeight(width);
 
     /// <inheritdoc />
-    public override float? GetDistanceToBaseline(
+    public override float? GetDistanceToBaseline
+    (
         TextBaseline baseline
     )
     {
@@ -1154,7 +1245,8 @@ public class RenderRichText : RenderBox
                 continue;
             }
 
-            var font = TextLayoutHelper.GetFont(
+            var font = TextLayoutHelper.GetFont
+            (
                 run.Style.FontFamily,
                 run.Style.FontSize,
                 run.Style.Weight
@@ -1172,7 +1264,8 @@ public class RenderRichText : RenderBox
         return null;
     }
 
-    private static float GetLineHeight(
+    private static float GetLineHeight
+    (
         SKFont font,
         float fontSize
     )
@@ -1193,12 +1286,14 @@ public class RenderRichText : RenderBox
                 continue;
             }
 
-            var font = TextLayoutHelper.GetFont(
+            var font = TextLayoutHelper.GetFont
+            (
                 run.Style.FontFamily,
                 run.Style.FontSize,
                 run.Style.Weight
             );
-            return GetLineHeight(
+            return GetLineHeight
+            (
                 font,
                 run.Style.FontSize
             );
@@ -1209,7 +1304,8 @@ public class RenderRichText : RenderBox
 
 
     /// <inheritdoc />
-    protected override void PaintInternal(
+    protected override void PaintInternal
+    (
         PaintingContext context
     )
     {
@@ -1245,16 +1341,19 @@ public class RenderRichText : RenderBox
             }
 
             var style = run.Style;
-            var font = TextLayoutHelper.GetFont(
+            var font = TextLayoutHelper.GetFont
+            (
                 style.FontFamily,
                 style.FontSize,
                 style.Weight
             );
             var y = line.Y - font.Metrics.Ascent;
 
-            context.Canvas.DrawText(
+            context.Canvas.DrawText
+            (
                 frag.Text,
-                new Vector2(
+                new Vector2
+                (
                     frag.X,
                     y
                 ),
@@ -1276,14 +1375,16 @@ public class RenderRichText : RenderBox
                 var paint = context.SharedPaint;
                 paint.Style = SKPaintStyle.Stroke;
                 paint.StrokeWidth = 1f;
-                paint.Color = new SKColor(
+                paint.Color = new SKColor
+                (
                     (byte)(style.Color.X * 255),
                     (byte)(style.Color.Y * 255),
                     (byte)(style.Color.Z * 255),
                     (byte)(style.Color.W * 255)
                 );
                 var underlineY = line.Y + line.Height - 1f;
-                context.Canvas.DrawLine(
+                context.Canvas.DrawLine
+                (
                     frag.X,
                     underlineY,
                     frag.X + frag.Width,

@@ -9,13 +9,16 @@ namespace Gui.Widgets.Framework;
 ///     of a given type via <see cref="BuildContext.DependOnInheritedWidgetOfExactType{T}" />
 ///     and will be rebuilt automatically when the inherited data changes.
 /// </summary>
-public abstract class InheritedWidget(
+public abstract class InheritedWidget
+(
     Widget child,
-    Key? key = null) : StatelessWidget(key)
+    Key? key = null
+) : StatelessWidget(key)
 {
     public Widget Child { get; } = child;
 
-    public override Widget Build(
+    public override Widget Build
+    (
         BuildContext context
     ) =>
         Child;
@@ -25,7 +28,8 @@ public abstract class InheritedWidget(
     ///     Return <c>true</c> if dependents should be rebuilt; <c>false</c> to
     ///     suppress notification.
     /// </summary>
-    public abstract bool UpdateShouldNotify(
+    public abstract bool UpdateShouldNotify
+    (
         InheritedWidget oldWidget
     );
 
@@ -40,7 +44,8 @@ public class InheritedElement : ComponentElement
 {
     private readonly HashSet<Element> _dependents = new();
 
-    public InheritedElement(
+    public InheritedElement
+    (
         InheritedWidget widget
     ) : base(widget)
     {
@@ -48,7 +53,8 @@ public class InheritedElement : ComponentElement
 
     protected override void OnMountBeforeRebuild() => _RegisterInMap();
 
-    public override void Update(
+    public override void Update
+    (
         Widget newWidget
     )
     {
@@ -61,12 +67,14 @@ public class InheritedElement : ComponentElement
         }
     }
 
-    internal void AddDependent(
+    internal void AddDependent
+    (
         Element dependent
     ) =>
         _dependents.Add(dependent);
 
-    internal void RemoveDependent(
+    internal void RemoveDependent
+    (
         Element dependent
     ) =>
         _dependents.Remove(dependent);

@@ -15,7 +15,8 @@ public abstract class MultiChildWidget : RenderObjectWidget, IMultiChildWidget
     /// <summary>Ordered list of child widgets.</summary>
     public readonly IReadOnlyList<Widget> Children;
 
-    protected MultiChildWidget(
+    protected MultiChildWidget
+    (
         IEnumerable<Widget>? children = null,
         Key? key = null
     ) : base(key)

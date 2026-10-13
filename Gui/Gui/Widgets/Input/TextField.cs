@@ -477,7 +477,7 @@ internal class TextFieldState : State<TextField>,
         );
         var cursorX = font.MeasureText
         (
-            text.Substring
+            text.AsSpan
             (
                 0,
                 extentPos
@@ -586,7 +586,8 @@ internal class TextFieldState : State<TextField>,
 
     /// <summary>
     ///     Resolves the border color and thickness for the current focus state. The bright
-    ///     focus outline is shown only for keyboard traversal (<see cref="FocusNode.ShowsFocusIndicator" />);
+    ///     focus outline is shown only for keyboard traversal (
+    ///     <see cref="FocusNode.ShowsFocusIndicator" />);
     ///     pointer focus blends toward the outline for a subtle highlight, and the unfocused
     ///     state keeps the configured style border.
     /// </summary>
@@ -711,7 +712,7 @@ internal class TextFieldState : State<TextField>,
             var mid = (lo + hi) / 2;
             var midWidth = font.MeasureText
             (
-                text.Substring
+                text.AsSpan
                 (
                     0,
                     mid + 1
@@ -720,7 +721,7 @@ internal class TextFieldState : State<TextField>,
             var prevWidth = mid > 0
                 ? font.MeasureText
                 (
-                    text.Substring
+                    text.AsSpan
                     (
                         0,
                         mid
@@ -954,18 +955,23 @@ internal class TextFieldState : State<TextField>,
             onPress: OnPointerDown,
             onMove: OnPointerMove,
             onRelease: _ => _isDragging = false,
-            child: new TextFieldRenderWidget
+            // The cursor blinks twice a second while focused; without its own layer that
+            // alone re-records the whole window.
+            child: new RepaintBoundary
             (
-                Controller.Text,
-                selection.ExtentOffset,
-                selection.Start,
-                selection.End,
-                _resolvedSelectionColor,
-                FocusNode.HasFocus,
-                _resolvedStyle,
-                _resolvedTextStyle,
-                _currentScrollOffset,
-                _cursorVisible
+                new TextFieldRenderWidget
+                (
+                    Controller.Text,
+                    selection.ExtentOffset,
+                    selection.Start,
+                    selection.End,
+                    _resolvedSelectionColor,
+                    FocusNode.HasFocus,
+                    _resolvedStyle,
+                    _resolvedTextStyle,
+                    _currentScrollOffset,
+                    _cursorVisible
+                )
             )
         );
     }

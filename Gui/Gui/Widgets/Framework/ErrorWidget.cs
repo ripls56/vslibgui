@@ -12,20 +12,21 @@ namespace Gui.Widgets.Framework;
 /// </summary>
 public class ErrorWidget : StatelessWidget
 {
+    private readonly Exception _exception;
+
     static ErrorWidget()
     {
         Builder = ex => new ErrorWidget(ex);
     }
 
     /// <summary>Initializes a new <see cref="ErrorWidget" /> for the given exception.</summary>
-    public ErrorWidget(
+    public ErrorWidget
+    (
         Exception exception
     )
     {
         _exception = exception;
     }
-
-    private readonly Exception _exception;
 
     /// <summary>
     ///     Factory used by the framework to build an error placeholder for a caught exception.
@@ -35,11 +36,16 @@ public class ErrorWidget : StatelessWidget
     public static Func<Exception, Widget> Builder { get; set; }
 
     /// <inheritdoc />
-    public override Widget Build(
+    public override Widget Build
+    (
         BuildContext context
     ) =>
-        new Container(
-            new BoxStyle { Color = new Vector4(1f, 0f, 0f, 0.8f) },
+        new Container
+        (
+            new BoxStyle
+            {
+                Color = new Vector4(1f, 0f, 0f, 0.8f)
+            },
             new Text(_exception.GetType().Name + ": " + _exception.Message)
         );
 }

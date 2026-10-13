@@ -18,7 +18,8 @@ public readonly struct Pitch
     public float Base { get; }
     public float Variance { get; }
 
-    private Pitch(
+    private Pitch
+    (
         float @base,
         float variance
     )
@@ -32,12 +33,14 @@ public readonly struct Pitch
     ///     [<paramref name="base" /> - <paramref name="variance" />,
     ///     <paramref name="base" /> + <paramref name="variance" />] on each resolve.
     /// </summary>
-    public static Pitch Varied(
+    public static Pitch Varied
+    (
         float @base,
         float variance
     )
     {
-        return new Pitch(
+        return new Pitch
+        (
             @base,
             Math.Abs(variance)
         );
@@ -52,16 +55,19 @@ public readonly struct Pitch
         }
 
         var offset = (float)(Rng.NextDouble() * 2.0 - 1.0) * Variance;
-        return Math.Max(
+        return Math.Max
+        (
             0.01f,
             Base + offset
         );
     }
 
-    public static implicit operator Pitch(
+    public static implicit operator Pitch
+    (
         float value
     ) =>
-        new(
+        new
+        (
             value,
             0f
         );

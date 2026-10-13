@@ -17,13 +17,15 @@ namespace Gui.Widgets.Painting;
 /// </summary>
 public class Transform : SingleChildWidget
 {
-    public Transform(
+    public Transform
+    (
         Widget? child,
         SKMatrix matrix,
         Alignment? alignment = null,
         Framework.Key? key = null
     )
-        : base(
+        : base
+        (
             child,
             key
         )
@@ -44,14 +46,16 @@ public class Transform : SingleChildWidget
     public Alignment? Alignment { get; }
 
     /// <summary>Creates a Transform that rotates its child by <paramref name="radians" />.</summary>
-    public static Transform Rotate(
+    public static Transform Rotate
+    (
         Widget? child,
         float radians,
         Alignment? alignment = null,
         Framework.Key? key = null
     )
     {
-        return new Transform(
+        return new Transform
+        (
             child,
             SKMatrix.CreateRotation(radians),
             alignment,
@@ -62,16 +66,19 @@ public class Transform : SingleChildWidget
     /// <summary>
     ///     Creates a Transform that scales its child uniformly by <paramref name="scale" />.
     /// </summary>
-    public static Transform Scale(
+    public static Transform Scale
+    (
         Widget? child,
         float scale,
         Alignment? alignment = null,
         Framework.Key? key = null
     )
     {
-        return new Transform(
+        return new Transform
+        (
             child,
-            SKMatrix.CreateScale(
+            SKMatrix.CreateScale
+            (
                 scale,
                 scale
             ),
@@ -83,7 +90,8 @@ public class Transform : SingleChildWidget
     /// <summary>
     ///     Creates a Transform that scales its child independently on each axis.
     /// </summary>
-    public static Transform ScaleXy(
+    public static Transform ScaleXy
+    (
         Widget? child,
         float scaleX,
         float scaleY,
@@ -91,9 +99,11 @@ public class Transform : SingleChildWidget
         Framework.Key? key = null
     )
     {
-        return new Transform(
+        return new Transform
+        (
             child,
-            SKMatrix.CreateScale(
+            SKMatrix.CreateScale
+            (
                 scaleX,
                 scaleY
             ),
@@ -103,15 +113,18 @@ public class Transform : SingleChildWidget
     }
 
     /// <summary>Creates a Transform that translates its child by <paramref name="offset" />.</summary>
-    public static Transform Translate(
+    public static Transform Translate
+    (
         Widget? child,
         Vector2 offset,
         Framework.Key? key = null
     )
     {
-        return new Transform(
+        return new Transform
+        (
             child,
-            SKMatrix.CreateTranslation(
+            SKMatrix.CreateTranslation
+            (
                 offset.X,
                 offset.Y
             ),
@@ -120,12 +133,13 @@ public class Transform : SingleChildWidget
         );
     }
 
-    public override RenderObject CreateRenderObject()
+    public override RenderObject CreateRenderObject() => new RenderTransform
     {
-        return new RenderTransform { Matrix = Matrix, Alignment = Alignment };
-    }
+        Matrix = Matrix, Alignment = Alignment
+    };
 
-    public override void UpdateRenderObject(
+    public override void UpdateRenderObject
+    (
         RenderObject renderObject
     )
     {

@@ -33,7 +33,8 @@ public static class TextLayoutHelper
     ///     Returns true if a font entry for the given key is currently cached (without promoting it
     ///     in the LRU order). Test/diagnostic only.
     /// </summary>
-    internal static bool IsCached(
+    internal static bool IsCached
+    (
         string fontFamily,
         float fontSize,
         FontWeight weight
@@ -48,7 +49,8 @@ public static class TextLayoutHelper
         return FontCache.ContainsKey(new FontKey(typeface.Handle, RoundSize(fontSize)));
     }
 
-    private static float RoundSize(
+    private static float RoundSize
+    (
         float fontSize
     )
     {
@@ -58,7 +60,8 @@ public static class TextLayoutHelper
             : rounded;
     }
 
-    public static SKFont GetFont(
+    public static SKFont GetFont
+    (
         SKTypeface typeface,
         float fontSize
     )
@@ -83,14 +86,18 @@ public static class TextLayoutHelper
             Hinting = SKFontHinting.None
         };
 
-        var entry = new CacheEntry { Key = key, Font = font };
+        var entry = new CacheEntry
+        {
+            Key = key, Font = font
+        };
         var newNode = new LinkedListNode<CacheEntry>(entry);
         LruOrder.AddFirst(newNode);
         FontCache[key] = newNode;
         return font;
     }
 
-    public static SKFont GetFont(
+    public static SKFont GetFont
+    (
         string fontFamily,
         float fontSize,
         FontWeight weight
@@ -98,12 +105,14 @@ public static class TextLayoutHelper
     {
         var resolvedFamily = FontRegistry.ResolveFontFamily(fontFamily);
 
-        if (!TypefaceCache.TryGetValue(
+        if (!TypefaceCache.TryGetValue
+            (
                 resolvedFamily + weight,
                 out var typeface
             ))
         {
-            typeface = FontRegistry.GetCustomTypeface(
+            typeface = FontRegistry.GetCustomTypeface
+            (
                 resolvedFamily,
                 weight
             );
@@ -119,7 +128,8 @@ public static class TextLayoutHelper
                 var skSlant = weight == FontWeight.Italic
                     ? SKFontStyleSlant.Italic
                     : SKFontStyleSlant.Upright;
-                typeface = SKTypeface.FromFamilyName(
+                typeface = SKTypeface.FromFamilyName
+                (
                     resolvedFamily,
                     skWeight,
                     SKFontStyleWidth.Normal,
@@ -139,11 +149,14 @@ public static class TextLayoutHelper
         {
             LruOrder.RemoveLast();
             FontCache.Remove(oldest.Value.Key);
-            oldest.Value.Font.Dispose();
+            // C1: do NOT dispose the SKFont here. TextShaper's ShapedRun.Font holds this
+            // exact instance; disposing on evict causes use-after-free in BuildBlobs.
+            // Fonts are a few KB each and bounded by MaxFontCacheSize; let GC reclaim them.
         }
     }
 
-    public static Vector2 MeasureText(
+    public static Vector2 MeasureText
+    (
         string text,
         string fontFamily,
         float fontSize,
@@ -200,7 +213,8 @@ public static class TextLayoutHelper
         return new Vector2(maxWidth, lines.Length * lineHeight);
     }
 
-    internal static List<string> BreakIntoLines(
+    internal static List<string> BreakIntoLines
+    (
         string text,
         SKFont font,
         float maxWidth
@@ -222,7 +236,8 @@ public static class TextLayoutHelper
                 continue;
             }
 
-            SoftWrapLine(
+            SoftWrapLine
+            (
                 hardLine,
                 font,
                 maxWidth,
@@ -245,7 +260,8 @@ public static class TextLayoutHelper
             or >= '豈' and <= '﫿';
     }
 
-    private static void SoftWrapLine(
+    private static void SoftWrapLine
+    (
         string line,
         SKFont font,
         float maxWidth,
@@ -283,8 +299,14 @@ public static class TextLayoutHelper
         }
     }
 
-    private static int CountCharsFitting(string line, int start, int maxChars, SKFont font,
-        float maxWidth)
+    private static int CountCharsFitting
+    (
+        string line,
+        int start,
+        int maxChars,
+        SKFont font,
+        float maxWidth
+    )
     {
         var lo = 0;
         var hi = maxChars;
@@ -304,7 +326,13 @@ public static class TextLayoutHelper
         return lo;
     }
 
-    private static float ShapedWidth(string line, int start, int count, SKFont font)
+    private static float ShapedWidth
+    (
+        string line,
+        int start,
+        int count,
+        SKFont font
+    )
     {
         if (count <= 0)
         {
@@ -321,7 +349,12 @@ public static class TextLayoutHelper
         return w;
     }
 
-    private static int LastBreakOpportunity(string line, int start, int count)
+    private static int LastBreakOpportunity
+    (
+        string line,
+        int start,
+        int count
+    )
     {
         var last = start + count - 1;
 
@@ -345,7 +378,7 @@ public static class TextLayoutHelper
                 return i - start + 1;
             }
 
-            if (IsCjkBreakable(line[i]) || (i > start && IsCjkBreakable(line[i - 1])))
+            if (IsCjkBreakable(line[i]) || i > start && IsCjkBreakable(line[i - 1]))
             {
                 return i - start;
             }
@@ -354,7 +387,8 @@ public static class TextLayoutHelper
         return -1;
     }
 
-    internal static float MeasureTextWidth(
+    internal static float MeasureTextWidth
+    (
         string text,
         SKFont font
     )
@@ -367,7 +401,8 @@ public static class TextLayoutHelper
         return font.MeasureText(text);
     }
 
-    public static float GetVerticalOffset(
+    public static float GetVerticalOffset
+    (
         SKFontMetrics metrics,
         float containerHeight
     ) =>
@@ -380,6 +415,12 @@ public static class TextLayoutHelper
     /// </summary>
     public static void ClearCache()
     {
+        // Order matters. Cached SKShapers wrap HarfBuzz faces built from the typefaces below,
+        // and cached ShapedRuns hold the SKFonts below, so both must be released before the
+        // objects they point at are disposed. FontRunSplitter caches typeface references too.
+        TextShaper.ClearCache();
+        FontRunSplitter.ClearCache();
+
         foreach (var node in LruOrder)
         {
             node.Font.Dispose();
@@ -393,8 +434,6 @@ public static class TextLayoutHelper
         FontCache.Clear();
         LruOrder.Clear();
         TypefaceCache.Clear();
-        TextShaper.ClearCache();
-        FontRunSplitter.ClearCache();
     }
 
     private readonly struct FontKey : IEquatable<FontKey>
@@ -402,7 +441,8 @@ public static class TextLayoutHelper
         public readonly IntPtr TypefaceHandle;
         public readonly float Size;
 
-        public FontKey(
+        public FontKey
+        (
             IntPtr typefaceHandle,
             float size
         )
@@ -411,19 +451,22 @@ public static class TextLayoutHelper
             Size = size;
         }
 
-        public bool Equals(
+        public bool Equals
+        (
             FontKey other
         ) =>
             TypefaceHandle == other.TypefaceHandle && Size.Equals(other.Size);
 
-        public override bool Equals(
+        public override bool Equals
+        (
             object? obj
         ) =>
             obj is FontKey other && Equals(other);
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(
+            return HashCode.Combine
+            (
                 TypefaceHandle,
                 Size
             );

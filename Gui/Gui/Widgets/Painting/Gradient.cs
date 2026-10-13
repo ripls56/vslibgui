@@ -6,51 +6,71 @@ using SkiaSharp;
 namespace Gui.Widgets.Painting;
 
 /// <summary>One color stop in a gradient.</summary>
-public readonly record struct GradientStop(Vector4 Color, float Position)
+public readonly record struct GradientStop
+(
+    Vector4 Color,
+    float Position
+)
 {
-    public GradientStop Lighten(
+    public GradientStop Lighten
+    (
         float amount
     )
     {
-        var color = new Vector4(
-            Math.Min(
+        var color = new Vector4
+        (
+            Math.Min
+            (
                 1f,
                 Color.X + amount
             ),
-            Math.Min(
+            Math.Min
+            (
                 1f,
                 Color.Y + amount
             ),
-            Math.Min(
+            Math.Min
+            (
                 1f,
                 Color.Z + amount
             ),
             Color.W
         );
-        return this with { Color = color };
+        return this with
+        {
+            Color = color
+        };
     }
 
 
-    public GradientStop Darken(
+    public GradientStop Darken
+    (
         float amount
     )
     {
-        var color = new Vector4(
-            Math.Min(
+        var color = new Vector4
+        (
+            Math.Min
+            (
                 1f,
                 Color.X - amount
             ),
-            Math.Min(
+            Math.Min
+            (
                 1f,
                 Color.Y - amount
             ),
-            Math.Min(
+            Math.Min
+            (
                 1f,
                 Color.Z - amount
             ),
             Color.W
         );
-        return this with { Color = color };
+        return this with
+        {
+            Color = color
+        };
     }
 }
 
@@ -60,7 +80,8 @@ public readonly record struct GradientStop(Vector4 Color, float Position)
 /// </summary>
 public abstract class Gradient
 {
-    protected Gradient(
+    protected Gradient
+    (
         GradientStop[] stops
     )
     {
@@ -73,7 +94,8 @@ public abstract class Gradient
     ///     Creates the SKShader for this gradient given the widget's render size.
     ///     Caller must Dispose the returned shader.
     /// </summary>
-    public abstract SKShader CreateShader(
+    public abstract SKShader CreateShader
+    (
         Vector2 size
     );
 
@@ -81,12 +103,14 @@ public abstract class Gradient
     ///     Interpolates from this gradient toward <paramref name="to" /> at position t.
     ///     If <paramref name="to" /> is a different gradient type, snaps at t=0.5.
     /// </summary>
-    public abstract Gradient LerpTo(
+    public abstract Gradient LerpTo
+    (
         Gradient to,
         double t
     );
 
-    protected static GradientStop[] LerpStops(
+    protected static GradientStop[] LerpStops
+    (
         GradientStop[] begin,
         GradientStop[] end,
         double t
@@ -108,7 +132,8 @@ public abstract class Gradient
         }
 
         var ft = (float)t;
-        var count = Math.Max(
+        var count = Math.Max
+        (
             begin.Length,
             end.Length
         );
@@ -121,7 +146,8 @@ public abstract class Gradient
             var e = i < end.Length
                 ? end[i]
                 : end[^1];
-            result[i] = new GradientStop(
+            result[i] = new GradientStop
+            (
                 b.Color + (e.Color - b.Color) * ft,
                 b.Position + (e.Position - b.Position) * ft
             );
@@ -149,7 +175,8 @@ public abstract class Gradient
 /// </summary>
 public sealed class LinearGradient : Gradient
 {
-    public LinearGradient(
+    public LinearGradient
+    (
         float angle,
         params GradientStop[] stops
     )
@@ -163,7 +190,8 @@ public sealed class LinearGradient : Gradient
     /// </summary>
     public float Angle { get; }
 
-    public override SKShader CreateShader(
+    public override SKShader CreateShader
+    (
         Vector2 size
     )
     {
@@ -181,15 +209,18 @@ public sealed class LinearGradient : Gradient
         var rad = Angle * MathF.PI / 180f;
         var dx = MathF.Cos(rad) * size.X * 0.5f;
         var dy = MathF.Sin(rad) * size.Y * 0.5f;
-        var start = new SKPoint(
+        var start = new SKPoint
+        (
             size.X * 0.5f - dx,
             size.Y * 0.5f - dy
         );
-        var end = new SKPoint(
+        var end = new SKPoint
+        (
             size.X * 0.5f + dx,
             size.Y * 0.5f + dy
         );
-        return SKShader.CreateLinearGradient(
+        return SKShader.CreateLinearGradient
+        (
             start,
             end,
             colors,
@@ -198,7 +229,8 @@ public sealed class LinearGradient : Gradient
         );
     }
 
-    public override Gradient LerpTo(
+    public override Gradient LerpTo
+    (
         Gradient to,
         double t
     )
@@ -212,12 +244,14 @@ public sealed class LinearGradient : Gradient
 
         var ft = (float)t;
         var angle = Angle + (other.Angle - Angle) * ft;
-        var stops = LerpStops(
+        var stops = LerpStops
+        (
             Stops,
             other.Stops,
             t
         );
-        return new LinearGradient(
+        return new LinearGradient
+        (
             angle,
             stops
         );
@@ -229,7 +263,8 @@ public sealed class LinearGradient : Gradient
 /// </summary>
 public sealed class RadialGradient : Gradient
 {
-    public RadialGradient(
+    public RadialGradient
+    (
         Vector2 center,
         float radius,
         params GradientStop[] stops
@@ -246,7 +281,8 @@ public sealed class RadialGradient : Gradient
     /// <summary>Radius as a fraction of max(width, height).</summary>
     public float Radius { get; }
 
-    public override SKShader CreateShader(
+    public override SKShader CreateShader
+    (
         Vector2 size
     )
     {
@@ -261,15 +297,18 @@ public sealed class RadialGradient : Gradient
         }
 
         var (colors, positions) = ExtractStops();
-        var center = new SKPoint(
+        var center = new SKPoint
+        (
             Center.X * size.X,
             Center.Y * size.Y
         );
-        var radius = Radius * MathF.Max(
+        var radius = Radius * MathF.Max
+        (
             size.X,
             size.Y
         );
-        return SKShader.CreateRadialGradient(
+        return SKShader.CreateRadialGradient
+        (
             center,
             radius,
             colors,
@@ -278,7 +317,8 @@ public sealed class RadialGradient : Gradient
         );
     }
 
-    public override Gradient LerpTo(
+    public override Gradient LerpTo
+    (
         Gradient to,
         double t
     )
@@ -293,12 +333,14 @@ public sealed class RadialGradient : Gradient
         var ft = (float)t;
         var center = Center + (other.Center - Center) * ft;
         var radius = Radius + (other.Radius - Radius) * ft;
-        var stops = LerpStops(
+        var stops = LerpStops
+        (
             Stops,
             other.Stops,
             t
         );
-        return new RadialGradient(
+        return new RadialGradient
+        (
             center,
             radius,
             stops

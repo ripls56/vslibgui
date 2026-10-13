@@ -10,7 +10,8 @@ public sealed class MouseCursor
     public static readonly MouseCursor LinkSelect = new("linkselect");
     public static readonly MouseCursor TextSelect = new("textselect");
 
-    private MouseCursor(
+    private MouseCursor
+    (
         string name
     )
     {
@@ -24,7 +25,8 @@ public sealed class MouseCursor
     public string Name { get; }
 
     /// <summary>Creates a cursor with a custom VS cursor name.</summary>
-    public static MouseCursor Custom(
+    public static MouseCursor Custom
+    (
         string name
     ) =>
         new(name);

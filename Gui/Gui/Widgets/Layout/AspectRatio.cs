@@ -6,7 +6,8 @@ namespace Gui.Widgets.Layout;
 
 public class AspectRatio : SingleChildWidget
 {
-    public AspectRatio(
+    public AspectRatio
+    (
         Widget child,
         float aspectRatio,
         Framework.Key? key = null
@@ -18,9 +19,13 @@ public class AspectRatio : SingleChildWidget
     public float Ratio { get; }
 
     public override RenderObject CreateRenderObject() =>
-        new RenderAspectRatio { AspectRatio = Ratio };
+        new RenderAspectRatio
+        {
+            AspectRatio = Ratio
+        };
 
-    public override void UpdateRenderObject(
+    public override void UpdateRenderObject
+    (
         RenderObject renderObject
     )
     {

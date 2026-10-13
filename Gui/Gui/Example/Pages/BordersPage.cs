@@ -65,9 +65,9 @@ internal class BordersPage : StatelessWidget
                         "Symmetric",
                         Border.Symmetric
                         (
-                            vertical: 1f,
-                            horizontal: 4f,
-                            color: colors.Border
+                            1f,
+                            4f,
+                            colors.Border
                         )
                     ),
                     "Border.Symmetric(vertical: 1f, horizontal: 4f, color: color)",
@@ -82,10 +82,10 @@ internal class BordersPage : StatelessWidget
                         "Per-side color",
                         new Border
                         (
-                            Left: new BorderSide(3f, "#E05252".FromHex()),
-                            Top: new BorderSide(3f, "#52C77E".FromHex()),
-                            Right: new BorderSide(3f, "#5B9BD5".FromHex()),
-                            Bottom: new BorderSide(3f, "#E0B052".FromHex())
+                            new BorderSide(3f, "#E05252".FromHex()),
+                            new BorderSide(3f, "#52C77E".FromHex()),
+                            new BorderSide(3f, "#5B9BD5".FromHex()),
+                            new BorderSide(3f, "#E0B052".FromHex())
                         )
                     ),
                     "new Border(\n  Left:   new BorderSide(3f, red),\n  Top:    new BorderSide(3f, green),\n  Right:  new BorderSide(3f, blue),\n  Bottom: new BorderSide(3f, yellow))",
@@ -100,9 +100,9 @@ internal class BordersPage : StatelessWidget
                         "Rounded",
                         Border.Symmetric
                         (
-                            vertical: 2f,
-                            horizontal: 6f,
-                            color: colors.Primary
+                            2f,
+                            6f,
+                            colors.Primary
                         ),
                         new Vector4(12)
                     ),

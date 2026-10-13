@@ -71,17 +71,25 @@ internal class ButtonState : FocusableState<Button>, IActivatable
 
     private bool _isHovered;
     private bool _isPressed;
+    private ButtonStatus _lastStatus;
+    private CurvedAnimation _statusCurved = null!;
 
     // Re-triggerable content-swap transition: crossfades Child <-> LoadingDots
     // (and any other status-driven content change) instead of snapping instantly.
     private AnimationController _statusTransition = null!;
-    private CurvedAnimation _statusCurved = null!;
-    private ButtonStatus _lastStatus;
 
     private bool IsInteractive => Widget.Enabled && Widget.Status != ButtonStatus.Loading;
     private bool EffectivePressed => (_isPressed || Widget.ForceActive) && IsInteractive;
     private bool EffectiveHovered => (_isHovered || Widget.ForceHover) && IsInteractive;
     private bool EffectiveFocused => FocusNode.ShowsFocusIndicator || Widget.ForceFocus;
+
+    public void Activate()
+    {
+        if (IsInteractive)
+        {
+            HandleTap(KeyboardActivation);
+        }
+    }
 
     public override void InitState()
     {
@@ -99,19 +107,12 @@ internal class ButtonState : FocusableState<Button>, IActivatable
         base.Dispose();
     }
 
-    public void Activate()
-    {
-        if (IsInteractive) HandleTap(KeyboardActivation);
-    }
-
-    private void PlaySound()
-    {
-        Element.Owner!.GetSoundPlayer().Play("click", Pitch.Varied(.95f, .05f), .2f);
-    }
-
     private void HandleTap(PointerEvent e)
     {
-        if (IsInteractive) Widget.OnTap?.Invoke(e);
+        if (IsInteractive)
+        {
+            Widget.OnTap?.Invoke(e);
+        }
     }
 
     public override Widget Build(BuildContext context)
@@ -132,7 +133,7 @@ internal class ButtonState : FocusableState<Button>, IActivatable
         var fgColor = GetForegroundColor(theme, variantStyle);
         var shadows = BuildShadows(Widget.Variant, bgColor);
         var content = BuildContent(fgColor);
-        var scale = EffectivePressed ? 0.96f : (EffectiveHovered ? 1.03f : 1f);
+        var scale = EffectivePressed ? 0.96f : EffectiveHovered ? 1.03f : 1f;
 
         return new MouseRegion
         (
@@ -144,7 +145,10 @@ internal class ButtonState : FocusableState<Button>, IActivatable
                 (() =>
                     {
                         _isPressed = true;
-                        if (IsInteractive) PlaySound();
+                        if (IsInteractive)
+                        {
+                            this.Click();
+                        }
                     }
                 ),
                 onRelease: _ => SetState(() => _isPressed = false),
@@ -156,42 +160,47 @@ internal class ButtonState : FocusableState<Button>, IActivatable
                         _isPressed = false;
                     }
                 ),
-                child: new AnimatedScale
+                child: new RepaintBoundary
                 (
-                    scale: scale,
-                    duration: TimeSpan.FromMilliseconds(140),
-                    curve: Curves.EaseOut,
-                    alignment: Alignment.Center,
-                    child: new AnimatedContainer
+                    new AnimatedScale
                     (
-                        duration: TimeSpan.FromMilliseconds(200),
-                        curve: Curves.EaseOutCubic,
-                        style: new BoxStyle
-                        {
-                            Color = bgColor,
-                            BorderColor = borderColor,
-                            BorderThickness = MathF.Max(1f, variantStyle.BorderThickness),
-                            CornerRadius = new Vector4(variantStyle.CornerRadius),
-                            BoxShadows = shadows
-                        },
-                        child: new Opacity
+                        scale,
+                        TimeSpan.FromMilliseconds(140),
+                        Curves.EaseOut,
+                        alignment: Alignment.Center,
+                        child: new AnimatedContainer
                         (
-                            Widget.Enabled ? 1f : 0.45f,
-                            new Padding
+                            duration: TimeSpan.FromMilliseconds(200),
+                            curve: Curves.EaseOutCubic,
+                            style: new BoxStyle
+                            {
+                                Color = bgColor,
+                                BorderColor = borderColor,
+                                BorderThickness = MathF.Max(1f, variantStyle.BorderThickness),
+                                CornerRadius = new Vector4(variantStyle.CornerRadius),
+                                BoxShadows = shadows
+                            },
+                            child: new Opacity
                             (
-                                style.Padding,
-                                new DefaultTextStyle
+                                Widget.Enabled ? 1f : 0.45f,
+                                new Padding
                                 (
-                                    new TextStyle
-                                    {
-                                        Color = fgColor, FontSize = 14, Weight = FontWeight.SemiBold
-                                    },
-                                    new IconTheme
+                                    style.Padding,
+                                    new DefaultTextStyle
                                     (
-                                        new IconThemeData
+                                        new TextStyle
                                         {
-                                            Color = fgColor
-                                        }, content
+                                            Color = fgColor,
+                                            FontSize = 14,
+                                            Weight = FontWeight.SemiBold
+                                        },
+                                        new IconTheme
+                                        (
+                                            new IconThemeData
+                                            {
+                                                Color = fgColor
+                                            }, content
+                                        )
                                     )
                                 )
                             )
@@ -204,15 +213,23 @@ internal class ButtonState : FocusableState<Button>, IActivatable
 
     private Vector4 GetForegroundColor(ThemeData theme, ButtonVariantStyle variant)
     {
-        if (Widget.Status == ButtonStatus.Error) return theme.ColorScheme.OnError;
-        if (Widget.Status == ButtonStatus.Success) return theme.ColorScheme.OnSecondary;
+        if (Widget.Status == ButtonStatus.Error)
+        {
+            return theme.ColorScheme.OnError;
+        }
+        if (Widget.Status == ButtonStatus.Success)
+        {
+            return theme.ColorScheme.OnSecondary;
+        }
         if (EffectiveFocused)
+        {
             return Widget.Variant switch
             {
                 ButtonVariant.Primary => theme.ColorScheme.OnPrimary,
                 ButtonVariant.Danger => theme.ColorScheme.OnError,
                 _ => theme.ColorScheme.OnSurface
             };
+        }
         ;
 
         return Widget.Variant switch
@@ -225,16 +242,31 @@ internal class ButtonState : FocusableState<Button>, IActivatable
 
     private Vector4 GetBackgroundColor(ThemeData theme, ButtonVariantStyle variant)
     {
-        if (Widget.Status == ButtonStatus.Error) return theme.ColorScheme.Error;
-        if (Widget.Status == ButtonStatus.Success) return theme.ColorScheme.Secondary;
-        if (EffectivePressed) return variant.PressBackgroundColor;
-        if (EffectiveHovered) return variant.HoverBackgroundColor;
+        if (Widget.Status == ButtonStatus.Error)
+        {
+            return theme.ColorScheme.Error;
+        }
+        if (Widget.Status == ButtonStatus.Success)
+        {
+            return theme.ColorScheme.Secondary;
+        }
+        if (EffectivePressed)
+        {
+            return variant.PressBackgroundColor;
+        }
+        if (EffectiveHovered)
+        {
+            return variant.HoverBackgroundColor;
+        }
         return variant.BackgroundColor;
     }
 
     private Vector4 GetBorderColor(ThemeData theme, ButtonVariantStyle variant)
     {
-        if (EffectiveFocused) return theme.FocusOutlineColor;
+        if (EffectiveFocused)
+        {
+            return theme.FocusOutlineColor;
+        }
 
         var color = variant.BorderColor;
 
@@ -254,7 +286,7 @@ internal class ButtonState : FocusableState<Button>, IActivatable
         (
             bgColor.WithAlpha(0.35f),
             Vector2.Zero,
-            BlurRadius: 6
+            6
         );
 
         var resolvedShadow = variant switch
@@ -290,12 +322,12 @@ internal class ButtonState : FocusableState<Button>, IActivatable
     {
         return new AnimatedBuilder
         (
-            animation: _statusTransition,
-            builder: _ =>
+            _statusTransition,
+            _ =>
             {
                 var opacity = (float)_statusCurved.Value;
                 var child = Widget.Status == ButtonStatus.Loading
-                    ? new Padding(edgeInsets: EdgeInsets.All(6), new LoadingDots(fgColor))
+                    ? new Padding(EdgeInsets.All(6), new LoadingDots(fgColor))
                     : Widget.Child;
 
                 return new Opacity(opacity, child);

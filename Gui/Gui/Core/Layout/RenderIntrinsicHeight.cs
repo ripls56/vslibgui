@@ -17,13 +17,15 @@ public class RenderIntrinsicHeight : RenderProxyBox
 
         var child = Children[0];
         var intrinsicH = child.GetMinIntrinsicHeight(Constraints.MaxWidth);
-        intrinsicH = Math.Clamp(
+        intrinsicH = Math.Clamp
+        (
             intrinsicH,
             Constraints.MinHeight,
             Constraints.MaxHeight
         );
 
-        var childConstraints = new LayoutConstraints(
+        var childConstraints = new LayoutConstraints
+        (
             Constraints.MinWidth,
             Constraints.MaxWidth,
             intrinsicH,

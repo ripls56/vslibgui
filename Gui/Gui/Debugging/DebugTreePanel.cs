@@ -33,13 +33,20 @@ public class DebugTreePanel : StatelessWidget
     {
         if (_root == null)
         {
-            return new Text("No active UI", new TextStyle { FontSize = 11, Color = Vector4.One });
+            return new Text
+            (
+                "No active UI", new TextStyle
+                {
+                    FontSize = 11, Color = Vector4.One
+                }
+            );
         }
 
         var lines = TreeVisitor.GetTreeDebugStrings(_root);
         var lineWidgets = lines.Select(line => (Widget)new Text(line, LineStyle));
 
-        return new SizedBox(
+        return new SizedBox
+        (
             height: 300,
             child: new ListView(lineWidgets, 14f)
         );

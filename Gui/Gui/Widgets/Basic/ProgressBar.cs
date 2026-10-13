@@ -14,14 +14,16 @@ namespace Gui.Widgets.Basic;
 public class ProgressBar : StatelessWidget
 {
     /// <summary>Creates a new progress bar.</summary>
-    public ProgressBar(
+    public ProgressBar
+    (
         float value,
         ProgressBarStyle? style = null,
         Framework.Key? key = null
     )
         : base(key)
     {
-        Value = Math.Clamp(
+        Value = Math.Clamp
+        (
             value,
             0f,
             1f
@@ -39,12 +41,14 @@ public class ProgressBar : StatelessWidget
     public ProgressBarStyle? Style { get; }
 
     /// <inheritdoc />
-    public override Widget Build(
+    public override Widget Build
+    (
         BuildContext context
     )
     {
         var style = Style ?? Theme.Of(context).ProgressBarStyle;
-        return new ProgressBarTrackWidget(
+        return new ProgressBarTrackWidget
+        (
             Value,
             style.Height,
             style.CornerRadius,
@@ -59,7 +63,8 @@ public class ProgressBar : StatelessWidget
 
 internal class ProgressBarTrackWidget : SingleChildWidget
 {
-    public ProgressBarTrackWidget(
+    public ProgressBarTrackWidget
+    (
         float value,
         float trackHeight,
         float cornerRadius,
@@ -106,7 +111,8 @@ internal class ProgressBarTrackWidget : SingleChildWidget
     }
 
     /// <inheritdoc />
-    public override void UpdateRenderObject(
+    public override void UpdateRenderObject
+    (
         RenderObject renderObject
     )
     {

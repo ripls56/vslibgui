@@ -1,5 +1,6 @@
 using System;
 using Gui.Rendering;
+using SkiaSharp;
 using Vintagestory.API.Client;
 
 namespace Gui.Debugging;
@@ -9,11 +10,13 @@ public class GuiElementSkiaCanvas : GuiElement
     private readonly Action<PaintingContext> _onPaint;
     private PaintingContext? _paintingContext;
 
-    public GuiElementSkiaCanvas(
+    public GuiElementSkiaCanvas
+    (
         ICoreClientAPI capi,
         ElementBounds bounds,
         Action<PaintingContext> onPaint
-    ) : base(
+    ) : base
+    (
         capi,
         bounds
     )
@@ -21,7 +24,8 @@ public class GuiElementSkiaCanvas : GuiElement
         _onPaint = onPaint;
     }
 
-    public override void RenderInteractiveElements(
+    public override void RenderInteractiveElements
+    (
         float deltaTime
     )
     {
@@ -45,7 +49,8 @@ public class GuiElementSkiaCanvas : GuiElement
 
         // However, SkiaRenderer.Begin requires width/height.
         // We'll use the window dimensions.
-        skiaRenderer.Begin(
+        skiaRenderer.Begin
+        (
             api.Render.FrameWidth,
             api.Render.FrameHeight
         );
@@ -54,7 +59,8 @@ public class GuiElementSkiaCanvas : GuiElement
         {
             if (skiaRenderer.Canvas != null)
             {
-                _paintingContext = new PaintingContext(
+                _paintingContext = new PaintingContext
+                (
                     skiaRenderer.Canvas,
                     api.InWorldEllapsedMilliseconds
                 );
@@ -63,9 +69,21 @@ public class GuiElementSkiaCanvas : GuiElement
 
         if (_paintingContext != null)
         {
-            _paintingContext.SaveLayer();
+            // Bound the offscreen layer to this element's box (pre-translate coords),
+            // not the whole window clip.
+            _paintingContext.SaveLayer
+            (
+                new SKRect
+                (
+                    (float)Bounds.renderX,
+                    (float)Bounds.renderY,
+                    (float)(Bounds.renderX + Bounds.OuterWidth),
+                    (float)(Bounds.renderY + Bounds.OuterHeight)
+                )
+            );
             // Translate to our element's position
-            _paintingContext.Canvas?.Translate(
+            _paintingContext.Canvas?.Translate
+            (
                 (float)Bounds.renderX,
                 (float)Bounds.renderY
             );
@@ -82,15 +100,18 @@ public class GuiElementSkiaCanvas : GuiElement
 
 public static class GuiComposerExtensions
 {
-    public static GuiComposer AddSkiaCanvas(
+    public static GuiComposer AddSkiaCanvas
+    (
         this GuiComposer composer,
         ElementBounds bounds,
         Action<PaintingContext> onPaint,
         string? key = null
     )
     {
-        composer.AddInteractiveElement(
-            new GuiElementSkiaCanvas(
+        composer.AddInteractiveElement
+        (
+            new GuiElementSkiaCanvas
+            (
                 composer.Api,
                 bounds,
                 onPaint

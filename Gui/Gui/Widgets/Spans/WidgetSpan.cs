@@ -34,7 +34,8 @@ public sealed class WidgetSpan : InlineSpan
     /// <param name="child">The widget to embed.</param>
     /// <param name="alignment">Vertical alignment within the line.</param>
     /// <param name="float">Float behavior for this widget.</param>
-    public WidgetSpan(
+    public WidgetSpan
+    (
         Widget child,
         PlaceholderAlignment alignment = PlaceholderAlignment.Middle,
         VtmlFloat @float = VtmlFloat.None
@@ -57,12 +58,14 @@ public sealed class WidgetSpan : InlineSpan
     public VtmlFloat Float { get; }
 
     /// <inheritdoc />
-    internal override void CollectRuns(
+    internal override void CollectRuns
+    (
         TextStyle inherited,
         List<PlacedRun> runs
     )
     {
-        runs.Add(
+        runs.Add
+        (
             new PlacedRun
             {
                 Text = "",

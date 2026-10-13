@@ -18,11 +18,13 @@ namespace Gui.Widgets.Painting;
 /// </summary>
 public class FractionalTranslation : SingleChildWidget
 {
-    public FractionalTranslation(
+    public FractionalTranslation
+    (
         Vector2 translation,
         Widget? child = null,
         Framework.Key? key = null
-    ) : base(
+    ) : base
+    (
         child,
         key
     )
@@ -37,9 +39,13 @@ public class FractionalTranslation : SingleChildWidget
     public Vector2 Translation { get; }
 
     public override RenderObject CreateRenderObject() =>
-        new RenderFractionalTranslation { Translation = Translation };
+        new RenderFractionalTranslation
+        {
+            Translation = Translation
+        };
 
-    public override void UpdateRenderObject(
+    public override void UpdateRenderObject
+    (
         RenderObject renderObject
     ) =>
         ((RenderFractionalTranslation)renderObject).Translation = Translation;

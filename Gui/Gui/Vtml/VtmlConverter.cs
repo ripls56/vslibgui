@@ -24,7 +24,8 @@ public static class VtmlConverter
     /// <param name="baseStyle">Base text style applied to unstyled text.</param>
     /// <param name="logger">Logger for parse errors (null to suppress).</param>
     /// <returns>List of inline elements ready for layout.</returns>
-    public static List<VtmlInlineElement> Convert(
+    public static List<VtmlInlineElement> Convert
+    (
         string vtml,
         TextStyle baseStyle,
         ILogger? logger = null
@@ -35,7 +36,8 @@ public static class VtmlConverter
             return [];
         }
 
-        var tokens = VtmlParser.Tokenize(
+        var tokens = VtmlParser.Tokenize
+        (
             logger ?? NullLogger.Instance,
             vtml
         );
@@ -44,7 +46,8 @@ public static class VtmlConverter
         var fontStack = new Stack<TextStyle>();
         fontStack.Push(baseStyle);
 
-        ConvertTokens(
+        ConvertTokens
+        (
             tokens,
             result,
             fontStack,
@@ -53,7 +56,8 @@ public static class VtmlConverter
         return result;
     }
 
-    private static void ConvertTokens(
+    private static void ConvertTokens
+    (
         VtmlToken[] tokens,
         List<VtmlInlineElement> result,
         Stack<TextStyle> fontStack,
@@ -62,7 +66,8 @@ public static class VtmlConverter
     {
         foreach (var token in tokens)
         {
-            ConvertToken(
+            ConvertToken
+            (
                 token,
                 result,
                 fontStack,
@@ -71,7 +76,8 @@ public static class VtmlConverter
         }
     }
 
-    private static void ConvertToken(
+    private static void ConvertToken
+    (
         VtmlToken token,
         List<VtmlInlineElement> result,
         Stack<TextStyle> fontStack,
@@ -82,7 +88,8 @@ public static class VtmlConverter
         {
             if (!string.IsNullOrEmpty(textToken.Text))
             {
-                EmitTextWithLineBreaks(
+                EmitTextWithLineBreaks
+                (
                     textToken.Text,
                     fontStack.Peek(),
                     currentHref,
@@ -106,7 +113,8 @@ public static class VtmlConverter
 
             case "strong":
             case "b":
-                ConvertWithStyle(
+                ConvertWithStyle
+                (
                     tag,
                     result,
                     fontStack,
@@ -121,7 +129,8 @@ public static class VtmlConverter
                 break;
 
             case "i":
-                ConvertWithStyle(
+                ConvertWithStyle
+                (
                     tag,
                     result,
                     fontStack,
@@ -135,12 +144,14 @@ public static class VtmlConverter
                 break;
 
             case "font":
-                ConvertWithStyle(
+                ConvertWithStyle
+                (
                     tag,
                     result,
                     fontStack,
                     currentHref,
-                    style => ApplyFontAttributes(
+                    style => ApplyFontAttributes
+                    (
                         tag,
                         style
                     )
@@ -148,7 +159,8 @@ public static class VtmlConverter
                 break;
 
             case "code":
-                ConvertWithStyle(
+                ConvertWithStyle
+                (
                     tag,
                     result,
                     fontStack,
@@ -163,11 +175,13 @@ public static class VtmlConverter
 
             case "a":
             {
-                tag.Attributes.TryGetValue(
+                tag.Attributes.TryGetValue
+                (
                     "href",
                     out var href
                 );
-                ConvertChildren(
+                ConvertChildren
+                (
                     tag,
                     result,
                     fontStack,
@@ -189,8 +203,12 @@ public static class VtmlConverter
                         "toolmode" => "toolmodeselect",
                         _ => text
                     };
-                    result.Add(
-                        new VtmlHotkeyRun { HotkeyCode = text, Style = fontStack.Peek() }
+                    result.Add
+                    (
+                        new VtmlHotkeyRun
+                        {
+                            HotkeyCode = text, Style = fontStack.Peek()
+                        }
                     );
                 }
 
@@ -199,17 +217,20 @@ public static class VtmlConverter
 
             case "icon":
             {
-                tag.Attributes.TryGetValue(
+                tag.Attributes.TryGetValue
+                (
                     "name",
                     out var iconName
                 );
-                tag.Attributes.TryGetValue(
+                tag.Attributes.TryGetValue
+                (
                     "path",
                     out var iconPath
                 );
                 iconName ??= tag.ContentText?.Trim();
 
-                result.Add(
+                result.Add
+                (
                     new VtmlIconRun
                     {
                         Name = iconName, Path = iconPath, Size = fontStack.Peek().FontSize
@@ -219,7 +240,8 @@ public static class VtmlConverter
             }
 
             case "itemstack":
-                ConvertItemStack(
+                ConvertItemStack
+                (
                     tag,
                     result,
                     fontStack
@@ -232,7 +254,8 @@ public static class VtmlConverter
 
             default:
                 // Unknown tag — process children so content isn't lost
-                ConvertChildren(
+                ConvertChildren
+                (
                     tag,
                     result,
                     fontStack,
@@ -242,16 +265,19 @@ public static class VtmlConverter
         }
     }
 
-    private static void ConvertWithStyle(
+    private static void ConvertWithStyle
+    (
         VtmlTagToken tag,
         List<VtmlInlineElement> result,
         Stack<TextStyle> fontStack,
-        string? currentHref, System.Func<TextStyle, TextStyle> modify
+        string? currentHref,
+        System.Func<TextStyle, TextStyle> modify
     )
     {
         var style = modify(fontStack.Peek());
         fontStack.Push(style);
-        ConvertChildren(
+        ConvertChildren
+        (
             tag,
             result,
             fontStack,
@@ -260,7 +286,8 @@ public static class VtmlConverter
         fontStack.Pop();
     }
 
-    private static void ConvertChildren(
+    private static void ConvertChildren
+    (
         VtmlTagToken tag,
         List<VtmlInlineElement> result,
         Stack<TextStyle> fontStack,
@@ -269,7 +296,8 @@ public static class VtmlConverter
     {
         foreach (var child in tag.ChildElements)
         {
-            ConvertToken(
+            ConvertToken
+            (
                 child,
                 result,
                 fontStack,
@@ -278,7 +306,8 @@ public static class VtmlConverter
         }
     }
 
-    private static void EmitTextWithLineBreaks(
+    private static void EmitTextWithLineBreaks
+    (
         string text,
         TextStyle style,
         string? href,
@@ -286,7 +315,8 @@ public static class VtmlConverter
     )
     {
         // Split on \r\n or \n, emitting VtmlLineBreak between segments
-        var lines = text.Split(
+        var lines = text.Split
+        (
             ["\r\n", "\n"],
             StringSplitOptions.None
         );
@@ -299,21 +329,27 @@ public static class VtmlConverter
 
             if (lines[i].Length > 0)
             {
-                result.Add(
-                    new VtmlTextRun { Text = lines[i], Style = style, Href = href }
+                result.Add
+                (
+                    new VtmlTextRun
+                    {
+                        Text = lines[i], Style = style, Href = href
+                    }
                 );
             }
         }
     }
 
-    private static void ConvertItemStack(
+    private static void ConvertItemStack
+    (
         VtmlTagToken tag,
         List<VtmlInlineElement> result,
         Stack<TextStyle> fontStack
     )
     {
         var floatType = VtmlFloat.Inline;
-        if (tag.Attributes.TryGetValue(
+        if (tag.Attributes.TryGetValue
+            (
                 "floattype",
                 out var ftStr
             ))
@@ -327,7 +363,8 @@ public static class VtmlConverter
             };
         }
 
-        tag.Attributes.TryGetValue(
+        tag.Attributes.TryGetValue
+        (
             "code",
             out var code
         );
@@ -336,12 +373,14 @@ public static class VtmlConverter
         var itemType = tag.Attributes.GetValueOrDefault("type", "block");
 
         var rsize = 1f;
-        if (tag.Attributes.TryGetValue(
+        if (tag.Attributes.TryGetValue
+            (
                 "rsize",
                 out var rsizeStr
             ))
         {
-            float.TryParse(
+            float.TryParse
+            (
                 rsizeStr,
                 NumberStyles.Any,
                 CultureInfo.InvariantCulture,
@@ -350,12 +389,14 @@ public static class VtmlConverter
         }
 
         float offx = 0f, offy = 0f;
-        if (tag.Attributes.TryGetValue(
+        if (tag.Attributes.TryGetValue
+            (
                 "offx",
                 out var offxStr
             ))
         {
-            float.TryParse(
+            float.TryParse
+            (
                 offxStr,
                 NumberStyles.Any,
                 CultureInfo.InvariantCulture,
@@ -363,12 +404,14 @@ public static class VtmlConverter
             );
         }
 
-        if (tag.Attributes.TryGetValue(
+        if (tag.Attributes.TryGetValue
+            (
                 "offy",
                 out var offyStr
             ))
         {
-            float.TryParse(
+            float.TryParse
+            (
                 offyStr,
                 NumberStyles.Any,
                 CultureInfo.InvariantCulture,
@@ -376,7 +419,8 @@ public static class VtmlConverter
             );
         }
 
-        result.Add(
+        result.Add
+        (
             new VtmlItemStackRun
             {
                 Code = code,
@@ -390,16 +434,19 @@ public static class VtmlConverter
         );
     }
 
-    private static TextStyle ApplyFontAttributes(
+    private static TextStyle ApplyFontAttributes
+    (
         VtmlTagToken tag,
         TextStyle style
     )
     {
-        if (tag.Attributes.TryGetValue(
+        if (tag.Attributes.TryGetValue
+            (
                 "size",
                 out var sizeStr
             ) &&
-            float.TryParse(
+            float.TryParse
+            (
                 sizeStr,
                 NumberStyles.Any,
                 CultureInfo.InvariantCulture,
@@ -409,7 +456,8 @@ public static class VtmlConverter
             style.FontSize = size;
         }
 
-        if (tag.Attributes.TryGetValue(
+        if (tag.Attributes.TryGetValue
+            (
                 "color",
                 out var colorStr
             ))
@@ -421,11 +469,13 @@ public static class VtmlConverter
             }
         }
 
-        if (tag.Attributes.TryGetValue(
+        if (tag.Attributes.TryGetValue
+            (
                 "opacity",
                 out var opStr
             ) &&
-            float.TryParse(
+            float.TryParse
+            (
                 opStr,
                 NumberStyles.Any,
                 CultureInfo.InvariantCulture,
@@ -433,7 +483,8 @@ public static class VtmlConverter
             ))
         {
             var c = style.Color;
-            style.Color = new Vector4(
+            style.Color = new Vector4
+            (
                 c.X,
                 c.Y,
                 c.Z,
@@ -441,7 +492,8 @@ public static class VtmlConverter
             );
         }
 
-        if (tag.Attributes.TryGetValue(
+        if (tag.Attributes.TryGetValue
+            (
                 "weight",
                 out var weightStr
             ) &&
@@ -451,7 +503,8 @@ public static class VtmlConverter
             style.Boldness = 0.5f;
         }
 
-        if (tag.Attributes.TryGetValue(
+        if (tag.Attributes.TryGetValue
+            (
                 "family",
                 out var family
             ))
@@ -459,7 +512,8 @@ public static class VtmlConverter
             style.FontFamily = family;
         }
 
-        if (tag.Attributes.TryGetValue(
+        if (tag.Attributes.TryGetValue
+            (
                 "align",
                 out var alignStr
             ))
@@ -475,7 +529,8 @@ public static class VtmlConverter
         return style;
     }
 
-    internal static bool TryParseHexColor(
+    internal static bool TryParseHexColor
+    (
         string text,
         out Vector4 color
     )
@@ -494,8 +549,10 @@ public static class VtmlConverter
 
         if (span.Length == 6)
         {
-            if (int.TryParse(
-                    span.Slice(
+            if (int.TryParse
+                (
+                    span.Slice
+                    (
                         0,
                         2
                     ),
@@ -503,8 +560,10 @@ public static class VtmlConverter
                     null,
                     out var r
                 ) &&
-                int.TryParse(
-                    span.Slice(
+                int.TryParse
+                (
+                    span.Slice
+                    (
                         2,
                         2
                     ),
@@ -512,8 +571,10 @@ public static class VtmlConverter
                     null,
                     out var g
                 ) &&
-                int.TryParse(
-                    span.Slice(
+                int.TryParse
+                (
+                    span.Slice
+                    (
                         4,
                         2
                     ),
@@ -522,7 +583,8 @@ public static class VtmlConverter
                     out var b
                 ))
             {
-                color = new Vector4(
+                color = new Vector4
+                (
                     r / 255f,
                     g / 255f,
                     b / 255f,
@@ -533,8 +595,10 @@ public static class VtmlConverter
         }
         else if (span.Length == 8)
         {
-            if (int.TryParse(
-                    span.Slice(
+            if (int.TryParse
+                (
+                    span.Slice
+                    (
                         0,
                         2
                     ),
@@ -542,8 +606,10 @@ public static class VtmlConverter
                     null,
                     out var a
                 ) &&
-                int.TryParse(
-                    span.Slice(
+                int.TryParse
+                (
+                    span.Slice
+                    (
                         2,
                         2
                     ),
@@ -551,8 +617,10 @@ public static class VtmlConverter
                     null,
                     out var r
                 ) &&
-                int.TryParse(
-                    span.Slice(
+                int.TryParse
+                (
+                    span.Slice
+                    (
                         4,
                         2
                     ),
@@ -560,8 +628,10 @@ public static class VtmlConverter
                     null,
                     out var g
                 ) &&
-                int.TryParse(
-                    span.Slice(
+                int.TryParse
+                (
+                    span.Slice
+                    (
                         6,
                         2
                     ),
@@ -570,7 +640,8 @@ public static class VtmlConverter
                     out var b
                 ))
             {
-                color = new Vector4(
+                color = new Vector4
+                (
                     r / 255f,
                     g / 255f,
                     b / 255f,
@@ -615,7 +686,8 @@ public static class VtmlConverter
         {
         }
 
-        public void Log(
+        public void Log
+        (
             EnumLogType logType,
             string format,
             params object[] args
@@ -623,182 +695,210 @@ public static class VtmlConverter
         {
         }
 
-        public void Log(
+        public void Log
+        (
             EnumLogType logType,
             string message
         )
         {
         }
 
-        public void LogException(
+        public void LogException
+        (
             EnumLogType logType,
             Exception e
         )
         {
         }
 
-        public void Chat(
+        public void Chat
+        (
             string format,
             params object[] args
         )
         {
         }
 
-        public void Chat(
+        public void Chat
+        (
             string message
         )
         {
         }
 
-        public void Event(
+        public void Event
+        (
             string format,
             params object[] args
         )
         {
         }
 
-        public void Event(
+        public void Event
+        (
             string message
         )
         {
         }
 
-        public void StoryEvent(
+        public void StoryEvent
+        (
             string format,
             params object[] args
         )
         {
         }
 
-        public void StoryEvent(
+        public void StoryEvent
+        (
             string message
         )
         {
         }
 
-        public void Build(
+        public void Build
+        (
             string format,
             params object[] args
         )
         {
         }
 
-        public void Build(
+        public void Build
+        (
             string message
         )
         {
         }
 
-        public void VerboseDebug(
+        public void VerboseDebug
+        (
             string format,
             params object[] args
         )
         {
         }
 
-        public void VerboseDebug(
+        public void VerboseDebug
+        (
             string message
         )
         {
         }
 
-        public void Debug(
+        public void Debug
+        (
             string format,
             params object[] args
         )
         {
         }
 
-        public void Debug(
+        public void Debug
+        (
             string message
         )
         {
         }
 
-        public void Notification(
+        public void Notification
+        (
             string format,
             params object[] args
         )
         {
         }
 
-        public void Notification(
+        public void Notification
+        (
             string message
         )
         {
         }
 
-        public void Warning(
+        public void Warning
+        (
             string format,
             params object[] args
         )
         {
         }
 
-        public void Warning(
+        public void Warning
+        (
             string message
         )
         {
         }
 
-        public void Warning(
+        public void Warning
+        (
             Exception e
         )
         {
         }
 
-        public void Error(
+        public void Error
+        (
             string format,
             params object[] args
         )
         {
         }
 
-        public void Error(
+        public void Error
+        (
             string message
         )
         {
         }
 
-        public void Error(
+        public void Error
+        (
             Exception e
         )
         {
         }
 
-        public void Fatal(
+        public void Fatal
+        (
             string format,
             params object[] args
         )
         {
         }
 
-        public void Fatal(
+        public void Fatal
+        (
             string message
         )
         {
         }
 
-        public void Fatal(
+        public void Fatal
+        (
             Exception e
         )
         {
         }
 
-        public void Audit(
+        public void Audit
+        (
             string format,
             params object[] args
         )
         {
         }
 
-        public void Audit(
+        public void Audit
+        (
             string message
         )
         {
         }
 
-        public void Worldgen(
+        public void Worldgen
+        (
             string format,
             params object[] args
         )

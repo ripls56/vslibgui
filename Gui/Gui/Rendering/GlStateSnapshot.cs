@@ -55,44 +55,54 @@ internal struct GlStateSnapshot
             _framebufferSrgb = GL.IsEnabled(EnableCap.FramebufferSrgb)
         };
 
-        GL.GetInteger(
+        GL.GetInteger
+        (
             GetPName.Viewport,
             snapshot._viewport
         );
-        GL.GetBoolean(
+        GL.GetBoolean
+        (
             GetPName.DepthWritemask,
             out snapshot._depthMask
         );
-        GL.GetBoolean(
+        GL.GetBoolean
+        (
             GetPName.ColorWritemask,
             snapshot._colorMask
         );
 
-        GL.GetInteger(
+        GL.GetInteger
+        (
             GetPName.BlendEquationRgb,
             out snapshot._blendEquationRgb
         );
-        GL.GetInteger(
+        GL.GetInteger
+        (
             GetPName.BlendEquationAlpha,
             out snapshot._blendEquationAlpha
         );
-        GL.GetInteger(
+        GL.GetInteger
+        (
             GetPName.BlendSrcRgb,
             out snapshot._blendSrcRgb
         );
-        GL.GetInteger(
+        GL.GetInteger
+        (
             GetPName.BlendDstRgb,
             out snapshot._blendDstRgb
         );
-        GL.GetInteger(
+        GL.GetInteger
+        (
             GetPName.BlendSrcAlpha,
             out snapshot._blendSrcAlpha
         );
-        GL.GetInteger(
+        GL.GetInteger
+        (
             GetPName.BlendDstAlpha,
             out snapshot._blendDstAlpha
         );
-        GL.GetInteger(
+        GL.GetInteger
+        (
             GetPName.DepthFunc,
             out snapshot._depthFunc
         );
@@ -102,37 +112,45 @@ internal struct GlStateSnapshot
 
     public void Restore()
     {
-        SetCap(
+        SetCap
+        (
             EnableCap.Blend,
             _blend
         );
-        SetCap(
+        SetCap
+        (
             EnableCap.DepthTest,
             _depthTest
         );
-        SetCap(
+        SetCap
+        (
             EnableCap.ScissorTest,
             _scissorTest
         );
-        SetCap(
+        SetCap
+        (
             EnableCap.StencilTest,
             _stencilTest
         );
-        SetCap(
+        SetCap
+        (
             EnableCap.CullFace,
             _cullFace
         );
-        SetCap(
+        SetCap
+        (
             EnableCap.SampleAlphaToCoverage,
             _sampleAlphaToCoverage
         );
-        SetCap(
+        SetCap
+        (
             EnableCap.FramebufferSrgb,
             _framebufferSrgb
         );
 
         GL.DepthMask(_depthMask);
-        GL.ColorMask(
+        GL.ColorMask
+        (
             _colorMask[0],
             _colorMask[1],
             _colorMask[2],
@@ -140,18 +158,21 @@ internal struct GlStateSnapshot
         );
         GL.DepthFunc((DepthFunction)_depthFunc);
 
-        GL.BlendEquationSeparate(
+        GL.BlendEquationSeparate
+        (
             (BlendEquationMode)_blendEquationRgb,
             (BlendEquationMode)_blendEquationAlpha
         );
-        GL.BlendFuncSeparate(
+        GL.BlendFuncSeparate
+        (
             (BlendingFactorSrc)_blendSrcRgb,
             (BlendingFactorDest)_blendDstRgb,
             (BlendingFactorSrc)_blendSrcAlpha,
             (BlendingFactorDest)_blendDstAlpha
         );
 
-        GL.Viewport(
+        GL.Viewport
+        (
             _viewport[0],
             _viewport[1],
             _viewport[2],

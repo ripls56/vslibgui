@@ -18,7 +18,8 @@ namespace Gui.Vtml;
 /// </summary>
 public static class VtmlSpanBuilder
 {
-    private static readonly Vector4 LinkColor = new(
+    private static readonly Vector4 LinkColor = new
+    (
         0.39f,
         0.58f,
         0.93f,
@@ -32,7 +33,8 @@ public static class VtmlSpanBuilder
     /// <param name="baseStyle">Base text style for fallback.</param>
     /// <param name="onLinkClick">Optional link click callback.</param>
     /// <returns>Root <see cref="TextSpan" /> containing all children.</returns>
-    public static InlineSpan Build(
+    public static InlineSpan Build
+    (
         List<VtmlInlineElement> elements,
         TextStyle baseStyle,
         Action<string>? onLinkClick = null
@@ -46,8 +48,10 @@ public static class VtmlSpanBuilder
         var children = new List<InlineSpan>();
         foreach (var elem in elements)
         {
-            children.Add(
-                ConvertElement(
+            children.Add
+            (
+                ConvertElement
+                (
                     elem,
                     baseStyle,
                     onLinkClick
@@ -58,7 +62,8 @@ public static class VtmlSpanBuilder
         return new TextSpan(children: children);
     }
 
-    private static InlineSpan ConvertElement(
+    private static InlineSpan ConvertElement
+    (
         VtmlInlineElement elem,
         TextStyle baseStyle,
         Action<string>? onLinkClick
@@ -67,7 +72,8 @@ public static class VtmlSpanBuilder
         switch (elem)
         {
             case VtmlTextRun run:
-                return ConvertTextRun(
+                return ConvertTextRun
+                (
                     run,
                     onLinkClick
                 );
@@ -79,7 +85,8 @@ public static class VtmlSpanBuilder
                 return new ClearSpan();
 
             case VtmlIconRun icon:
-                return ConvertIcon(
+                return ConvertIcon
+                (
                     icon,
                     baseStyle
                 );
@@ -95,7 +102,8 @@ public static class VtmlSpanBuilder
         }
     }
 
-    private static InlineSpan ConvertTextRun(
+    private static InlineSpan ConvertTextRun
+    (
         VtmlTextRun run,
         Action<string>? onLinkClick
     )
@@ -104,11 +112,13 @@ public static class VtmlSpanBuilder
         {
             var href = run.Href;
             var handler = onLinkClick ?? HandleLink;
-            return new TextSpan(
+            return new TextSpan
+            (
                 run.Text,
                 new SpanStyle
                 {
-                    Color = new Vector4(
+                    Color = new Vector4
+                    (
                         LinkColor.X,
                         LinkColor.Y,
                         LinkColor.Z,
@@ -124,11 +134,15 @@ public static class VtmlSpanBuilder
                     GlowColor = run.Style.GlowColor,
                     Decoration = TextDecoration.Underline
                 },
-                recognizer: new TapGestureRecognizer { OnTap = () => handler(href) }
+                recognizer: new TapGestureRecognizer
+                {
+                    OnTap = () => handler(href)
+                }
             );
         }
 
-        return new TextSpan(
+        return new TextSpan
+        (
             run.Text,
             new SpanStyle
             {
@@ -145,7 +159,8 @@ public static class VtmlSpanBuilder
         );
     }
 
-    private static void HandleLink(
+    private static void HandleLink
+    (
         string href
     )
     {
@@ -155,7 +170,8 @@ public static class VtmlSpanBuilder
             return;
         }
 
-        new LinkTextComponent(
+        new LinkTextComponent
+        (
             capi,
             "",
             CairoFont.WhiteSmallText(),
@@ -163,7 +179,8 @@ public static class VtmlSpanBuilder
         ).SetHref(href).Trigger();
     }
 
-    private static InlineSpan ConvertIcon(
+    private static InlineSpan ConvertIcon
+    (
         VtmlIconRun icon,
         TextStyle baseStyle
     )
@@ -177,14 +194,17 @@ public static class VtmlSpanBuilder
                 : icon.Path;
             if (colonIdx > 0)
             {
-                domain = icon.Path.Substring(
+                domain = icon.Path.Substring
+                (
                     0,
                     colonIdx
                 );
             }
 
-            return new WidgetSpan(
-                new Icon(
+            return new WidgetSpan
+            (
+                new Icon
+                (
                     domain,
                     path,
                     icon.Size
@@ -194,8 +214,10 @@ public static class VtmlSpanBuilder
 
         if (icon.Name != null)
         {
-            return new WidgetSpan(
-                new VsIcon(
+            return new WidgetSpan
+            (
+                new VsIcon
+                (
                     icon.Name,
                     icon.Size,
                     baseStyle.Color
@@ -206,7 +228,8 @@ public static class VtmlSpanBuilder
         return new TextSpan("");
     }
 
-    private static InlineSpan ConvertHotkey(
+    private static InlineSpan ConvertHotkey
+    (
         VtmlHotkeyRun hotkey
     )
     {
@@ -214,8 +237,10 @@ public static class VtmlSpanBuilder
             ? hotkey.Style.FontSize
             : 14f;
         var mapping = ResolveHotkeyMapping(hotkey.HotkeyCode);
-        return new WidgetSpan(
-            new HotkeyChip(
+        return new WidgetSpan
+        (
+            new HotkeyChip
+            (
                 mapping,
                 $"[{hotkey.HotkeyCode}]",
                 fontSize
@@ -223,13 +248,15 @@ public static class VtmlSpanBuilder
         );
     }
 
-    private static InlineSpan ConvertItemStack(
+    private static InlineSpan ConvertItemStack
+    (
         VtmlItemStackRun item
     )
     {
         var size = item.FontHeight * 1.3f * item.RSize;
 
-        Widget child = new SizedBox(
+        Widget child = new SizedBox
+        (
             size,
             size
         );
@@ -243,16 +270,19 @@ public static class VtmlSpanBuilder
                 var code = codes[0].Trim();
                 var collectible = item.ItemType == "item"
                     ? capi.World.GetItem(new AssetLocation(code))
-                    : (CollectibleObject?)capi.World.GetBlock(
+                    : (CollectibleObject?)capi.World.GetBlock
+                    (
                         new AssetLocation(code)
                     );
                 if (collectible != null)
                 {
-                    child = new ItemStackDisplay(
+                    child = new ItemStackDisplay
+                    (
                         new ItemStack(collectible),
                         size,
                         size,
-                        Math.Max(
+                        Math.Max
+                        (
                             16,
                             (int)size
                         )
@@ -265,13 +295,15 @@ public static class VtmlSpanBuilder
             ? VtmlFloat.Inline
             : item.FloatType;
 
-        return new WidgetSpan(
+        return new WidgetSpan
+        (
             child,
             @float: floatType
         );
     }
 
-    private static KeyCombination? ResolveHotkeyMapping(
+    private static KeyCombination? ResolveHotkeyMapping
+    (
         string hotkeyCode
     )
     {

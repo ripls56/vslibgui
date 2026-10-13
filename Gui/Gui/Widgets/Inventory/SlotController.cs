@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using Gui.Widgets.Framework;
+using JetBrains.Annotations;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
@@ -40,7 +42,8 @@ public class SlotController : ChangeNotifier
     private bool _isRightDragActive;
     private ItemStack? _referenceDistributStack;
 
-    public SlotController(
+    public SlotController
+    (
         ICoreClientAPI capi
     )
     {
@@ -85,9 +88,31 @@ public class SlotController : ChangeNotifier
     ///     Clears the currently hovered slot in VS's inventory manager and restores the vanilla
     ///     HUD tooltip. Call when the pointer leaves a slot.
     /// </summary>
-    public void LeaveSlot()
+    [Obsolete
+    (
+        "Use LeaveSlot(ItemSlot?) and pass the slot being left, so an out-of-order leave cannot clear a newer hover registration."
+    )]
+    [PublicAPI]
+    public void LeaveSlot() => LeaveSlot(null);
+
+    /// <summary>
+    ///     Clears the currently hovered slot in VS's inventory manager and restores the vanilla
+    ///     HUD tooltip. Call when the pointer leaves a slot.
+    ///     <para>
+    ///         The state is only cleared if <paramref name="slot" /> is still the registered
+    ///         hovered one, so an out-of-order leave (the pointer already entered the next slot,
+    ///         or another dialog took over the hover) cannot wipe the newer registration.
+    ///     </para>
+    /// </summary>
+    public void LeaveSlot(ItemSlot? slot)
     {
-        _capi.World.Player.InventoryManager.CurrentHoveredSlot = null;
+        var manager = _capi.World.Player.InventoryManager;
+        if (slot != null && manager.CurrentHoveredSlot != slot)
+        {
+            return;
+        }
+
+        manager.CurrentHoveredSlot = null;
         HudMouseTools.showTooltip = true;
     }
 
@@ -97,7 +122,8 @@ public class SlotController : ChangeNotifier
     ///     in the inventory changes, all listeners are notified so that
     ///     bound widgets can rebuild.
     /// </summary>
-    public void WatchInventory(
+    public void WatchInventory
+    (
         IInventory inventory
     )
     {
@@ -110,7 +136,8 @@ public class SlotController : ChangeNotifier
     }
 
     /// <summary>Stops observing <paramref name="inventory" />.</summary>
-    public void UnwatchInventory(
+    public void UnwatchInventory
+    (
         IInventory inventory
     )
     {
@@ -129,7 +156,8 @@ public class SlotController : ChangeNotifier
     ///     calls <see cref="IInventory.ActivateSlot" />, and sends the
     ///     resulting packet to the server.
     /// </summary>
-    public void ClickSlot(
+    public void ClickSlot
+    (
         ItemSlot slot,
         EnumMouseButton button,
         IInventory? outerInventory = null
@@ -159,12 +187,16 @@ public class SlotController : ChangeNotifier
         var wasMouseEmpty = mouse.Itemstack == null;
         var prevCollectible = mouse.Itemstack?.Collectible;
 
-        var op = new ItemStackMoveOperation(
+        var op = new ItemStackMoveOperation
+        (
             _capi.World,
             button,
             modifiers,
             EnumMergePriority.AutoMerge
-        ) { ActingPlayer = _capi.World.Player };
+        )
+        {
+            ActingPlayer = _capi.World.Player
+        };
 
         object packet;
         var shiftPressed = (modifiers & EnumModifierKey.SHIFT) != 0;
@@ -172,7 +204,8 @@ public class SlotController : ChangeNotifier
         if (shiftPressed)
         {
             op.RequestedQuantity = slot.StackSize;
-            packet = activateInv.ActivateSlot(
+            packet = activateInv.ActivateSlot
+            (
                 slotId,
                 slot,
                 ref op
@@ -181,7 +214,8 @@ public class SlotController : ChangeNotifier
         else
         {
             op.CurrentPriority = EnumMergePriority.DirectMerge;
-            packet = activateInv.ActivateSlot(
+            packet = activateInv.ActivateSlot
+            (
                 slotId,
                 mouse,
                 ref op
@@ -201,7 +235,8 @@ public class SlotController : ChangeNotifier
     ///     decide whether to mark the underlying <c>PointerEvent</c> handled
     ///     so unhandled wheel events bubble up to ancestor scrollables.
     /// </summary>
-    public bool WheelSlot(
+    public bool WheelSlot
+    (
         ItemSlot slot,
         int wheelDir,
         IInventory? outerInventory = null
@@ -233,15 +268,20 @@ public class SlotController : ChangeNotifier
             return false;
         }
 
-        var op = new ItemStackMoveOperation(
+        var op = new ItemStackMoveOperation
+        (
             _capi.World,
             EnumMouseButton.Wheel,
             0,
             EnumMergePriority.AutoMerge,
             1
-        ) { WheelDir = wheelDir, ActingPlayer = _capi.World.Player };
+        )
+        {
+            WheelDir = wheelDir, ActingPlayer = _capi.World.Player
+        };
 
-        var packet = activateInv.ActivateSlot(
+        var packet = activateInv.ActivateSlot
+        (
             slotId,
             MouseSlot,
             ref op
@@ -272,16 +312,19 @@ public class SlotController : ChangeNotifier
 
         if (_warnedInventories.Add(inventory))
         {
-            _capi.Logger.Warning(
+            _capi.Logger.Warning
+            (
                 "[gui] Skipped slot activation in inventory '{0}' (slotId={1}): inventory is " +
                 "not network-ready or the slot is not part of it.",
-                inventory.InventoryID, slotId);
+                inventory.InventoryID, slotId
+            );
         }
 
         return false;
     }
 
-    private void PlaySlotSound(
+    private void PlaySlotSound
+    (
         bool wasMouseEmpty,
         CollectibleObject? prevCollectible
     )
@@ -317,7 +360,8 @@ public class SlotController : ChangeNotifier
     ///         per-slot packets are batched until <see cref="EndDrag" />.
     ///     </para>
     /// </summary>
-    public void BeginDrag(
+    public void BeginDrag
+    (
         EnumMouseButton button,
         ItemSlot initialSlot
     )
@@ -355,7 +399,8 @@ public class SlotController : ChangeNotifier
     ///     For right-drag, places one item per slot. For left-drag,
     ///     distributes items evenly across all visited slots.
     /// </summary>
-    public void DragEnterSlot(
+    public void DragEnterSlot
+    (
         ItemSlot slot,
         IInventory? outerInventory = null
     )
@@ -443,7 +488,8 @@ public class SlotController : ChangeNotifier
         NotifyListeners();
     }
 
-    private void PauseInventory(
+    private void PauseInventory
+    (
         IInventory? inventory
     )
     {
@@ -466,7 +512,8 @@ public class SlotController : ChangeNotifier
         _pausedInventories.Clear();
     }
 
-    private bool IsAlreadyVisited(
+    private bool IsAlreadyVisited
+    (
         ItemSlot slot
     )
     {
@@ -481,7 +528,8 @@ public class SlotController : ChangeNotifier
         return false;
     }
 
-    private bool IsCompatibleSlot(
+    private bool IsCompatibleSlot
+    (
         ItemSlot slot,
         ItemStack reference
     )
@@ -491,7 +539,8 @@ public class SlotController : ChangeNotifier
             return true;
         }
 
-        return slot.Itemstack.Equals(
+        return slot.Itemstack.Equals
+        (
             _capi.World,
             reference,
             GlobalConstants.IgnoredStackAttributes
@@ -525,12 +574,16 @@ public class SlotController : ChangeNotifier
             }
 
             var excess = added - perSlot;
-            var op = new ItemStackMoveOperation(
+            var op = new ItemStackMoveOperation
+            (
                 _capi.World,
                 EnumMouseButton.Left,
                 0,
                 EnumMergePriority.AutoMerge
-            ) { ActingPlayer = _capi.World.Player, RequestedQuantity = excess };
+            )
+            {
+                ActingPlayer = _capi.World.Player, RequestedQuantity = excess
+            };
             var packet = _capi.World.Player.InventoryManager
                 .TryTransferTo(slot, lastSlot, ref op);
             SendPacket(packet);
@@ -539,11 +592,13 @@ public class SlotController : ChangeNotifier
         NotifyListeners();
     }
 
-    private void OnSlotModified(
+    private void OnSlotModified
+    (
         int slotId
     )
     {
-        _capi.Event.EnqueueMainThreadTask(
+        _capi.Event.EnqueueMainThreadTask
+        (
             NotifyListeners,
             "SlotController.OnSlotModified"
         );
@@ -571,7 +626,8 @@ public class SlotController : ChangeNotifier
         return m;
     }
 
-    private void SendPacket(
+    private void SendPacket
+    (
         object? packet
     )
     {

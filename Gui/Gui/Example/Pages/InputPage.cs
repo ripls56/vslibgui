@@ -226,7 +226,7 @@ internal class InputPage : StatefulWidget
                                     Height = 35,
                                     FillColor = new Vector4(0f, 0f, 0f, 0.3f),
                                     BorderThickness = 1f,
-                                    BorderColor = colors.Border,
+                                    BorderColor = colors.Border
                                 }
                             )
                         ),

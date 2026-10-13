@@ -37,12 +37,14 @@ internal struct RepaintRecord
     {
     }
 
-    public bool WasDirtyPaintedThisFrame(
+    public bool WasDirtyPaintedThisFrame
+    (
         int currentFrameId
     ) =>
         DirtyPaintedFrameId == currentFrameId;
 
-    public bool WasCacheHitThisFrame(
+    public bool WasCacheHitThisFrame
+    (
         int currentFrameId
     ) =>
         CacheHitFrameId == currentFrameId;

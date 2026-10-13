@@ -22,7 +22,8 @@ public class NineSliceBox : SingleChildWidget
     private readonly Vector4 _tint;
     private readonly float? _width;
 
-    public NineSliceBox(
+    public NineSliceBox
+    (
         SKBitmap texture,
         EdgeInsets slice,
         float scale = 1f,
@@ -32,7 +33,8 @@ public class NineSliceBox : SingleChildWidget
         float? height = null,
         Widget? child = null,
         Framework.Key? key = null
-    ) : base(
+    ) : base
+    (
         child,
         key
     )
@@ -46,7 +48,8 @@ public class NineSliceBox : SingleChildWidget
         _height = height;
     }
 
-    public static NineSliceBox Sliced(
+    public static NineSliceBox Sliced
+    (
         SKBitmap texture,
         EdgeInsets slice,
         float scale = 1f,
@@ -57,7 +60,8 @@ public class NineSliceBox : SingleChildWidget
         Framework.Key? key = null
     )
     {
-        return new NineSliceBox(
+        return new NineSliceBox
+        (
             texture,
             slice,
             scale,
@@ -70,7 +74,8 @@ public class NineSliceBox : SingleChildWidget
         );
     }
 
-    public static NineSliceBox Sliced(
+    public static NineSliceBox Sliced
+    (
         SKBitmap texture,
         float slice,
         float scale = 1f,
@@ -81,7 +86,8 @@ public class NineSliceBox : SingleChildWidget
         Framework.Key? key = null
     )
     {
-        return Sliced(
+        return Sliced
+        (
             texture,
             EdgeInsets.All(slice),
             scale,
@@ -93,7 +99,8 @@ public class NineSliceBox : SingleChildWidget
         );
     }
 
-    public static NineSliceBox Tiled(
+    public static NineSliceBox Tiled
+    (
         SKBitmap texture,
         EdgeInsets slice,
         float scale = 1f,
@@ -104,7 +111,8 @@ public class NineSliceBox : SingleChildWidget
         Framework.Key? key = null
     )
     {
-        return new NineSliceBox(
+        return new NineSliceBox
+        (
             texture,
             slice,
             scale,
@@ -117,7 +125,8 @@ public class NineSliceBox : SingleChildWidget
         );
     }
 
-    public static NineSliceBox Tiled(
+    public static NineSliceBox Tiled
+    (
         SKBitmap texture,
         float slice,
         float scale = 1f,
@@ -128,7 +137,8 @@ public class NineSliceBox : SingleChildWidget
         Framework.Key? key = null
     )
     {
-        return Tiled(
+        return Tiled
+        (
             texture,
             EdgeInsets.All(slice),
             scale,
@@ -142,7 +152,8 @@ public class NineSliceBox : SingleChildWidget
 
     public override RenderObject CreateRenderObject() => new RenderNineSlice();
 
-    public override void UpdateRenderObject(
+    public override void UpdateRenderObject
+    (
         RenderObject renderObject
     )
     {

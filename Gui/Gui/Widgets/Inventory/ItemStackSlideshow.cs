@@ -35,8 +35,8 @@ public class ItemStackSlideshow : StatefulWidget
 
     private class SlideshowState : State<ItemStackSlideshow>
     {
-        private Ticker _ticker = null!;
         private long _elapsedMs;
+        private Ticker _ticker = null!;
 
         /// <inheritdoc />
         public override void InitState()
@@ -46,10 +46,8 @@ public class ItemStackSlideshow : StatefulWidget
             _ticker.Start();
         }
 
-        private void OnTick(TimeSpan delta)
-        {
-            SetState(() => _elapsedMs += (long)delta.TotalMilliseconds);
-        }
+        private void OnTick(TimeSpan delta) => SetState
+            (() => _elapsedMs += (long)delta.TotalMilliseconds);
 
         /// <inheritdoc />
         public override void Dispose()
@@ -63,7 +61,7 @@ public class ItemStackSlideshow : StatefulWidget
         {
             if (Widget.Stacks.Count == 0)
             {
-                return new SizedBox(width: Widget.Size, height: Widget.Size);
+                return new SizedBox(Widget.Size, Widget.Size);
             }
 
             var count = Widget.Stacks.Count;
@@ -76,10 +74,12 @@ public class ItemStackSlideshow : StatefulWidget
                 var rawT = (float)(phaseMs - FadeStartMs) / (1000 - FadeStartMs);
                 var t = (float)Curves.EaseInOut.Transform(rawT);
                 var nextIndex = (curIndex + 1) % count;
-                return new SlideshowCrossfade(Widget.Stacks[curIndex], Widget.Stacks[nextIndex], t, Widget.Size);
+                return new SlideshowCrossfade
+                    (Widget.Stacks[curIndex], Widget.Stacks[nextIndex], t, Widget.Size);
             }
 
-            return new ItemStackDisplay(Widget.Stacks[curIndex], Widget.Size, Widget.Size, (int)(Widget.Size * 2));
+            return new ItemStackDisplay
+                (Widget.Stacks[curIndex], Widget.Size, Widget.Size, (int)(Widget.Size * 2));
         }
     }
 }

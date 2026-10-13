@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Gui.Core.Layout;
 using Gui.Rendering.Text;
+using Gui.Sound;
 using Gui.Widgets.Events;
 using Gui.Widgets.Framework;
 using Gui.Widgets.Input;
@@ -34,7 +35,8 @@ namespace Gui.Widgets.Basic;
 /// </summary>
 public class WindowTitleBar : StatefulWidget
 {
-    public WindowTitleBar(
+    public WindowTitleBar
+    (
         string title = "",
         float height = 28f,
         Action? onClose = null,
@@ -56,7 +58,8 @@ public class WindowTitleBar : StatefulWidget
         var defaults = ThemeData.Default.ColorScheme;
         BackgroundColor = backgroundColor ?? defaults.Surface;
         TextColor = textColor ?? defaults.OnSurface;
-        ButtonHoverColor = buttonHoverColor ?? new Vector4(
+        ButtonHoverColor = buttonHoverColor ?? new Vector4
+        (
             defaults.Surface.X + 0.12f,
             defaults.Surface.Y + 0.12f,
             defaults.Surface.Z + 0.12f,
@@ -88,7 +91,8 @@ public class WindowTitleBar : StatefulWidget
         private bool _isMinimized;
         private bool _minimizeHovered;
 
-        public override Widget Build(
+        public override Widget Build
+        (
             BuildContext context
         )
         {
@@ -99,8 +103,10 @@ public class WindowTitleBar : StatefulWidget
 
             if (w.ShowMinimize)
             {
-                buttons.Add(
-                    _TitleBarButton(
+                buttons.Add
+                (
+                    _TitleBarButton
+                    (
                         _isMinimized
                             ? "+"
                             : "\u2013",
@@ -113,6 +119,15 @@ public class WindowTitleBar : StatefulWidget
                         _ => SetState(() => _minimizeHovered = false),
                         _ =>
                         {
+                            if (_isMinimized)
+                            {
+                                this.ToggleOn();
+                            }
+                            else
+                            {
+                                this.ToggleOff();
+                            }
+
                             SetState(() => _isMinimized = !_isMinimized);
                             w.OnMinimizeChanged?.Invoke(_isMinimized);
                         }
@@ -122,8 +137,10 @@ public class WindowTitleBar : StatefulWidget
 
             if (w.ShowClose)
             {
-                buttons.Add(
-                    _TitleBarButton(
+                buttons.Add
+                (
+                    _TitleBarButton
+                    (
                         "\u00d7",
                         btnSize,
                         _closeHovered,
@@ -132,23 +149,38 @@ public class WindowTitleBar : StatefulWidget
                         w.FontSize + 2,
                         _ => SetState(() => _closeHovered = true),
                         _ => SetState(() => _closeHovered = false),
-                        _ => w.OnClose?.Invoke()
+                        _ =>
+                        {
+                            this.Close();
+                            w.OnClose?.Invoke();
+                        }
                     )
                 );
             }
 
-            return new Container(
-                new BoxStyle { Height = w.Height, Color = w.BackgroundColor },
-                new Row(
+            return new Container
+            (
+                new BoxStyle
+                {
+                    Height = w.Height, Color = w.BackgroundColor
+                },
+                new Row
+                (
                     children:
                     [
                         new SizedBox(8),
-                        new Expanded(
-                            new Align(
+                        new Expanded
+                        (
+                            new Align
+                            (
                                 Alignment.CenterLeft,
-                                new Text(
+                                new Text
+                                (
                                     w.Title,
-                                    new TextStyle { FontSize = w.FontSize, Color = w.TextColor }
+                                    new TextStyle
+                                    {
+                                        FontSize = w.FontSize, Color = w.TextColor
+                                    }
                                 )
                             )
                         ),
@@ -159,7 +191,8 @@ public class WindowTitleBar : StatefulWidget
             );
         }
 
-        private static Widget _TitleBarButton(
+        private static Widget _TitleBarButton
+        (
             string label,
             float size,
             bool isHovered,
@@ -171,11 +204,13 @@ public class WindowTitleBar : StatefulWidget
             Action<PointerEvent> onTap
         )
         {
-            return new GestureDetector(
+            return new GestureDetector
+            (
                 onTap: onTap,
                 onEnter: onEnter,
                 onExit: onExit,
-                child: new Container(
+                child: new Container
+                (
                     new BoxStyle
                     {
                         Width = size,
@@ -185,10 +220,15 @@ public class WindowTitleBar : StatefulWidget
                             : Vector4.Zero,
                         CornerRadius = new Vector4(3)
                     },
-                    new Center(
-                        new Text(
+                    new Center
+                    (
+                        new Text
+                        (
                             label,
-                            new TextStyle { FontSize = fontSize, Color = textColor }
+                            new TextStyle
+                            {
+                                FontSize = fontSize, Color = textColor
+                            }
                         )
                     )
                 )
@@ -210,7 +250,8 @@ public class WindowTitleBar : StatefulWidget
 /// </summary>
 public class WindowFrame : StatefulWidget
 {
-    public WindowFrame(
+    public WindowFrame
+    (
         string title = "",
         Widget? child = null,
         Action? onClose = null,
@@ -261,14 +302,16 @@ public class WindowFrame : StatefulWidget
     {
         private bool _isMinimized;
 
-        public override Widget Build(
+        public override Widget Build
+        (
             BuildContext context
         )
         {
             var w = Widget;
             var children = new List<Widget>
             {
-                new WindowTitleBar(
+                new WindowTitleBar
+                (
                     w.Title,
                     w.TitleBarHeight,
                     w.OnClose,
@@ -285,17 +328,22 @@ public class WindowFrame : StatefulWidget
 
             if (!_isMinimized && w.Child != null)
             {
-                children.Add(fill
-                    ? new Expanded(w.Child)
-                    : w.Child);
+                children.Add
+                (
+                    fill
+                        ? new Expanded(w.Child)
+                        : w.Child
+                );
             }
 
-            return new Column(
+            return new Column
+            (
                 crossAxisAlignment: CrossAxisAlignment.Stretch,
                 mainAxisSize: fill
                     ? MainAxisSize.Max
                     : MainAxisSize.Min,
-                children: children);
+                children: children
+            );
         }
     }
 }

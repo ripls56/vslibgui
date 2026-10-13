@@ -32,21 +32,25 @@ public sealed class WorldAnchor
     /// <param name="windowSize">The dialog's window size in logical pixels.</param>
     /// <param name="windowPos">Computed top-left window position in logical pixels.</param>
     /// <returns>True if the projection succeeded; false if behind camera.</returns>
-    public bool TryProject(
+    public bool TryProject
+    (
         double[] projection,
         double[] view,
         int frameWidth,
         int frameHeight,
         float guiScale,
         Vector2 windowSize,
-        out Vector2 windowPos)
+        out Vector2 windowPos
+    )
     {
-        var screen = MatrixToolsd.Project(
+        var screen = MatrixToolsd.Project
+        (
             WorldPos,
             projection,
             view,
             frameWidth,
-            frameHeight);
+            frameHeight
+        );
 
         if (screen.Z < 0)
         {
@@ -54,9 +58,11 @@ public sealed class WorldAnchor
             return false;
         }
 
-        windowPos = new Vector2(
+        windowPos = new Vector2
+        (
             (float)(screen.X / guiScale) - windowSize.X / 2f,
-            (float)((frameHeight - screen.Y) / guiScale) - windowSize.Y * (float)Align);
+            (float)((frameHeight - screen.Y) / guiScale) - windowSize.Y * (float)Align
+        );
         return true;
     }
 }

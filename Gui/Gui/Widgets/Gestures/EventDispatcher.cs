@@ -81,7 +81,7 @@ public class EventDispatcher
         {
             var el = result.Path[i].Element;
             var isTarget = filter != null
-                ? filter(el.Widget) || (el is StatefulElement se2 && filter(se2.State))
+                ? filter(el.Widget) || el is StatefulElement se2 && filter(se2.State)
                 : IsAnyActiveTarget(el);
 
             if (isTarget)
@@ -101,8 +101,8 @@ public class EventDispatcher
     )
     {
         return EventCheckHelper.HandlesAnyPointerEvent(el.Widget) ||
-               (el is StatefulElement se &&
-                EventCheckHelper.HandlesAnyPointerEvent(se.State));
+               el is StatefulElement se &&
+               EventCheckHelper.HandlesAnyPointerEvent(se.State);
     }
 
     private static bool IsActiveTarget<THandler>
@@ -122,6 +122,18 @@ public class EventDispatcher
 
         return true;
     }
+
+    /// <summary>
+    ///     True while an element is latched as hovered and still owes a pointer-exit call.
+    ///     Lets a window skip the hover watchdog work when nothing can go stale.
+    /// </summary>
+    public bool HasHoverState => _hoveredElement != null || _dragHoveredElement != null;
+
+    /// <summary>
+    ///     True while a widget holds pointer capture (an active press or drag). Hover must not
+    ///     be cancelled then: the captured widget owns the pointer even outside its bounds.
+    /// </summary>
+    public bool IsPointerCaptured => _capturedElement != null;
 
     public void DispatchPointerMove
     (
@@ -237,6 +249,38 @@ public class EventDispatcher
                 e
             );
         }
+    }
+
+    /// <summary>
+    ///     Dispatches <see cref="IPointerExitHandler.OnPointerExit" /> to the currently
+    ///     hovered (and drag-hovered) hierarchy and clears all hover/capture tracking,
+    ///     without running a hit test. Call when the pointer can no longer report a move
+    ///     over the tree — e.g. the dialog is closing and the engine warps the cursor back
+    ///     to screen centre, which would otherwise leave hover state (vanilla tooltip
+    ///     suppression, highlights, cursor shape) permanently stuck.
+    /// </summary>
+    public void CancelHover()
+    {
+        var e = new PointerEvent(-1, -1);
+
+        if (_hoveredElement != null)
+        {
+            DispatchToHierarchy<IPointerExitHandler>
+                (_hoveredElement, h => h.OnPointerExit(e));
+        }
+
+        if (_dragHoveredElement != null && _dragHoveredElement != _hoveredElement)
+        {
+            DispatchToHierarchy<IPointerExitHandler>
+                (_dragHoveredElement, h => h.OnPointerExit(e));
+        }
+
+        _hoveredElement = null;
+        _dragHoveredElement = null;
+        _capturedElement = null;
+        _pressedElement = null;
+        _hitTestResult.Clear();
+        _dragHitTestResult.Clear();
     }
 
     /// <summary>

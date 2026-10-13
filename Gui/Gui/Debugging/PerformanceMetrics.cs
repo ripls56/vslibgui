@@ -22,7 +22,8 @@ public class PerformanceMetrics
 
     public int WidgetCount { get; set; }
 
-    public void RecordFrameTime(
+    public void RecordFrameTime
+    (
         float dtMs
     )
     {
@@ -42,7 +43,8 @@ public class PerformanceMetrics
         TotalAllocatedMemory = GC.GetTotalMemory(false);
     }
 
-    public void RecordBuildTime(
+    public void RecordBuildTime
+    (
         float ms
     )
     {
@@ -56,7 +58,8 @@ public class PerformanceMetrics
         }
     }
 
-    public void RecordLayoutTime(
+    public void RecordLayoutTime
+    (
         float ms
     )
     {
@@ -70,7 +73,8 @@ public class PerformanceMetrics
         }
     }
 
-    public void RecordPaintTime(
+    public void RecordPaintTime
+    (
         float ms
     )
     {
@@ -84,7 +88,8 @@ public class PerformanceMetrics
         }
     }
 
-    public void RecordBeginTime(
+    public void RecordBeginTime
+    (
         float ms
     )
     {
@@ -98,7 +103,8 @@ public class PerformanceMetrics
         }
     }
 
-    public void RecordEndTime(
+    public void RecordEndTime
+    (
         float ms
     )
     {
@@ -120,7 +126,8 @@ public class PerformanceMetrics
 
     public void IncrementRepaintBoundaryMiss() => RepaintBoundaryMisses++;
 
-    public void OnFrameStart(
+    public void OnFrameStart
+    (
         double totalTime
     )
     {

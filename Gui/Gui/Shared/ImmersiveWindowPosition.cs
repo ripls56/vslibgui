@@ -18,7 +18,12 @@ public static class ImmersiveWindowPosition
     ///     logical size when immersive mouse mode is enabled, or <c>null</c> for
     ///     default centered placement.
     /// </summary>
-    public static Vector2? RightAnchoredOrCentered(ICoreClientAPI capi, float width, float height)
+    public static Vector2? RightAnchoredOrCentered
+    (
+        ICoreClientAPI capi,
+        float width,
+        float height
+    )
     {
         if (!capi.Settings.Bool["immersiveMouseMode"])
         {
@@ -26,8 +31,10 @@ public static class ImmersiveWindowPosition
         }
 
         var scale = RuntimeEnv.GUIScale;
-        return new Vector2(
+        return new Vector2
+        (
             capi.Render.FrameWidth / scale - width - ImmersiveRightMargin,
-            (capi.Render.FrameHeight / scale - height) / 2f);
+            (capi.Render.FrameHeight / scale - height) / 2f
+        );
     }
 }

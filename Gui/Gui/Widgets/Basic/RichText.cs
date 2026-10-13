@@ -23,7 +23,8 @@ public class RichText : StatefulWidget
     /// <param name="maxLines">Maximum lines to display. 0 = unlimited.</param>
     /// <param name="overflow">Overflow behavior for truncated text.</param>
     /// <param name="key">Optional widget key for reconciliation.</param>
-    public RichText(
+    public RichText
+    (
         InlineSpan span,
         TextStyle? defaultStyle = null,
         int maxLines = 0,
@@ -65,7 +66,8 @@ internal class RichTextState
     private bool _hasRecognizers;
 
     /// <inheritdoc />
-    public void OnPointerClick(
+    public void OnPointerClick
+    (
         PointerEvent e
     )
     {
@@ -80,13 +82,16 @@ internal class RichTextState
             return;
         }
 
-        var local = ro.GlobalToLocal(
-            new Vector2(
+        var local = ro.GlobalToLocal
+        (
+            new Vector2
+            (
                 e.X,
                 e.Y
             )
         );
-        var hit = ro.HitTestRun(
+        var hit = ro.HitTestRun
+        (
             local.X,
             local.Y
         );
@@ -98,7 +103,8 @@ internal class RichTextState
     }
 
     /// <inheritdoc />
-    public bool HandlesEvent(
+    public bool HandlesEvent
+    (
         Type eventInterface
     )
     {
@@ -114,7 +120,8 @@ internal class RichTextState
     }
 
     /// <inheritdoc />
-    public override void UpdateWidget(
+    public override void UpdateWidget
+    (
         RichText old
     )
     {
@@ -123,11 +130,13 @@ internal class RichTextState
     }
 
     /// <inheritdoc />
-    public override Widget Build(
+    public override Widget Build
+    (
         BuildContext context
     )
     {
-        return new RichTextRenderWidget(
+        return new RichTextRenderWidget
+        (
             Widget.Span,
             Widget.DefaultStyle,
             Widget.MaxLines,
@@ -144,7 +153,8 @@ internal class RichTextState
 internal class RichTextRenderWidget : MultiChildWidget
 {
     /// <summary>Creates a new render widget for the given span tree.</summary>
-    public RichTextRenderWidget(
+    public RichTextRenderWidget
+    (
         InlineSpan span,
         TextStyle defaultStyle,
         int maxLines = 0,
@@ -174,7 +184,8 @@ internal class RichTextRenderWidget : MultiChildWidget
     public override RenderObject CreateRenderObject() => new RenderRichText();
 
     /// <inheritdoc />
-    public override void UpdateRenderObject(
+    public override void UpdateRenderObject
+    (
         RenderObject renderObject
     )
     {

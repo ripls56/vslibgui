@@ -6,7 +6,8 @@ namespace Gui.Widgets.Layout;
 
 public class Positioned : SingleChildWidget
 {
-    public Positioned(
+    public Positioned
+    (
         float? left = null,
         float? top = null,
         float? right = null,
@@ -34,7 +35,8 @@ public class Positioned : SingleChildWidget
 
     public override RenderObject CreateRenderObject() => new RenderPositioned();
 
-    public override void UpdateRenderObject(
+    public override void UpdateRenderObject
+    (
         RenderObject renderObject
     )
     {

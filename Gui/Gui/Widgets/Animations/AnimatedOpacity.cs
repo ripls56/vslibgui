@@ -14,7 +14,8 @@ public class AnimatedOpacity : ImplicitlyAnimatedWidget
     ///     Creates an animated opacity widget that transitions between opacity
     ///     values over the given <paramref name="duration" />.
     /// </summary>
-    public AnimatedOpacity(
+    public AnimatedOpacity
+    (
         float opacity,
         TimeSpan duration,
         Curve? curve = null,
@@ -22,7 +23,8 @@ public class AnimatedOpacity : ImplicitlyAnimatedWidget
         Widget? child = null,
         Framework.Key? key = null
     )
-        : base(
+        : base
+        (
             duration,
             curve,
             onEnd,
@@ -52,14 +54,17 @@ internal class AnimatedOpacityState
     private FloatTween? _opacityTween;
 
     /// <inheritdoc />
-    protected override void ForEachTween(
+    protected override void ForEachTween
+    (
         TweenVisitor visitor
     )
     {
-        _opacityTween = (FloatTween)visitor.Visit(
+        _opacityTween = (FloatTween)visitor.Visit
+        (
             _opacityTween,
             Widget.OpacityValue,
-            v => new FloatTween(
+            v => new FloatTween
+            (
                 v,
                 v
             )
@@ -67,11 +72,13 @@ internal class AnimatedOpacityState
     }
 
     /// <inheritdoc />
-    public override Widget Build(
+    public override Widget Build
+    (
         BuildContext context
     )
     {
-        return new Opacity(
+        return new Opacity
+        (
             _opacityTween!.Evaluate(Animation),
             Widget.Child
         );

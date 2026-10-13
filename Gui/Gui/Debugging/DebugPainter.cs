@@ -8,42 +8,48 @@ namespace Gui.Debugging;
 
 public static class DebugPainter
 {
-    private static readonly Vector4 BoundsColor = new(
+    private static readonly Vector4 BoundsColor = new
+    (
         0,
         1,
         1,
         0.4f
     ); // Cyan
 
-    private static readonly Vector4 BoundaryColor = new(
+    private static readonly Vector4 BoundaryColor = new
+    (
         1,
         0,
         1,
         0.6f
     ); // Magenta
 
-    private static readonly Vector4 DirtyLayoutColor = new(
+    private static readonly Vector4 DirtyLayoutColor = new
+    (
         1,
         0.5f,
         0,
         0.8f
     ); // Orange
 
-    private static readonly Vector4 DirtyPaintColor = new(
+    private static readonly Vector4 DirtyPaintColor = new
+    (
         1,
         0,
         0,
         0.8f
     ); // Red
 
-    private static readonly Vector4 ViolationFill = new(
+    private static readonly Vector4 ViolationFill = new
+    (
         1,
         0,
         0,
         0.25f
     ); // Red fill
 
-    private static readonly Vector4 ViolationBorder = new(
+    private static readonly Vector4 ViolationBorder = new
+    (
         1,
         0,
         0,
@@ -51,19 +57,22 @@ public static class DebugPainter
     ); // Red border
 
     // Repaint overlay colors
-    private static readonly Vector3 HitColor = new(
+    private static readonly Vector3 HitColor = new
+    (
         0,
         1,
         0
     ); // Green for cache hit
 
-    private static readonly Vector3 MissColor = new(
+    private static readonly Vector3 MissColor = new
+    (
         1,
         0,
         0
     ); // Red for cache miss
 
-    private static readonly Vector3 DirtyColor = new(
+    private static readonly Vector3 DirtyColor = new
+    (
         1,
         0.55f,
         0
@@ -86,14 +95,16 @@ public static class DebugPainter
     ///     <see langword="true" /> when this window is the topmost focused window; gates
     ///     the pointer-cursor draw so only one cursor appears.
     /// </param>
-    public static void PaintDebugInfo(
+    public static void PaintDebugInfo
+    (
         RenderObject ro,
         PaintingContext context,
         DebugSettings settings,
         double currentTime,
         bool isActiveWindow = false
     ) =>
-        PaintDebugInfo(
+        PaintDebugInfo
+        (
             ro,
             context,
             settings,
@@ -124,7 +135,8 @@ public static class DebugPainter
     /// <param name="profiler">
     ///     Per-window profiler. See <paramref name="metrics" /> for draw conditions.
     /// </param>
-    public static void PaintDebugInfo(
+    public static void PaintDebugInfo
+    (
         RenderObject ro,
         PaintingContext context,
         DebugSettings settings,
@@ -145,24 +157,29 @@ public static class DebugPainter
         if (ro.Parent == null && isActiveWindow && LastPointerPos.HasValue)
         {
             var pointerColor = IsPointerOverInteractive
-                ? new Vector4(
+                ? new Vector4
+                (
                     0,
                     1,
                     0,
                     1
                 )
-                : new Vector4(
+                : new Vector4
+                (
                     1,
                     1,
                     0,
                     1
                 );
-            context.DrawBox(
-                LastPointerPos.Value - new Vector2(
+            context.DrawBox
+            (
+                LastPointerPos.Value - new Vector2
+                (
                     3,
                     3
                 ),
-                new Vector2(
+                new Vector2
+                (
                     6,
                     6
                 ),
@@ -175,7 +192,8 @@ public static class DebugPainter
 
         if (ro.Parent == null && settings.ShowProfiler && metrics != null && profiler != null)
         {
-            PaintProfilerPanel(
+            PaintProfilerPanel
+            (
                 context,
                 metrics,
                 profiler
@@ -184,7 +202,8 @@ public static class DebugPainter
 
         if (settings.ShowBounds)
         {
-            PaintBoundsOverlay(
+            PaintBoundsOverlay
+            (
                 ro,
                 context
             );
@@ -192,7 +211,8 @@ public static class DebugPainter
 
         if (settings.ShowPaint || settings.ShowHeatMap)
         {
-            PaintRepaintOverlay(
+            PaintRepaintOverlay
+            (
                 ro,
                 context,
                 settings,
@@ -203,7 +223,8 @@ public static class DebugPainter
 
         if (settings.ShowViolations && ro.HasLayoutViolation)
         {
-            context.DrawBox(
+            context.DrawBox
+            (
                 Vector2.Zero,
                 ro.Size,
                 ViolationFill,
@@ -216,11 +237,13 @@ public static class DebugPainter
         foreach (var child in ro.Children)
         {
             context.Canvas.Save();
-            context.Canvas.Translate(
+            context.Canvas.Translate
+            (
                 child.X,
                 child.Y
             );
-            PaintDebugInfo(
+            PaintDebugInfo
+            (
                 child,
                 context,
                 settings,
@@ -233,7 +256,8 @@ public static class DebugPainter
         }
     }
 
-    private static void PaintBoundsOverlay(
+    private static void PaintBoundsOverlay
+    (
         RenderObject ro,
         PaintingContext context
     )
@@ -254,7 +278,8 @@ public static class DebugPainter
             color = DirtyPaintColor;
         }
 
-        context.DrawBox(
+        context.DrawBox
+        (
             Vector2.Zero,
             ro.Size,
             Vector4.Zero,
@@ -264,13 +289,15 @@ public static class DebugPainter
         );
     }
 
-    private static void PaintProfilerPanel(
+    private static void PaintProfilerPanel
+    (
         PaintingContext context,
         PerformanceMetrics metrics,
         GuiProfiler profiler
     )
     {
-        var lines = ProfilerOverlay.BuildLines(
+        var lines = ProfilerOverlay.BuildLines
+        (
             metrics,
             profiler,
             5
@@ -280,16 +307,20 @@ public static class DebugPainter
         const float padding = 4f;
         var height = lines.Count * lineHeight + padding * 2f;
 
-        context.DrawBox(
-            new Vector2(
+        context.DrawBox
+        (
+            new Vector2
+            (
                 4,
                 4
             ),
-            new Vector2(
+            new Vector2
+            (
                 240,
                 height
             ),
-            new Vector4(
+            new Vector4
+            (
                 0,
                 0,
                 0,
@@ -303,14 +334,17 @@ public static class DebugPainter
         var y = 4 + padding + 9f;
         foreach (var line in lines)
         {
-            context.DrawText(
+            context.DrawText
+            (
                 line,
-                new Vector2(
+                new Vector2
+                (
                     8,
                     y
                 ),
                 9f,
-                new Vector4(
+                new Vector4
+                (
                     1,
                     1,
                     1,
@@ -322,7 +356,8 @@ public static class DebugPainter
         }
     }
 
-    private static void PaintRepaintOverlay(
+    private static void PaintRepaintOverlay
+    (
         RenderObject ro,
         PaintingContext context,
         DebugSettings settings,
@@ -332,7 +367,8 @@ public static class DebugPainter
     {
         if (ro.IsRepaintBoundary)
         {
-            PaintBoundaryOverlay(
+            PaintBoundaryOverlay
+            (
                 ro,
                 context,
                 settings,
@@ -342,7 +378,8 @@ public static class DebugPainter
         }
         else
         {
-            PaintRegularNodeOverlay(
+            PaintRegularNodeOverlay
+            (
                 ro,
                 context,
                 settings,
@@ -352,7 +389,8 @@ public static class DebugPainter
         }
     }
 
-    private static void PaintBoundaryOverlay(
+    private static void PaintBoundaryOverlay
+    (
         RenderObject ro,
         PaintingContext context,
         DebugSettings settings,
@@ -361,7 +399,8 @@ public static class DebugPainter
     )
     {
         var record = ro.RepaintRecord;
-        var state = GetBoundaryState(
+        var state = GetBoundaryState
+        (
             record,
             frameId
         );
@@ -372,7 +411,8 @@ public static class DebugPainter
         }
 
         var elapsed = currentTime - record.LastEventTimestampMs;
-        var alpha = (float)Math.Max(
+        var alpha = (float)Math.Max
+        (
             0.0,
             1.0 - elapsed / settings.FlashDurationMs
         );
@@ -384,15 +424,18 @@ public static class DebugPainter
         if (state == BoundaryRepaintState.CacheHit)
         {
             // GREEN: thin border + faint fill
-            var fill = new Vector4(
+            var fill = new Vector4
+            (
                 HitColor,
                 0.15f * alpha
             );
-            var border = new Vector4(
+            var border = new Vector4
+            (
                 HitColor,
                 0.9f * alpha
             );
-            context.DrawBox(
+            context.DrawBox
+            (
                 Vector2.Zero,
                 ro.Size,
                 fill,
@@ -400,14 +443,17 @@ public static class DebugPainter
                 2.0f,
                 border
             );
-            context.DrawText(
+            context.DrawText
+            (
                 "HIT",
-                new Vector2(
+                new Vector2
+                (
                     3,
                     10
                 ),
                 9f,
-                new Vector4(
+                new Vector4
+                (
                     HitColor,
                     alpha
                 ),
@@ -417,15 +463,18 @@ public static class DebugPainter
         else // CacheMiss
         {
             // RED: thicker border + stronger fill
-            var fill = new Vector4(
+            var fill = new Vector4
+            (
                 MissColor,
                 0.25f * alpha
             );
-            var border = new Vector4(
+            var border = new Vector4
+            (
                 MissColor,
                 0.9f * alpha
             );
-            context.DrawBox(
+            context.DrawBox
+            (
                 Vector2.Zero,
                 ro.Size,
                 fill,
@@ -433,14 +482,17 @@ public static class DebugPainter
                 3.0f,
                 border
             );
-            context.DrawText(
+            context.DrawText
+            (
                 $"MISS #{record.DirtyPaintCount}",
-                new Vector2(
+                new Vector2
+                (
                     3,
                     10
                 ),
                 9f,
-                new Vector4(
+                new Vector4
+                (
                     1f,
                     0.4f,
                     0.4f,
@@ -451,7 +503,8 @@ public static class DebugPainter
         }
     }
 
-    private static void PaintRegularNodeOverlay(
+    private static void PaintRegularNodeOverlay
+    (
         RenderObject ro,
         PaintingContext context,
         DebugSettings settings,
@@ -464,18 +517,21 @@ public static class DebugPainter
         // Heat map: persistent blue→red tint proportional to repaint frequency
         if (settings.ShowHeatMap && record.DirtyPaintCount > 0)
         {
-            var heat = Math.Clamp(
+            var heat = Math.Clamp
+            (
                 record.HotFrameCount / 30f,
                 0f,
                 1f
             );
-            var heatFill = new Vector4(
+            var heatFill = new Vector4
+            (
                 heat,
                 0f,
                 1f - heat,
                 0.12f * heat
             );
-            context.DrawBox(
+            context.DrawBox
+            (
                 Vector2.Zero,
                 ro.Size,
                 heatFill,
@@ -497,7 +553,8 @@ public static class DebugPainter
 
         // ORANGE flash: this node was dirty-painted this frame
         var elapsed = currentTime - record.LastEventTimestampMs;
-        var alpha = (float)Math.Max(
+        var alpha = (float)Math.Max
+        (
             0.0,
             1.0 - elapsed / settings.FlashDurationMs
         );
@@ -506,15 +563,18 @@ public static class DebugPainter
             return;
         }
 
-        var fill = new Vector4(
+        var fill = new Vector4
+        (
             DirtyColor,
             0.2f * alpha
         );
-        var border = new Vector4(
+        var border = new Vector4
+        (
             DirtyColor,
             0.7f * alpha
         );
-        context.DrawBox(
+        context.DrawBox
+        (
             Vector2.Zero,
             ro.Size,
             fill,
@@ -524,7 +584,8 @@ public static class DebugPainter
         );
     }
 
-    private static BoundaryRepaintState GetBoundaryState(
+    private static BoundaryRepaintState GetBoundaryState
+    (
         in RepaintRecord record,
         int frameId
     )

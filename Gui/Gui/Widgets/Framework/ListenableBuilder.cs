@@ -4,7 +4,8 @@ namespace Gui.Widgets.Framework;
 
 public class ListenableBuilder : StatefulWidget
 {
-    public ListenableBuilder(
+    public ListenableBuilder
+    (
         IListenable listenable,
         Func<BuildContext, Widget> builder
     )
@@ -28,7 +29,8 @@ public class ListenableBuilder : StatefulWidget
 
         private void HandleTick() => SetState(() => { });
 
-        public override Widget Build(
+        public override Widget Build
+        (
             BuildContext context
         ) =>
             Widget.Builder(context);

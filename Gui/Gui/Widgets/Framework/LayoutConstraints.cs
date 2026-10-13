@@ -9,7 +9,8 @@ namespace Gui.Widgets.Framework;
 ///     to occupy. Every <c>RenderObject.Layout()</c> call receives constraints from its parent
 ///     and must produce a <c>Size</c> within those bounds.
 /// </summary>
-public struct LayoutConstraints(
+public struct LayoutConstraints
+(
     float minWidth = 0,
     float maxWidth = float.PositiveInfinity,
     float minHeight = 0,
@@ -26,12 +27,14 @@ public struct LayoutConstraints(
     ///     Creates constraints that force an exact size (<c>min == max</c>). Used by the root
     ///     layout pass and by <c>RenderConstrainedBox</c> with explicit width/height.
     /// </summary>
-    public static LayoutConstraints Tight(
+    public static LayoutConstraints Tight
+    (
         float width,
         float height
     )
     {
-        return new LayoutConstraints(
+        return new LayoutConstraints
+        (
             width,
             width,
             height,
@@ -42,11 +45,13 @@ public struct LayoutConstraints(
     /// <summary>
     ///     Creates constraints that force an exact size.
     /// </summary>
-    public static LayoutConstraints Tight(
+    public static LayoutConstraints Tight
+    (
         Vector2 size
     )
     {
-        return new LayoutConstraints(
+        return new LayoutConstraints
+        (
             size.X,
             size.X,
             size.Y,
@@ -58,12 +63,14 @@ public struct LayoutConstraints(
     ///     Creates constraints where <c>min == 0</c> on both axes. The child may be any size
     ///     up to <paramref name="maxWidth" /> × <paramref name="maxHeight" />.
     /// </summary>
-    public static LayoutConstraints Loose(
+    public static LayoutConstraints Loose
+    (
         float maxWidth,
         float maxHeight
     )
     {
-        return new LayoutConstraints(
+        return new LayoutConstraints
+        (
             0,
             maxWidth,
             0,
@@ -80,7 +87,8 @@ public struct LayoutConstraints(
     /// </summary>
     public LayoutConstraints Loosen()
     {
-        return new LayoutConstraints(
+        return new LayoutConstraints
+        (
             0,
             MaxWidth,
             0,
@@ -92,12 +100,14 @@ public struct LayoutConstraints(
     ///     Creates constraints that are tight on the axes where a value is supplied and
     ///     unbounded (<c>0..∞</c>) on axes where <c>null</c> is passed.
     /// </summary>
-    public static LayoutConstraints TightFor(
+    public static LayoutConstraints TightFor
+    (
         float? width = null,
         float? height = null
     )
     {
-        return new LayoutConstraints(
+        return new LayoutConstraints
+        (
             width ?? 0,
             width ?? float.PositiveInfinity,
             height ?? 0,
@@ -115,7 +125,8 @@ public struct LayoutConstraints(
     ///     This differs from Flutter's behavior where <c>constraints.biggest</c> may return
     ///     positive infinity on unconstrained axes.
     /// </remarks>
-    public Vector2 Biggest => new(
+    public Vector2 Biggest => new
+    (
         float.IsPositiveInfinity(MaxWidth)
             ? MinWidth
             : MaxWidth,
@@ -125,7 +136,8 @@ public struct LayoutConstraints(
     );
 
     /// <summary>The smallest size permitted by these constraints.</summary>
-    public Vector2 Smallest => new(
+    public Vector2 Smallest => new
+    (
         MinWidth,
         MinHeight
     );
@@ -134,27 +146,33 @@ public struct LayoutConstraints(
     ///     Intersects these constraints with <paramref name="constraints" />, clamping each
     ///     bound into the other's range.
     /// </summary>
-    public LayoutConstraints Enforce(
+    public LayoutConstraints Enforce
+    (
         LayoutConstraints constraints
     )
     {
-        return new LayoutConstraints(
-            Math.Clamp(
+        return new LayoutConstraints
+        (
+            Math.Clamp
+            (
                 MinWidth,
                 constraints.MinWidth,
                 constraints.MaxWidth
             ),
-            Math.Clamp(
+            Math.Clamp
+            (
                 MaxWidth,
                 constraints.MinWidth,
                 constraints.MaxWidth
             ),
-            Math.Clamp(
+            Math.Clamp
+            (
                 MinHeight,
                 constraints.MinHeight,
                 constraints.MaxHeight
             ),
-            Math.Clamp(
+            Math.Clamp
+            (
                 MaxHeight,
                 constraints.MinHeight,
                 constraints.MaxHeight
@@ -166,17 +184,21 @@ public struct LayoutConstraints(
     ///     Clamps <paramref name="size" /> so that both components fall within
     ///     [Min, Max] on each axis.
     /// </summary>
-    public Vector2 Constrain(
+    public Vector2 Constrain
+    (
         Vector2 size
     )
     {
-        return new Vector2(
-            Math.Clamp(
+        return new Vector2
+        (
+            Math.Clamp
+            (
                 size.X,
                 MinWidth,
                 MaxWidth
             ),
-            Math.Clamp(
+            Math.Clamp
+            (
                 size.Y,
                 MinHeight,
                 MaxHeight

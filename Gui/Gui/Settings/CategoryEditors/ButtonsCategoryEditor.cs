@@ -34,7 +34,7 @@ public sealed class ButtonsCategoryEditor : StatelessWidget
         var o = _draft.Button;
         return new Column
         (
-            spacing: 24,
+            24,
             children:
             [
                 new EdgeInsetsOverrideField
@@ -68,7 +68,7 @@ public sealed class ButtonsCategoryEditor : StatelessWidget
         SetVariant(name, variant);
         return new Column
         (
-            spacing: 8,
+            8,
             children:
             [
                 new Text(name, _baseTheme.TextTheme.Title),

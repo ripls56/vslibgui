@@ -7,11 +7,13 @@ using Gui.Widgets.Framework;
 using Gui.Widgets.Gestures;
 using Gui.Widgets.Input;
 using Gui.Widgets.Layout;
+using Gui.Widgets.Painting;
 using OpenTK.Mathematics;
 
 namespace Gui.Widgets.Scroll;
 
-public delegate Widget IndexedWidgetBuilder(
+public delegate Widget IndexedWidgetBuilder
+(
     BuildContext context,
     int index
 );
@@ -19,7 +21,8 @@ public delegate Widget IndexedWidgetBuilder(
 public class ListView : StatefulWidget
 {
     /// <summary>Fixed-height static-children mode.</summary>
-    public ListView(
+    public ListView
+    (
         IEnumerable<Widget> children,
         float itemHeight,
         ScrollController? controller = null,
@@ -41,7 +44,8 @@ public class ListView : StatefulWidget
     }
 
     /// <summary>Variable-height static-children mode.</summary>
-    public ListView(
+    public ListView
+    (
         IEnumerable<Widget> children,
         float estimatedItemHeight,
         bool variableHeight,
@@ -64,7 +68,8 @@ public class ListView : StatefulWidget
         Controller = controller;
     }
 
-    public ListView(
+    public ListView
+    (
         IndexedWidgetBuilder itemBuilder,
         int itemCount,
         float itemHeight,
@@ -85,7 +90,8 @@ public class ListView : StatefulWidget
         Controller = controller;
     }
 
-    public ListView(
+    public ListView
+    (
         IndexedWidgetBuilder itemBuilder,
         int itemCount,
         float estimatedItemHeight,
@@ -156,7 +162,8 @@ public class ListView : StatefulWidget
             AttachController(Controller);
         }
 
-        public override void UpdateWidget(
+        public override void UpdateWidget
+        (
             ListView old
         )
         {
@@ -173,7 +180,8 @@ public class ListView : StatefulWidget
             }
         }
 
-        private void AttachController(
+        private void AttachController
+        (
             ScrollController ctrl
         )
         {
@@ -181,7 +189,8 @@ public class ListView : StatefulWidget
             ctrl.OnChanged += HandleScrollUpdate;
         }
 
-        private void DetachController(
+        private void DetachController
+        (
             ScrollController ctrl
         ) =>
             ctrl.OnChanged -= HandleScrollUpdate;
@@ -206,7 +215,8 @@ public class ListView : StatefulWidget
             SetState(() => { });
         }
 
-        private void HandleLayoutUpdate(
+        private void HandleLayoutUpdate
+        (
             float viewportHeight,
             float contentHeight
         )
@@ -225,7 +235,8 @@ public class ListView : StatefulWidget
             // Auto-scroll to bottom when sticky or explicitly requested
             if (Widget.StickToBottom && wasSticky)
             {
-                var maxScroll = Math.Max(
+                var maxScroll = Math.Max
+                (
                     0,
                     contentHeight - viewportHeight
                 );
@@ -243,7 +254,8 @@ public class ListView : StatefulWidget
                         }
                         else
                         {
-                            Controller.AnimateTo(
+                            Controller.AnimateTo
+                            (
                                 0,
                                 TimeSpan.FromMilliseconds(150),
                                 maxScroll: maxScroll
@@ -267,7 +279,8 @@ public class ListView : StatefulWidget
                     }
                     else
                     {
-                        Controller.AnimateTo(
+                        Controller.AnimateTo
+                        (
                             maxScroll,
                             TimeSpan.FromMilliseconds(150),
                             maxScroll: maxScroll
@@ -283,7 +296,8 @@ public class ListView : StatefulWidget
             }
         }
 
-        public void OnMouseWheel(
+        public void OnMouseWheel
+        (
             PointerEvent e
         )
         {
@@ -301,7 +315,8 @@ public class ListView : StatefulWidget
             e.Handled = true;
         }
 
-        public override Widget Build(
+        public override Widget Build
+        (
             BuildContext context
         )
         {
@@ -316,11 +331,13 @@ public class ListView : StatefulWidget
                 var vpEst = _viewportHeight > 0
                     ? _viewportHeight
                     : 400f;
-                var maxScroll = Math.Max(
+                var maxScroll = Math.Max
+                (
                     0,
                     contentEst - vpEst
                 );
-                effectiveOffset = Math.Max(
+                effectiveOffset = Math.Max
+                (
                     0,
                     maxScroll - Controller.Offset
                 );
@@ -334,11 +351,14 @@ public class ListView : StatefulWidget
                 ? new Vector2(effectiveOffset, 0)
                 : new Vector2(0, effectiveOffset);
 
-            return new GestureDetector(
+            return new GestureDetector
+            (
                 onWheel: OnMouseWheel,
-                child: new Viewport(
+                child: new Viewport
+                (
                     viewportOffset,
-                    new ListViewContent(
+                    new ListViewContent
+                    (
                         Widget.ItemBuilder,
                         Widget.ItemCount,
                         Widget.ItemHeight,
@@ -367,7 +387,8 @@ public class ListView : StatefulWidget
 
     private class ListViewContent : Widget
     {
-        public ListViewContent(
+        public ListViewContent
+        (
             IndexedWidgetBuilder itemBuilder,
             int itemCount,
             float itemHeight,
@@ -417,9 +438,14 @@ public class ListView : StatefulWidget
         private readonly Dictionary<int, Element> _activeChildren = new();
         private readonly ItemHeightCache _cache = new();
         private readonly Dictionary<int, Widget> _cachedWidgets = new();
+        private readonly List<int> _removeBuffer = new();
         private readonly RenderListViewContent _renderObject;
+        // Reused across frames — VisitChildren and reconciliation are per-mouse-move hot paths.
+        private readonly HashSet<int> _targetIndices = new();
+        private readonly List<int> _visitKeyBuffer = new();
 
-        public ListViewContentElement(
+        public ListViewContentElement
+        (
             ListViewContent widget
         ) : base(widget)
         {
@@ -431,7 +457,8 @@ public class ListView : StatefulWidget
 
         public override RenderObject? RenderObject => _renderObject;
 
-        public override void Mount(
+        public override void Mount
+        (
             Element? parent
         )
         {
@@ -445,7 +472,8 @@ public class ListView : StatefulWidget
             UpdateVisibleItems();
         }
 
-        public override void Update(
+        public override void Update
+        (
             Widget newWidget
         )
         {
@@ -454,7 +482,8 @@ public class ListView : StatefulWidget
 
             _renderObject.ScrollDirection = next.ScrollDirection;
 
-            var dataChanged = !ReferenceEquals(
+            var dataChanged = !ReferenceEquals
+            (
                 old.DataIdentity,
                 next.DataIdentity
             );
@@ -466,7 +495,8 @@ public class ListView : StatefulWidget
                 _cachedWidgets.Clear();
                 if (next.VariableHeight)
                 {
-                    _cache.Reset(
+                    _cache.Reset
+                    (
                         next.ItemCount,
                         next.EstimatedItemHeight
                     );
@@ -476,14 +506,16 @@ public class ListView : StatefulWidget
             {
                 if (next.ItemCount > _cache.Count)
                 {
-                    _cache.GrowTo(
+                    _cache.GrowTo
+                    (
                         next.ItemCount,
                         next.EstimatedItemHeight
                     );
                 }
                 else if (next.ItemCount != _cache.Count)
                 {
-                    _cache.Reset(
+                    _cache.Reset
+                    (
                         next.ItemCount,
                         next.EstimatedItemHeight
                     );
@@ -522,7 +554,8 @@ public class ListView : StatefulWidget
             }
         }
 
-        private void UpdateVisibleItemsFixed(
+        private void UpdateVisibleItemsFixed
+        (
             ListViewContent widget
         )
         {
@@ -540,22 +573,26 @@ public class ListView : StatefulWidget
             var lastVisible =
                 (int)Math.Ceiling((widget.ScrollOffset + viewportHeight) / widget.ItemHeight);
 
-            firstVisible = Math.Max(
+            firstVisible = Math.Max
+            (
                 0,
                 firstVisible - 1
             );
-            lastVisible = Math.Min(
+            lastVisible = Math.Min
+            (
                 widget.ItemCount - 1,
                 lastVisible + 1
             );
 
-            var targetIndices = new HashSet<int>();
+            var targetIndices = _targetIndices;
+            targetIndices.Clear();
             for (var i = firstVisible; i <= lastVisible; i++)
             {
                 targetIndices.Add(i);
             }
 
-            ReconcileChildren(
+            ReconcileChildren
+            (
                 widget,
                 targetIndices,
                 index => index * widget.ItemHeight
@@ -563,13 +600,15 @@ public class ListView : StatefulWidget
             _renderObject.MarkNeedsLayout();
         }
 
-        private void UpdateVisibleItemsVariable(
+        private void UpdateVisibleItemsVariable
+        (
             ListViewContent widget
         )
         {
             if (_cache.Count == 0 && widget.ItemCount > 0)
             {
-                _cache.Reset(
+                _cache.Reset
+                (
                     widget.ItemCount,
                     widget.EstimatedItemHeight
                 );
@@ -588,27 +627,32 @@ public class ListView : StatefulWidget
             }
 
             var firstVisible = _cache.FindFirstVisible(widget.ScrollOffset);
-            var lastVisible = _cache.FindLastVisible(
+            var lastVisible = _cache.FindLastVisible
+            (
                 widget.ScrollOffset,
                 viewportHeight
             );
 
-            firstVisible = Math.Max(
+            firstVisible = Math.Max
+            (
                 0,
                 firstVisible - 1
             );
-            lastVisible = Math.Min(
+            lastVisible = Math.Min
+            (
                 widget.ItemCount - 1,
                 lastVisible + 1
             );
 
-            var targetIndices = new HashSet<int>();
+            var targetIndices = _targetIndices;
+            targetIndices.Clear();
             for (var i = firstVisible; i <= lastVisible; i++)
             {
                 targetIndices.Add(i);
             }
 
-            ReconcileChildren(
+            ReconcileChildren
+            (
                 widget,
                 targetIndices,
                 index => _cache.GetPosition(index)
@@ -616,7 +660,8 @@ public class ListView : StatefulWidget
             _renderObject.MarkNeedsLayout();
         }
 
-        private void ReconcileChildren(
+        private void ReconcileChildren
+        (
             ListViewContent widget,
             HashSet<int> targetIndices,
             Func<int, float> getPosition
@@ -626,15 +671,18 @@ public class ListView : StatefulWidget
 
             foreach (var index in targetIndices)
             {
-                var itemWidget = GetOrBuildWidget(
+                var itemWidget = GetOrBuildWidget
+                (
                     widget,
                     index
                 );
-                var element = MountOrUpdateChild(
+                var element = MountOrUpdateChild
+                (
                     index,
                     itemWidget
                 );
-                PositionChild(
+                PositionChild
+                (
                     element,
                     index,
                     getPosition
@@ -642,11 +690,13 @@ public class ListView : StatefulWidget
             }
         }
 
-        private void UnmountChildrenOutsideRange(
+        private void UnmountChildrenOutsideRange
+        (
             HashSet<int> keepIndices
         )
         {
-            var toRemove = new List<int>();
+            var toRemove = _removeBuffer;
+            toRemove.Clear();
             foreach (var index in _activeChildren.Keys)
             {
                 if (!keepIndices.Contains(index))
@@ -664,22 +714,32 @@ public class ListView : StatefulWidget
             }
         }
 
-        private Widget GetOrBuildWidget(
+        private Widget GetOrBuildWidget
+        (
             ListViewContent widget,
             int index
         )
         {
-            if (!_cachedWidgets.TryGetValue(
+            if (!_cachedWidgets.TryGetValue
+                (
                     index,
                     out var itemWidget
                 ))
             {
-                itemWidget = widget.ItemBuilder(
-                    new BuildContext(
-                        Widget,
-                        this
-                    ),
-                    index
+                // Each item gets its own paint layer: scrolling then re-records only the
+                // viewport's own ops and replays item content, and an item that repaints
+                // on its own (hover, selection) leaves the rest of the list alone.
+                itemWidget = new RepaintBoundary
+                (
+                    widget.ItemBuilder
+                    (
+                        new BuildContext
+                        (
+                            Widget,
+                            this
+                        ),
+                        index
+                    )
                 );
                 _cachedWidgets[index] = itemWidget;
             }
@@ -687,17 +747,20 @@ public class ListView : StatefulWidget
             return itemWidget;
         }
 
-        private Element MountOrUpdateChild(
+        private Element MountOrUpdateChild
+        (
             int index,
             Widget itemWidget
         )
         {
-            if (_activeChildren.TryGetValue(
+            if (_activeChildren.TryGetValue
+                (
                     index,
                     out var existing
                 ))
             {
-                var updated = UpdateChild(
+                var updated = UpdateChild
+                (
                     existing,
                     itemWidget
                 )!;
@@ -712,7 +775,8 @@ public class ListView : StatefulWidget
                 return updated;
             }
 
-            var created = UpdateChild(
+            var created = UpdateChild
+            (
                 null,
                 itemWidget
             )!;
@@ -721,7 +785,8 @@ public class ListView : StatefulWidget
             return created;
         }
 
-        private void PositionChild(
+        private void PositionChild
+        (
             Element element,
             int index,
             Func<int, float> getPosition
@@ -746,7 +811,8 @@ public class ListView : StatefulWidget
             _renderObject.ChildIndexMap[ro] = index;
         }
 
-        private void AttachChild(
+        private void AttachChild
+        (
             Element element
         )
         {
@@ -756,7 +822,8 @@ public class ListView : StatefulWidget
             }
         }
 
-        private void DetachChild(
+        private void DetachChild
+        (
             Element element
         )
         {
@@ -767,13 +834,15 @@ public class ListView : StatefulWidget
             }
         }
 
-        public override void VisitChildren(
+        public override void VisitChildren
+        (
             Action<Element> visitor
         )
         {
-            var keys = new List<int>(_activeChildren.Keys);
-            keys.Sort();
-            foreach (var key in keys)
+            _visitKeyBuffer.Clear();
+            _visitKeyBuffer.AddRange(_activeChildren.Keys);
+            _visitKeyBuffer.Sort();
+            foreach (var key in _visitKeyBuffer)
             {
                 visitor(_activeChildren[key]);
             }

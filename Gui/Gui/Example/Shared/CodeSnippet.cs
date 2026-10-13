@@ -25,14 +25,16 @@ internal class CodeSnippet : StatelessWidget
     public override Widget Build(BuildContext context)
     {
         var colors = Theme.Of(context).ColorScheme;
-        var codeBg = new Vector4(
+        var codeBg = new Vector4
+        (
             colors.Background.X * 0.70f,
             colors.Background.Y * 0.70f,
             colors.Background.Z * 0.70f,
             1f
         );
 
-        return new Container(
+        return new Container
+        (
             new BoxStyle
             {
                 Color = codeBg,
@@ -41,22 +43,33 @@ internal class CodeSnippet : StatelessWidget
                 BorderColor = colors.Border,
                 ClipBehavior = ClipBehavior.HardEdge
             },
-            new Column(
+            new Column
+            (
                 crossAxisAlignment: CrossAxisAlignment.Stretch,
                 children:
                 [
-                    new Padding(
+                    new Padding
+                    (
                         EdgeInsets.All(12),
-                        new Text(Code,
+                        new Text
+                        (
+                            Code,
                             new TextStyle
                             {
                                 FontFamily = "JetBrains Mono",
                                 FontSize = 12,
                                 Color = colors.OnSurface,
                                 SoftWrap = false
-                            })
+                            }
+                        )
                     ),
-                    new Container(new BoxStyle { Color = colors.Border, Height = 1 }),
+                    new Container
+                    (
+                        new BoxStyle
+                        {
+                            Color = colors.Border, Height = 1
+                        }
+                    ),
                     new CopyBar(Code, Capi, colors.Primary, colors.OnSurface)
                 ]
             )
@@ -65,7 +78,8 @@ internal class CodeSnippet : StatelessWidget
 
     private class CopyBar : StatefulWidget
     {
-        public CopyBar(
+        public CopyBar
+        (
             string code,
             ICoreClientAPI capi,
             Vector4 primary,
@@ -97,37 +111,52 @@ internal class CodeSnippet : StatelessWidget
                     ? Widget.Primary
                     : new Vector4(Widget.OnSurface.X, Widget.OnSurface.Y, Widget.OnSurface.Z, 0.4f);
                 var bg = _hovered
-                    ? new Vector4(Widget.Primary.X * 0.12f, Widget.Primary.Y * 0.12f,
-                        Widget.Primary.Z * 0.12f, 1f)
+                    ? new Vector4
+                    (
+                        Widget.Primary.X * 0.12f, Widget.Primary.Y * 0.12f,
+                        Widget.Primary.Z * 0.12f, 1f
+                    )
                     : Vector4.Zero;
 
-                return new GestureDetector(
+                return new GestureDetector
+                (
                     onTap: _ =>
                     {
                         Widget.Capi.Input.ClipboardText = Widget.Code;
                         SetState(() => _copied = true);
                     },
                     onEnter: _ => SetState(() => _hovered = true),
-                    onExit: _ => SetState(() =>
-                    {
-                        _hovered = false;
-                        _copied = false;
-                    }),
-                    child: new Container(
-                        new BoxStyle { Color = bg },
-                        new Padding(
+                    onExit: _ => SetState
+                    (() =>
+                        {
+                            _hovered = false;
+                            _copied = false;
+                        }
+                    ),
+                    child: new Container
+                    (
+                        new BoxStyle
+                        {
+                            Color = bg
+                        },
+                        new Padding
+                        (
                             EdgeInsets.Symmetric(6, 12),
-                            new Row(
+                            new Row
+                            (
                                 children:
                                 [
                                     new Expanded(new SizedBox()),
-                                    new Text(label,
+                                    new Text
+                                    (
+                                        label,
                                         new TextStyle
                                         {
                                             FontFamily = "JetBrains Mono",
                                             FontSize = 11,
                                             Color = color
-                                        })
+                                        }
+                                    )
                                 ]
                             )
                         )

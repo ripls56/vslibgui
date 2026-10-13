@@ -12,7 +12,8 @@ internal class RenderScrollableContent : RenderProxyBox
 {
     private readonly Action<float, float> _onLayout;
 
-    public RenderScrollableContent(
+    public RenderScrollableContent
+    (
         Action<float, float> onLayout
     )
     {
@@ -24,8 +25,10 @@ internal class RenderScrollableContent : RenderProxyBox
         if (Children.Count > 0)
         {
             var child = Children[0];
-            child.Layout(
-                new LayoutConstraints(
+            child.Layout
+            (
+                new LayoutConstraints
+                (
                     Constraints.MinWidth,
                     Constraints.MaxWidth
                 )
@@ -38,7 +41,8 @@ internal class RenderScrollableContent : RenderProxyBox
         }
 
         var viewportHeight = Parent?.Size.Y ?? 0;
-        _onLayout(
+        _onLayout
+        (
             viewportHeight,
             Size.Y
         );

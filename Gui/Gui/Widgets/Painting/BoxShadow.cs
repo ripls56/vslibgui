@@ -21,7 +21,8 @@ namespace Gui.Widgets.Painting;
 ///     When true, renders as an inner shadow inside the box boundary.
 ///     When false (default), renders as an outer shadow behind the box.
 /// </param>
-public readonly record struct BoxShadow(
+public readonly record struct BoxShadow
+(
     Vector4 Color,
     Vector2 Offset,
     float BlurRadius = 0f,
@@ -45,15 +46,18 @@ public readonly record struct BoxShadow(
                 return 0f;
             }
 
-            var blurReach = MathF.Max(
+            var blurReach = MathF.Max
+            (
                 0f,
                 BlurRadius
             ) * 3f;
-            var spread = MathF.Max(
+            var spread = MathF.Max
+            (
                 0f,
                 SpreadRadius
             );
-            var offsetReach = MathF.Max(
+            var offsetReach = MathF.Max
+            (
                 MathF.Abs(Offset.X),
                 MathF.Abs(Offset.Y)
             );
@@ -66,23 +70,28 @@ public readonly record struct BoxShadow(
     /// </summary>
     public SKColor ToSkColor()
     {
-        return new SKColor(
-            (byte)Math.Clamp(
+        return new SKColor
+        (
+            (byte)Math.Clamp
+            (
                 Color.X * 255f,
                 0,
                 255
             ),
-            (byte)Math.Clamp(
+            (byte)Math.Clamp
+            (
                 Color.Y * 255f,
                 0,
                 255
             ),
-            (byte)Math.Clamp(
+            (byte)Math.Clamp
+            (
                 Color.Z * 255f,
                 0,
                 255
             ),
-            (byte)Math.Clamp(
+            (byte)Math.Clamp
+            (
                 Color.W * 255f,
                 0,
                 255
@@ -93,9 +102,15 @@ public readonly record struct BoxShadow(
     /// <summary>
     ///     Linearly interpolates between two shadows.
     /// </summary>
-    public static BoxShadow Lerp(BoxShadow a, BoxShadow b, float t)
+    public static BoxShadow Lerp
+    (
+        BoxShadow a,
+        BoxShadow b,
+        float t
+    )
     {
-        return new BoxShadow(
+        return new BoxShadow
+        (
             a.Color + (b.Color - a.Color) * t,
             a.Offset + (b.Offset - a.Offset) * t,
             a.BlurRadius + (b.BlurRadius - a.BlurRadius) * t,

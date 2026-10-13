@@ -13,20 +13,23 @@ public class SoundPlayer : ISoundPlayer
 {
     private readonly ICoreClientAPI _capi;
 
-    public SoundPlayer(
+    public SoundPlayer
+    (
         ICoreClientAPI capi
     )
     {
         _capi = capi;
     }
 
-    public void Play(
+    public void Play
+    (
         string name,
         Pitch pitch = default,
         float volume = 0.5f
     )
     {
-        var loc = new AssetLocation(
+        var loc = new AssetLocation
+        (
             "gui",
             $"sounds/{name}"
         );
@@ -40,14 +43,16 @@ public class SoundPlayer : ISoundPlayer
         _capi.World.LoadSound(param)?.Start();
     }
 
-    public SoundHandle Load(
+    public SoundHandle Load
+    (
         string name,
         bool loop = false,
         Pitch pitch = default,
         float volume = 0.5f
     )
     {
-        var loc = new AssetLocation(
+        var loc = new AssetLocation
+        (
             "gui",
             $"sounds/{name}"
         );
@@ -63,7 +68,8 @@ public class SoundPlayer : ISoundPlayer
         return new SoundHandle(sound);
     }
 
-    private static float ResolvePitch(
+    private static float ResolvePitch
+    (
         Pitch pitch
     )
     {

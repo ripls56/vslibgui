@@ -138,12 +138,13 @@ internal class ItemTooltipContentState : State<ItemTooltipContent>
                                 _ => new Opacity
                                 (
                                     (float)_curved.Value,
-                                    child: new ItemStackDisplay
+                                    new ItemStackDisplay
                                     (
                                         itemStack,
                                         size,
                                         size,
-                                        size * 2
+                                        size * 2,
+                                        showTooltip: false
                                     )
                                 )
                             ),

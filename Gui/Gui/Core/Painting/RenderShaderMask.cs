@@ -72,7 +72,8 @@ internal class RenderShaderMask : RenderProxyBox
     }
 
     /// <inheritdoc />
-    public override void Paint(
+    public override void Paint
+    (
         PaintingContext context
     )
     {
@@ -89,8 +90,10 @@ internal class RenderShaderMask : RenderProxyBox
         }
 
         context.Canvas.Save();
-        context.Canvas.ClipRect(
-            new SKRect(
+        context.Canvas.ClipRect
+        (
+            new SKRect
+            (
                 0,
                 0,
                 Size.X,
@@ -99,7 +102,8 @@ internal class RenderShaderMask : RenderProxyBox
             SKClipOperation.Intersect,
             true
         );
-        context.Canvas.Translate(
+        context.Canvas.Translate
+        (
             -_offsetX,
             -_offsetY
         );
@@ -108,7 +112,8 @@ internal class RenderShaderMask : RenderProxyBox
         paint.Shader = _shader;
         paint.BlendMode = _blendMode;
         paint.IsAntialias = true;
-        context.Canvas.DrawRect(
+        context.Canvas.DrawRect
+        (
             0,
             0,
             Size.X + MathF.Abs(_offsetX) + 200f,

@@ -4,6 +4,7 @@ using Gui.Core.Layout;
 using Gui.Core.Scroll;
 using Gui.Rendering;
 using Gui.Rendering.Text;
+using Gui.Sound;
 using Gui.Widgets.Animations;
 using Gui.Widgets.Framework;
 using Gui.Widgets.Input;
@@ -73,11 +74,11 @@ internal class TabViewState : State<TabView>
 
                 return new TabButtonWidget
                 (
-                    label: t.Label,
-                    isActive: isActive,
-                    position: Widget.Position,
-                    width: Widget.TabWidth,
-                    onTap: () =>
+                    t.Label,
+                    isActive,
+                    Widget.Position,
+                    Widget.TabWidth,
+                    () =>
                     {
                         SetState(() => _activeIndex = index);
                         Widget.OnTabChanged?.Invoke(index);
@@ -86,13 +87,13 @@ internal class TabViewState : State<TabView>
             }
         );
 
-        Widget content = Widget.Tabs[_activeIndex].Content;
+        var content = Widget.Tabs[_activeIndex].Content;
 
         content = new AnimatedSize
         (
-            duration: TimeSpan.FromMilliseconds(400),
-            curve: Curves.EaseOutCubic,
-            child: content
+            TimeSpan.FromMilliseconds(400),
+            Curves.EaseOutCubic,
+            content
         );
 
         if (Widget.Position == TabPosition.Top)
@@ -107,13 +108,13 @@ internal class TabViewState : State<TabView>
                         EdgeInsets.Only(bottom: 12),
                         new Container
                         (
-                            style: new BoxStyle
+                            new BoxStyle
                             {
                                 Color = colors.SurfaceLow,
                                 CornerRadius = new Vector4(8),
                                 Padding = EdgeInsets.All(4)
                             },
-                            child: new Row
+                            new Row
                             (
                                 mainAxisSize: MainAxisSize.Min,
                                 children: tabButtons
@@ -185,8 +186,8 @@ internal class TabButtonWidgetState : State<TabButtonWidget>
         Widget label = new AnimatedText
         (
             Widget.Label,
-            style: textStyle,
-            duration: TimeSpan.FromMilliseconds(200)
+            textStyle,
+            TimeSpan.FromMilliseconds(200)
         );
 
         if (Widget.Position == TabPosition.Top)
@@ -208,7 +209,9 @@ internal class TabButtonWidgetState : State<TabButtonWidget>
                 Padding = EdgeInsets.Symmetric(horizontal: 16, vertical: 8),
                 Color = Widget.IsActive
                     ? colors.SurfaceHigh
-                    : (_isHovered ? colors.StateHover : Vector4.Zero),
+                    : _isHovered
+                        ? colors.StateHover
+                        : Vector4.Zero,
                 CornerRadius = new Vector4(6),
                 Width = Widget.Width
             },
@@ -222,9 +225,9 @@ internal class TabButtonWidgetState : State<TabButtonWidget>
             (
                 new AnimatedScale
                 (
-                    scale: _isPressed ? 0.96f : (_isHovered ? 1.03f : 1.0f),
-                    duration: TimeSpan.FromMilliseconds(140),
-                    curve: Curves.EaseOut,
+                    _isPressed ? 0.96f : _isHovered ? 1.03f : 1.0f,
+                    TimeSpan.FromMilliseconds(140),
+                    Curves.EaseOut,
                     child: content
                 )
             )
@@ -242,7 +245,9 @@ internal class TabButtonWidgetState : State<TabButtonWidget>
                 Padding = EdgeInsets.Symmetric(horizontal: 12, vertical: 8),
                 Color = Widget.IsActive
                     ? colors.StateSelected
-                    : (_isHovered ? colors.StateHover : Vector4.Zero),
+                    : _isHovered
+                        ? colors.StateHover
+                        : Vector4.Zero,
                 CornerRadius = new Vector4(0, 0, 4, 4),
                 Width = Widget.Width
             },
@@ -260,7 +265,9 @@ internal class TabButtonWidgetState : State<TabButtonWidget>
                             Height = 16,
                             Color = Widget.IsActive
                                 ? colors.Primary
-                                : (_isHovered ? colors.Border : Vector4.Zero),
+                                : _isHovered
+                                    ? colors.Border
+                                    : Vector4.Zero,
                             CornerRadius = new Vector4(1.5f)
                         }
                     ),
@@ -274,9 +281,9 @@ internal class TabButtonWidgetState : State<TabButtonWidget>
         (
             new AnimatedScale
             (
-                scale: _isPressed ? 0.96f : (_isHovered ? 1.03f : 1.0f),
-                duration: TimeSpan.FromMilliseconds(140),
-                curve: Curves.EaseOut,
+                _isPressed ? 0.96f : _isHovered ? 1.03f : 1.0f,
+                TimeSpan.FromMilliseconds(140),
+                Curves.EaseOut,
                 child: content
             )
         );
@@ -295,7 +302,16 @@ internal class TabButtonWidgetState : State<TabButtonWidget>
                     _isPressed = false;
                 }
             ),
-            onPress: _ => SetState(() => _isPressed = true),
+            onPress: _ => SetState
+            (() =>
+                {
+                    _isPressed = true;
+                    if (!Widget.IsActive)
+                    {
+                        this.ToggleOn();
+                    }
+                }
+            ),
             onRelease: _ => SetState(() => _isPressed = false),
             child: child
         );

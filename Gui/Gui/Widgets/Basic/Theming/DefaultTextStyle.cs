@@ -23,8 +23,6 @@ public class DefaultTextStyle : InheritedWidget
         return widget?.Style ?? new TextStyle();
     }
 
-    public override bool UpdateShouldNotify(InheritedWidget oldWidget)
-    {
-        return !Style.Equals(((DefaultTextStyle)oldWidget).Style);
-    }
+    public override bool UpdateShouldNotify
+        (InheritedWidget oldWidget) => !Style.Equals(((DefaultTextStyle)oldWidget).Style);
 }

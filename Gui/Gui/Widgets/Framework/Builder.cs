@@ -8,7 +8,8 @@ namespace Gui.Widgets.Framework;
 /// </summary>
 public class Builder : StatelessWidget
 {
-    public Builder(
+    public Builder
+    (
         Func<BuildContext, Widget> builder,
         Key? key = null
     ) : base(key)
@@ -18,7 +19,8 @@ public class Builder : StatelessWidget
 
     public Func<BuildContext, Widget> BuilderFunc { get; }
 
-    public override Widget Build(
+    public override Widget Build
+    (
         BuildContext context
     ) =>
         BuilderFunc(context);

@@ -4,11 +4,15 @@ namespace Gui.Core.Scroll;
 
 internal class ItemHeightCache
 {
+    // Lowest index whose prefix sums are stale. int.MaxValue == clean.
+    // SetMeasured only advances this; the actual O(n) rebuild is deferred to Flush().
+    private int _dirtyFrom = int.MaxValue;
     private float[] _heights = [];
     private bool[] _isMeasured = [];
     private float[] _prefixSums = [0];
 
-    public ItemHeightCache(
+    public ItemHeightCache
+    (
         float defaultEstimate = 40f
     )
     {
@@ -16,10 +20,18 @@ internal class ItemHeightCache
     }
 
     public int Count { get; private set; }
-    public float TotalHeight => _prefixSums[Count];
+    public float TotalHeight
+    {
+        get
+        {
+            Flush();
+            return _prefixSums[Count];
+        }
+    }
     public float DefaultEstimate { get; private set; }
 
-    public void Reset(
+    public void Reset
+    (
         int newCount,
         float estimatedHeight
     )
@@ -35,10 +47,12 @@ internal class ItemHeightCache
             _heights[i] = estimatedHeight;
         }
 
+        _dirtyFrom = int.MaxValue;
         RebuildPrefixSums(0);
     }
 
-    public void GrowTo(
+    public void GrowTo
+    (
         int newCount,
         float estimatedHeight
     )
@@ -54,19 +68,23 @@ internal class ItemHeightCache
 
         if (newCount > _heights.Length)
         {
-            var capacity = Math.Max(
+            var capacity = Math.Max
+            (
                 newCount,
                 _heights.Length * 2
             );
-            Array.Resize(
+            Array.Resize
+            (
                 ref _heights,
                 capacity
             );
-            Array.Resize(
+            Array.Resize
+            (
                 ref _isMeasured,
                 capacity
             );
-            Array.Resize(
+            Array.Resize
+            (
                 ref _prefixSums,
                 capacity + 1
             );
@@ -78,10 +96,11 @@ internal class ItemHeightCache
             _isMeasured[i] = false;
         }
 
-        RebuildPrefixSums(oldCount);
+        MarkDirtyFrom(oldCount);
     }
 
-    public float SetMeasured(
+    public float SetMeasured
+    (
         int index,
         float height
     )
@@ -100,11 +119,12 @@ internal class ItemHeightCache
         var delta = height - oldHeight;
         _heights[index] = height;
         _isMeasured[index] = true;
-        RebuildPrefixSums(index);
+        MarkDirtyFrom(index);
         return delta;
     }
 
-    public float GetHeight(
+    public float GetHeight
+    (
         int index
     )
     {
@@ -116,15 +136,18 @@ internal class ItemHeightCache
         return _heights[index];
     }
 
-    public bool IsMeasured(
+    public bool IsMeasured
+    (
         int index
     ) =>
         index >= 0 && index < Count && _isMeasured[index];
 
-    public float GetPosition(
+    public float GetPosition
+    (
         int index
     )
     {
+        Flush();
         if (index < 0)
         {
             return 0f;
@@ -138,16 +161,19 @@ internal class ItemHeightCache
         return _prefixSums[index];
     }
 
-    public int FindFirstVisible(
+    public int FindFirstVisible
+    (
         float scrollOffset
     )
     {
+        Flush();
         if (Count == 0)
         {
             return 0;
         }
 
-        scrollOffset = Math.Max(
+        scrollOffset = Math.Max
+        (
             0,
             scrollOffset
         );
@@ -169,11 +195,13 @@ internal class ItemHeightCache
         return lo;
     }
 
-    public int FindLastVisible(
+    public int FindLastVisible
+    (
         float scrollOffset,
         float viewportHeight
     )
     {
+        Flush();
         var bottomEdge = scrollOffset + viewportHeight;
         if (Count == 0)
         {
@@ -197,7 +225,8 @@ internal class ItemHeightCache
         return lo;
     }
 
-    public void SetEstimatedHeight(
+    public void SetEstimatedHeight
+    (
         float estimate
     )
     {
@@ -214,11 +243,40 @@ internal class ItemHeightCache
 
         if (changed)
         {
-            RebuildPrefixSums(0);
+            MarkDirtyFrom(0);
         }
     }
 
-    private void RebuildPrefixSums(
+    private void MarkDirtyFrom
+    (
+        int index
+    )
+    {
+        if (index < _dirtyFrom)
+        {
+            _dirtyFrom = index;
+        }
+    }
+
+    /// <summary>
+    ///     Recomputes stale prefix sums in a single O(Count - dirtyFrom) pass. Called lazily
+    ///     from every read path (TotalHeight, GetPosition, Find*), so a burst of SetMeasured
+    ///     calls collapses into one rebuild instead of one per measured child.
+    /// </summary>
+    private void Flush()
+    {
+        if (_dirtyFrom == int.MaxValue)
+        {
+            return;
+        }
+
+        var from = _dirtyFrom;
+        _dirtyFrom = int.MaxValue;
+        RebuildPrefixSums(from);
+    }
+
+    private void RebuildPrefixSums
+    (
         int fromIndex
     )
     {

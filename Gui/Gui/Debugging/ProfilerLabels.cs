@@ -13,7 +13,8 @@ public static class ProfilerLabels
     ///     Returns the owning widget's type name (plus key when present), falling back
     ///     to the render object's own type name when no owner element is attached.
     /// </summary>
-    public static string Describe(
+    public static string Describe
+    (
         RenderObject ro
     )
     {
@@ -35,7 +36,8 @@ public static class ProfilerLabels
     ///     outermost ancestor down to the owning widget. Falls back to the render
     ///     object's own type name when no owner element is attached.
     /// </summary>
-    public static string DescribePath(
+    public static string DescribePath
+    (
         RenderObject ro
     )
     {

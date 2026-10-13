@@ -11,7 +11,8 @@ public class RenderAspectRatio : RenderProxyBox
     public float AspectRatio
     {
         get => _aspectRatio;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref _aspectRatio,
             value,
             relayout: true
@@ -31,13 +32,15 @@ public class RenderAspectRatio : RenderProxyBox
         }
     }
 
-    private Vector2 ApplyAspectRatio(
+    private Vector2 ApplyAspectRatio
+    (
         LayoutConstraints constraints
     )
     {
         if (constraints.IsTight)
         {
-            return new Vector2(
+            return new Vector2
+            (
                 constraints.MinWidth,
                 constraints.MinHeight
             );
@@ -80,8 +83,10 @@ public class RenderAspectRatio : RenderProxyBox
             width = height * _aspectRatio;
         }
 
-        return constraints.Constrain(
-            new Vector2(
+        return constraints.Constrain
+        (
+            new Vector2
+            (
                 width,
                 height
             )

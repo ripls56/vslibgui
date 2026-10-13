@@ -50,7 +50,8 @@ public struct SpanStyle
     ///     Resolves this partial style against a fully specified parent
     ///     <see cref="TextStyle" />, producing a new resolved style.
     /// </summary>
-    public TextStyle Resolve(
+    public TextStyle Resolve
+    (
         TextStyle parent
     )
     {

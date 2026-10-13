@@ -13,7 +13,8 @@ public abstract class Element : IRebuildable
 
     internal Dictionary<Type, InheritedElement>? InheritedWidgets;
 
-    protected Element(
+    protected Element
+    (
         Widget widget
     )
     {
@@ -37,7 +38,8 @@ public abstract class Element : IRebuildable
 
     public virtual void Rebuild() => IsDirty = false;
 
-    public virtual void Mount(
+    public virtual void Mount
+    (
         Element? parent
     )
     {
@@ -60,7 +62,8 @@ public abstract class Element : IRebuildable
 
         if (Widget.Key is GlobalKey gk && Owner != null)
         {
-            Owner.RegisterGlobalKey(
+            Owner.RegisterGlobalKey
+            (
                 gk,
                 this
             );
@@ -69,7 +72,8 @@ public abstract class Element : IRebuildable
         Owner?.OnElementMounted?.Invoke();
     }
 
-    public void AssignOwner(
+    public void AssignOwner
+    (
         BuildOwner owner
     ) =>
         Owner = owner;
@@ -85,7 +89,8 @@ public abstract class Element : IRebuildable
         Owner?.ScheduleBuildFor(this);
     }
 
-    public virtual void Update(
+    public virtual void Update
+    (
         Widget newWidget
     )
     {
@@ -167,7 +172,8 @@ public abstract class Element : IRebuildable
             return null;
         }
 
-        InheritedWidgets.TryGetValue(
+        InheritedWidgets.TryGetValue
+        (
             typeof(T),
             out var result
         );
@@ -186,7 +192,8 @@ public abstract class Element : IRebuildable
     /// <param name="child">Existing child element, or <c>null</c> for first mount.</param>
     /// <param name="newWidget">Widget to reconcile; pass <c>null</c> to unmount the child.</param>
     /// <returns>The reconciled element, or <c>null</c> if <paramref name="newWidget" /> is <c>null</c>.</returns>
-    internal Element? UpdateChild(
+    internal Element? UpdateChild
+    (
         Element? child,
         Widget? newWidget
     )
@@ -201,7 +208,8 @@ public abstract class Element : IRebuildable
 
         if (child != null)
         {
-            if (ReferenceEquals(
+            if (ReferenceEquals
+                (
                     child.Widget,
                     newWidget
                 ))
@@ -209,7 +217,8 @@ public abstract class Element : IRebuildable
                 return child;
             }
 
-            if (Widget.CanUpdate(
+            if (Widget.CanUpdate
+                (
                     child.Widget,
                     newWidget
                 ))
@@ -243,11 +252,13 @@ public abstract class Element : IRebuildable
         return ancestor as RenderObjectElement;
     }
 
-    public abstract void VisitChildren(
+    public abstract void VisitChildren
+    (
         Action<Element> visitor
     );
 
-    public virtual bool HitTest(
+    public virtual bool HitTest
+    (
         HitTestResult result,
         Vector2 position
     )
@@ -267,7 +278,8 @@ public abstract class Element : IRebuildable
         }
 
         var hitChild = false;
-        VisitChildrenInReverse(child =>
+        VisitChildrenInReverse
+        (child =>
             {
                 if (hitChild)
                 {
@@ -282,7 +294,8 @@ public abstract class Element : IRebuildable
                     var childPos = childRo == ro
                         ? position
                         : ro.GlobalToChild(childRo, position);
-                    if (child.HitTest(
+                    if (child.HitTest
+                        (
                             result,
                             childPos
                         ))
@@ -293,14 +306,16 @@ public abstract class Element : IRebuildable
             }
         );
 
-        var isInteractive = IsActivelyInteractive(
+        var isInteractive = IsActivelyInteractive
+        (
             Widget,
             this is StatefulElement se
                 ? se.State
                 : null
         );
 
-        if (hitChild || isInteractive || ro.HitTest(
+        if (hitChild || isInteractive || ro.HitTest
+            (
                 result,
                 position,
                 this
@@ -313,19 +328,21 @@ public abstract class Element : IRebuildable
         return false;
     }
 
-    protected virtual void VisitChildrenInReverse(
+    protected virtual void VisitChildrenInReverse
+    (
         Action<Element> visitor
     ) =>
         VisitChildren(visitor);
 
-    private static bool IsActivelyInteractive(
+    private static bool IsActivelyInteractive
+    (
         Widget widget,
         object? state
     )
     {
         return EventCheckHelper.IsInteractive(widget) ||
-               (state != null &&
-                EventCheckHelper.IsInteractive(state));
+               state != null &&
+               EventCheckHelper.IsInteractive(state);
     }
 }
 
@@ -338,7 +355,8 @@ public class RenderObjectElement : Element
 {
     private RenderObject? _renderObject;
 
-    public RenderObjectElement(
+    public RenderObjectElement
+    (
         Widget widget
     ) : base(widget)
     {
@@ -351,7 +369,8 @@ public class RenderObjectElement : Element
     ///     render object. Called automatically by <see cref="AttachRenderObject" />
     ///     when a descendant <see cref="RenderObjectElement" /> is mounted.
     /// </summary>
-    internal virtual void InsertChildRenderObject(
+    internal virtual void InsertChildRenderObject
+    (
         RenderObject child
     ) =>
         RenderObject?.AddChild(child);
@@ -361,7 +380,8 @@ public class RenderObjectElement : Element
     ///     render object. Called automatically by <see cref="DetachRenderObject" />
     ///     when a descendant <see cref="RenderObjectElement" /> is unmounted.
     /// </summary>
-    internal virtual void RemoveChildRenderObject(
+    internal virtual void RemoveChildRenderObject
+    (
         RenderObject child
     ) =>
         RenderObject?.RemoveChild(child);
@@ -381,7 +401,8 @@ public class RenderObjectElement : Element
         }
     }
 
-    public override void Mount(
+    public override void Mount
+    (
         Element? parent
     )
     {
@@ -392,7 +413,8 @@ public class RenderObjectElement : Element
         AttachRenderObject();
     }
 
-    public override void Update(
+    public override void Update
+    (
         Widget newWidget
     )
     {
@@ -416,7 +438,8 @@ public class RenderObjectElement : Element
         base.Unmount();
     }
 
-    public override void VisitChildren(
+    public override void VisitChildren
+    (
         Action<Element> visitor
     )
     {
@@ -427,7 +450,8 @@ public class ComponentElement : Element
 {
     private Element? _child;
 
-    public ComponentElement(
+    public ComponentElement
+    (
         Widget widget
     ) : base(widget)
     {
@@ -439,7 +463,8 @@ public class ComponentElement : Element
     {
     }
 
-    public override void Mount(
+    public override void Mount
+    (
         Element? parent
     )
     {
@@ -455,10 +480,11 @@ public class ComponentElement : Element
         var statelessWidget = (StatelessWidget)Widget;
         var pendingError = PendingError;
         PendingError = null;
-        Widget builtWidget = pendingError != null
+        var builtWidget = pendingError != null
             ? ErrorWidget.Builder(pendingError)
             : statelessWidget.Build(new BuildContext(Widget, this));
-        _child = UpdateChild(
+        _child = UpdateChild
+        (
             _child,
             builtWidget
         );
@@ -470,11 +496,13 @@ public class ComponentElement : Element
         }
     }
 
-    public override void Update(
+    public override void Update
+    (
         Widget newWidget
     )
     {
-        if (ReferenceEquals(
+        if (ReferenceEquals
+            (
                 Widget,
                 newWidget
             ))
@@ -495,7 +523,8 @@ public class ComponentElement : Element
         base.Unmount();
     }
 
-    public override void VisitChildren(
+    public override void VisitChildren
+    (
         Action<Element> visitor
     )
     {
@@ -505,7 +534,8 @@ public class ComponentElement : Element
         }
     }
 
-    protected override void VisitChildrenInReverse(
+    protected override void VisitChildrenInReverse
+    (
         Action<Element> visitor
     )
     {
@@ -520,19 +550,22 @@ public class SingleChildElement : RenderObjectElement
 {
     private Element? _child;
 
-    public SingleChildElement(
+    public SingleChildElement
+    (
         Widget widget
     ) : base(widget)
     {
     }
 
-    public override void Mount(
+    public override void Mount
+    (
         Element? parent
     )
     {
         base.Mount(parent);
         var singleChildWidget = (ISingleChildWidget)Widget;
-        _child = UpdateChild(
+        _child = UpdateChild
+        (
             null,
             singleChildWidget.Child
         );
@@ -542,7 +575,8 @@ public class SingleChildElement : RenderObjectElement
         }
     }
 
-    public override void Update(
+    public override void Update
+    (
         Widget newWidget
     )
     {
@@ -550,7 +584,8 @@ public class SingleChildElement : RenderObjectElement
         base.Update(newWidget);
 
         var oldRo = _child?.RenderObject;
-        _child = UpdateChild(
+        _child = UpdateChild
+        (
             _child,
             nextWidget.Child
         );
@@ -580,7 +615,8 @@ public class SingleChildElement : RenderObjectElement
         base.Unmount();
     }
 
-    public override void VisitChildren(
+    public override void VisitChildren
+    (
         Action<Element> visitor
     )
     {
@@ -590,7 +626,8 @@ public class SingleChildElement : RenderObjectElement
         }
     }
 
-    protected override void VisitChildrenInReverse(
+    protected override void VisitChildrenInReverse
+    (
         Action<Element> visitor
     )
     {
@@ -603,9 +640,12 @@ public class SingleChildElement : RenderObjectElement
 
 public class MultiChildElement : RenderObjectElement
 {
+    private readonly List<RenderObject> _orderedRoBuffer = [];
     private List<Element> _children = [];
+    private List<Element> _childrenBuffer = [];
 
-    public MultiChildElement(
+    public MultiChildElement
+    (
         Widget widget
     ) : base(widget)
     {
@@ -613,7 +653,8 @@ public class MultiChildElement : RenderObjectElement
 
     public IReadOnlyList<Element> ChildrenElements => _children;
 
-    public override void Mount(
+    public override void Mount
+    (
         Element? parent
     )
     {
@@ -623,7 +664,8 @@ public class MultiChildElement : RenderObjectElement
 
         for (var i = 0; i < childrenWidgets.Count; i++)
         {
-            var childElement = UpdateChild(
+            var childElement = UpdateChild
+            (
                 null,
                 childrenWidgets[i]
             );
@@ -638,7 +680,8 @@ public class MultiChildElement : RenderObjectElement
         }
     }
 
-    public override void Update(
+    public override void Update
+    (
         Widget newWidget
     )
     {
@@ -649,9 +692,11 @@ public class MultiChildElement : RenderObjectElement
         var nextCount = nextWidgets.Count;
         var currentCount = _children.Count;
 
-        var newElements = new List<Element>(nextCount);
+        var newElements = _childrenBuffer;
+        newElements.Clear();
 
-        var minLen = Math.Min(
+        var minLen = Math.Min
+        (
             currentCount,
             nextCount
         );
@@ -660,7 +705,8 @@ public class MultiChildElement : RenderObjectElement
         {
             var oldChild = _children[i];
             var oldRo = oldChild.RenderObject;
-            var newChild = UpdateChild(
+            var newChild = UpdateChild
+            (
                 oldChild,
                 nextWidgets[i]
             )!;
@@ -685,7 +731,8 @@ public class MultiChildElement : RenderObjectElement
         {
             for (var i = currentCount; i < nextCount; i++)
             {
-                var newChild = UpdateChild(
+                var newChild = UpdateChild
+                (
                     null,
                     nextWidgets[i]
                 )!;
@@ -710,6 +757,8 @@ public class MultiChildElement : RenderObjectElement
             }
         }
 
+        // Swap: the old list becomes next call's scratch buffer (both reused, no alloc).
+        _childrenBuffer = _children;
         _children = newElements;
 
         ReorderChildRenderObjects();
@@ -726,17 +775,17 @@ public class MultiChildElement : RenderObjectElement
             return;
         }
 
-        var orderedRos = new List<RenderObject>(_children.Count);
+        _orderedRoBuffer.Clear();
         foreach (var elem in _children)
         {
             var ro = elem.RenderObject;
             if (ro != null)
             {
-                orderedRos.Add(ro);
+                _orderedRoBuffer.Add(ro);
             }
         }
 
-        RenderObject.ReorderChildren(orderedRos);
+        RenderObject.ReorderChildren(_orderedRoBuffer);
     }
 
     public override void Unmount()
@@ -750,7 +799,8 @@ public class MultiChildElement : RenderObjectElement
         base.Unmount();
     }
 
-    public override void VisitChildren(
+    public override void VisitChildren
+    (
         Action<Element> visitor
     )
     {
@@ -760,7 +810,8 @@ public class MultiChildElement : RenderObjectElement
         }
     }
 
-    protected override void VisitChildrenInReverse(
+    protected override void VisitChildrenInReverse
+    (
         Action<Element> visitor
     )
     {

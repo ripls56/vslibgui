@@ -53,10 +53,10 @@ public class AnimatedContainer : ImplicitlyAnimatedWidget
     private class AnimatedContainerState
         : ImplicitlyAnimatedWidgetState<AnimatedContainer>
     {
-        private BoxShadowListTween? _boxShadowsTween;
         private ColorTween? _borderColorTween;
         private FloatTween? _borderThicknessTween;
         private BorderTween? _borderTween;
+        private BoxShadowListTween? _boxShadowsTween;
         private ColorTween? _colorTween;
         private GradientTween? _gradientTween;
         private FloatTween? _heightTween;

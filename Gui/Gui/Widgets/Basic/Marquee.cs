@@ -4,6 +4,7 @@ using Gui.Rendering;
 using Gui.Rendering.Text;
 using Gui.Widgets.Animations;
 using Gui.Widgets.Framework;
+using Gui.Widgets.Painting;
 using OpenTK.Mathematics;
 using SkiaSharp;
 
@@ -21,7 +22,8 @@ public class Marquee : StatefulWidget
     /// <param name="style">Text style.</param>
     /// <param name="velocity">Scroll speed in pixels per second.</param>
     /// <param name="gap">Gap in pixels between the end of the text and its repeat.</param>
-    public Marquee(
+    public Marquee
+    (
         string text,
         TextStyle style,
         float velocity = 30f,
@@ -100,19 +102,25 @@ internal class MarqueeState : State<Marquee>
 
     public override Widget Build(BuildContext context)
     {
-        return new MarqueeText(
-            Widget.Text,
-            Widget.Style,
-            _overflow ? _offset : 0f,
-            Widget.Gap,
-            _onMeasured
+        // Repaints every tick while overflowing; keep that out of the parent layer.
+        return new RepaintBoundary
+        (
+            new MarqueeText
+            (
+                Widget.Text,
+                Widget.Style,
+                _overflow ? _offset : 0f,
+                Widget.Gap,
+                _onMeasured
+            )
         );
     }
 }
 
 internal sealed class MarqueeText : RenderObjectWidget
 {
-    public MarqueeText(
+    public MarqueeText
+    (
         string text,
         TextStyle style,
         float scrollOffset,
@@ -239,9 +247,15 @@ internal sealed class RenderMarquee : RenderBox
         context.Canvas.Restore();
     }
 
-    private void _drawText(PaintingContext context, float x, float baseline)
+    private void _drawText
+    (
+        PaintingContext context,
+        float x,
+        float baseline
+    )
     {
-        context.DrawText(
+        context.DrawText
+        (
             _text,
             new Vector2(x, baseline),
             _style.FontSize,

@@ -149,9 +149,36 @@ public class RenderBox : RenderObject
 
     public override bool IsHitTestTarget =>
         HitTestBehavior == HitTestBehavior.Opaque ||
-        (HitTestBehavior == HitTestBehavior.Defer &&
-         (Color.W > 0 || BorderThickness > 0 ||
-          (_border.HasValue && _border.Value.AnyWidth) || Texture != null || Children.Count > 0));
+        HitTestBehavior == HitTestBehavior.Defer &&
+        (Color.W > 0 || BorderThickness > 0 ||
+         _border.HasValue && _border.Value.AnyWidth || Texture != null || Children.Count > 0);
+
+    /// <inheritdoc />
+    internal override float PaintOverflowExtent
+    {
+        get
+        {
+            if (_shadows == null)
+            {
+                return 0f;
+            }
+
+            var extent = 0f;
+            foreach (var shadow in _shadows)
+            {
+                if (!shadow.Inset)
+                {
+                    extent = MathF.Max
+                    (
+                        extent,
+                        shadow.Extent
+                    );
+                }
+            }
+
+            return extent;
+        }
+    }
 
     protected override void PerformLayout()
     {

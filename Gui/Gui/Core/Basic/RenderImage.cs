@@ -12,8 +12,12 @@ public class RenderImage : RenderBox
 {
     private Alignment _alignment = Alignment.Center;
     private SKBitmap? _bitmap;
+    private SKBlendMode _blendMode = SKBlendMode.Modulate;
+    private SKColorFilter? _cachedTintFilter;
+    private (Vector4 Color, SKBlendMode Mode)? _cachedTintKey;
     private BoxFit _fit = BoxFit.Contain;
     private float? _height;
+    private Vector4? _tint;
     private float? _width;
 
     // Tracks the asset path that produced the current bitmap so UpdateRenderObject
@@ -24,7 +28,8 @@ public class RenderImage : RenderBox
     public SKBitmap? Bitmap
     {
         get => _bitmap;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref _bitmap,
             value,
             relayout: true
@@ -34,7 +39,8 @@ public class RenderImage : RenderBox
     public BoxFit Fit
     {
         get => _fit;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref _fit,
             value,
             true
@@ -44,7 +50,8 @@ public class RenderImage : RenderBox
     public Alignment Alignment
     {
         get => _alignment;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref _alignment,
             value,
             true
@@ -54,7 +61,8 @@ public class RenderImage : RenderBox
     public float? Width
     {
         get => _width;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref _width,
             value,
             relayout: true
@@ -64,30 +72,61 @@ public class RenderImage : RenderBox
     public float? Height
     {
         get => _height;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref _height,
             value,
             relayout: true
         );
     }
 
+    /// <summary>
+    ///     Tint applied through <see cref="BlendMode" />; null draws the bitmap as-is.
+    ///     Distinct from the inherited <see cref="RenderBox.Color" />, which fills the box
+    ///     behind the bitmap.
+    /// </summary>
+    public Vector4? Tint
+    {
+        get => _tint;
+        set => SetProperty
+        (
+            ref _tint,
+            value,
+            true
+        );
+    }
+
+    public SKBlendMode BlendMode
+    {
+        get => _blendMode;
+        set => SetProperty
+        (
+            ref _blendMode,
+            value,
+            true
+        );
+    }
+
     public override bool IsHitTestTarget =>
         HitTestBehavior == HitTestBehavior.Opaque ||
-        (HitTestBehavior == HitTestBehavior.Defer && (_bitmap != null || BorderThickness > 0));
+        HitTestBehavior == HitTestBehavior.Defer && (_bitmap != null || BorderThickness > 0);
 
     protected override void PerformLayout()
     {
         var intrinsicW = _width ?? _bitmap?.Width ?? 0f;
         var intrinsicH = _height ?? _bitmap?.Height ?? 0f;
-        Size = Constraints.Constrain(
-            new Vector2(
+        Size = Constraints.Constrain
+        (
+            new Vector2
+            (
                 intrinsicW,
                 intrinsicH
             )
         );
     }
 
-    protected override void PaintInternal(
+    protected override void PaintInternal
+    (
         PaintingContext context
     )
     {
@@ -97,7 +136,8 @@ public class RenderImage : RenderBox
         }
 
         var (srcRect, dstRect) = ComputeRects();
-        context.Canvas.DrawImage(
+        context.Canvas.DrawImage
+        (
             _bitmap,
             Vector2.Zero,
             Size,
@@ -108,8 +148,43 @@ public class RenderImage : RenderBox
             BorderColor,
             context.SharedPaint,
             context.SharedRoundRect,
-            context.SharedBorderRoundRect
+            context.SharedBorderRoundRect,
+            TintFilter()
         );
+    }
+
+    /// <summary>
+    ///     Color filter for the current <see cref="Tint" /> / <see cref="BlendMode" />,
+    ///     rebuilt only when either changes — the filter is allocated per paint otherwise.
+    /// </summary>
+    private SKColorFilter? TintFilter()
+    {
+        if (_tint is not { } tint)
+        {
+            return null;
+        }
+
+        var key = (tint, _blendMode);
+        if (_cachedTintKey != key)
+        {
+            _cachedTintFilter?.Dispose();
+            _cachedTintFilter = SKColorFilter.CreateBlendMode
+            (
+                tint.ToSkColor(),
+                _blendMode
+            );
+            _cachedTintKey = key;
+        }
+
+        return _cachedTintFilter;
+    }
+
+    public override void Dispose()
+    {
+        _cachedTintFilter?.Dispose();
+        _cachedTintFilter = null;
+        _cachedTintKey = null;
+        base.Dispose();
     }
 
     /// <summary>
@@ -124,13 +199,15 @@ public class RenderImage : RenderBox
         var dstW = Size.X;
         var dstH = Size.Y;
 
-        var fullSrc = new SKRect(
+        var fullSrc = new SKRect
+        (
             0,
             0,
             srcW,
             srcH
         );
-        var fullDst = new SKRect(
+        var fullDst = new SKRect
+        (
             0,
             0,
             dstW,
@@ -149,11 +226,13 @@ public class RenderImage : RenderBox
 
             case BoxFit.Contain:
             {
-                var scale = Math.Min(
+                var scale = Math.Min
+                (
                     dstW / srcW,
                     dstH / srcH
                 );
-                return ContainRects(
+                return ContainRects
+                (
                     srcW,
                     srcH,
                     dstW,
@@ -165,7 +244,8 @@ public class RenderImage : RenderBox
 
             case BoxFit.Cover:
             {
-                var scale = Math.Max(
+                var scale = Math.Max
+                (
                     dstW / srcW,
                     dstH / srcH
                 );
@@ -174,7 +254,8 @@ public class RenderImage : RenderBox
                 // Alignment maps [-1,1] → [0, available crop offset].
                 var srcOffX = (srcW - cropW) * (_alignment.X + 1f) / 2f;
                 var srcOffY = (srcH - cropH) * (_alignment.Y + 1f) / 2f;
-                var srcRect = new SKRect(
+                var srcRect = new SKRect
+                (
                     srcOffX,
                     srcOffY,
                     srcOffX + cropW,
@@ -186,7 +267,8 @@ public class RenderImage : RenderBox
             case BoxFit.FitWidth:
             {
                 var scale = dstW / srcW;
-                return ContainRects(
+                return ContainRects
+                (
                     srcW,
                     srcH,
                     dstW,
@@ -199,7 +281,8 @@ public class RenderImage : RenderBox
             case BoxFit.FitHeight:
             {
                 var scale = dstH / srcH;
-                return ContainRects(
+                return ContainRects
+                (
                     srcW,
                     srcH,
                     dstW,
@@ -210,7 +293,8 @@ public class RenderImage : RenderBox
             }
 
             case BoxFit.None:
-                return ContainRects(
+                return ContainRects
+                (
                     srcW,
                     srcH,
                     dstW,
@@ -221,14 +305,17 @@ public class RenderImage : RenderBox
 
             case BoxFit.ScaleDown:
             {
-                var scale = Math.Min(
+                var scale = Math.Min
+                (
                     1f,
-                    Math.Min(
+                    Math.Min
+                    (
                         dstW / srcW,
                         dstH / srcH
                     )
                 );
-                return ContainRects(
+                return ContainRects
+                (
                     srcW,
                     srcH,
                     dstW,
@@ -245,7 +332,8 @@ public class RenderImage : RenderBox
 
     // Scales the source bitmap by `scale`, then uses Alignment to position the
     // scaled image within the widget bounds.
-    private (SKRect src, SKRect dst) ContainRects(
+    private (SKRect src, SKRect dst) ContainRects
+    (
         float srcW,
         float srcH,
         float dstW,
@@ -256,17 +344,21 @@ public class RenderImage : RenderBox
     {
         var renderW = srcW * scale;
         var renderH = srcH * scale;
-        var offset = _alignment.CalculateOffset(
-            new Vector2(
+        var offset = _alignment.CalculateOffset
+        (
+            new Vector2
+            (
                 dstW,
                 dstH
             ),
-            new Vector2(
+            new Vector2
+            (
                 renderW,
                 renderH
             )
         );
-        var dst = new SKRect(
+        var dst = new SKRect
+        (
             offset.X,
             offset.Y,
             offset.X + renderW,

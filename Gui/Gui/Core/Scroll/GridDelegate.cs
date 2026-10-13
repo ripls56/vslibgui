@@ -14,7 +14,8 @@ public readonly struct SliverGridGeometry
     public float MainAxisSpacing { get; }
     public float CrossAxisSpacing { get; }
 
-    public SliverGridGeometry(
+    public SliverGridGeometry
+    (
         int crossAxisCount,
         float cellWidth,
         float cellHeight,
@@ -29,7 +30,8 @@ public readonly struct SliverGridGeometry
         CrossAxisSpacing = crossAxisSpacing;
     }
 
-    public float TotalContentHeight(
+    public float TotalContentHeight
+    (
         int itemCount
     )
     {
@@ -39,13 +41,15 @@ public readonly struct SliverGridGeometry
         }
 
         var rowCount = (int)Math.Ceiling(itemCount / (double)CrossAxisCount);
-        return rowCount * CellHeight + Math.Max(
+        return rowCount * CellHeight + Math.Max
+        (
             0,
             rowCount - 1
         ) * MainAxisSpacing;
     }
 
-    public (float x, float y) CellOrigin(
+    public (float x, float y) CellOrigin
+    (
         int index
     )
     {
@@ -60,7 +64,8 @@ public readonly struct SliverGridGeometry
     ///     Returns the flat index range of cells that overlap the viewport window
     ///     <c>[scrollOffset, scrollOffset + viewportHeight]</c>, with a one-row buffer.
     /// </summary>
-    public (int firstIndex, int lastIndex) ComputeVisibleRange(
+    public (int firstIndex, int lastIndex) ComputeVisibleRange
+    (
         float scrollOffset,
         float viewportHeight,
         int itemCount
@@ -82,17 +87,20 @@ public readonly struct SliverGridGeometry
         var firstRow = (int)Math.Floor(scrollOffset / rowHeight);
         var lastRow = (int)Math.Ceiling((scrollOffset + viewportHeight) / rowHeight);
 
-        firstRow = Math.Max(
+        firstRow = Math.Max
+        (
             0,
             firstRow - 1
         );
-        lastRow = Math.Min(
+        lastRow = Math.Min
+        (
             totalRows - 1,
             lastRow
         );
 
         var firstIndex = firstRow * CrossAxisCount;
-        var lastIndex = Math.Min(
+        var lastIndex = Math.Min
+        (
             itemCount - 1,
             (lastRow + 1) * CrossAxisCount - 1
         );
@@ -107,7 +115,8 @@ public readonly struct SliverGridGeometry
 /// </summary>
 public abstract class SliverGridDelegate
 {
-    public abstract SliverGridGeometry GetGeometry(
+    public abstract SliverGridGeometry GetGeometry
+    (
         float viewportWidth
     );
 }
@@ -119,7 +128,8 @@ public abstract class SliverGridDelegate
 /// </summary>
 public class SliverGridDelegateWithFixedCrossAxisCount : SliverGridDelegate
 {
-    public SliverGridDelegateWithFixedCrossAxisCount(
+    public SliverGridDelegateWithFixedCrossAxisCount
+    (
         int crossAxisCount,
         float mainAxisSpacing = 0,
         float crossAxisSpacing = 0,
@@ -127,7 +137,8 @@ public class SliverGridDelegateWithFixedCrossAxisCount : SliverGridDelegate
         float? fixedItemHeight = null
     )
     {
-        CrossAxisCount = Math.Max(
+        CrossAxisCount = Math.Max
+        (
             1,
             crossAxisCount
         );
@@ -143,7 +154,8 @@ public class SliverGridDelegateWithFixedCrossAxisCount : SliverGridDelegate
     public float ChildAspectRatio { get; }
     public float? FixedItemHeight { get; }
 
-    public override SliverGridGeometry GetGeometry(
+    public override SliverGridGeometry GetGeometry
+    (
         float viewportWidth
     )
     {
@@ -155,7 +167,8 @@ public class SliverGridDelegateWithFixedCrossAxisCount : SliverGridDelegate
         var totalSpacing = CrossAxisSpacing * (CrossAxisCount - 1);
         var cellWidth = (viewportWidth - totalSpacing) / CrossAxisCount;
         var cellHeight = FixedItemHeight ?? cellWidth / ChildAspectRatio;
-        return new SliverGridGeometry(
+        return new SliverGridGeometry
+        (
             CrossAxisCount,
             cellWidth,
             cellHeight,
@@ -171,7 +184,8 @@ public class SliverGridDelegateWithFixedCrossAxisCount : SliverGridDelegate
 /// </summary>
 public class SliverGridDelegateWithMaxCrossAxisExtent : SliverGridDelegate
 {
-    public SliverGridDelegateWithMaxCrossAxisExtent(
+    public SliverGridDelegateWithMaxCrossAxisExtent
+    (
         float maxCrossAxisExtent,
         float mainAxisSpacing = 0,
         float crossAxisSpacing = 0,
@@ -179,7 +193,8 @@ public class SliverGridDelegateWithMaxCrossAxisExtent : SliverGridDelegate
         float? fixedItemHeight = null
     )
     {
-        MaxCrossAxisExtent = Math.Max(
+        MaxCrossAxisExtent = Math.Max
+        (
             1,
             maxCrossAxisExtent
         );
@@ -195,7 +210,8 @@ public class SliverGridDelegateWithMaxCrossAxisExtent : SliverGridDelegate
     public float ChildAspectRatio { get; }
     public float? FixedItemHeight { get; }
 
-    public override SliverGridGeometry GetGeometry(
+    public override SliverGridGeometry GetGeometry
+    (
         float viewportWidth
     )
     {
@@ -204,9 +220,11 @@ public class SliverGridDelegateWithMaxCrossAxisExtent : SliverGridDelegate
             viewportWidth = 400;
         }
 
-        var crossAxisCount = Math.Max(
+        var crossAxisCount = Math.Max
+        (
             1,
-            (int)Math.Floor(
+            (int)Math.Floor
+            (
                 (viewportWidth + CrossAxisSpacing) /
                 (MaxCrossAxisExtent + CrossAxisSpacing)
             )
@@ -214,7 +232,8 @@ public class SliverGridDelegateWithMaxCrossAxisExtent : SliverGridDelegate
         var totalSpacing = CrossAxisSpacing * (crossAxisCount - 1);
         var cellWidth = (viewportWidth - totalSpacing) / crossAxisCount;
         var cellHeight = FixedItemHeight ?? cellWidth / ChildAspectRatio;
-        return new SliverGridGeometry(
+        return new SliverGridGeometry
+        (
             crossAxisCount,
             cellWidth,
             cellHeight,

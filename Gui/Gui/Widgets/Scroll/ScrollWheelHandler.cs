@@ -35,7 +35,8 @@ internal sealed class ScrollWheelHandler
     /// <param name="delta">Raw wheel delta (positive = up/left).</param>
     /// <param name="maxScroll">Current maximum scroll extent in pixels.</param>
     /// <param name="reverse">When <c>true</c>, the scroll axis is reversed.</param>
-    public static bool CanScroll(
+    public static bool CanScroll
+    (
         ScrollController controller,
         float delta,
         float maxScroll,
@@ -91,7 +92,8 @@ internal sealed class ScrollWheelHandler
     ///     (<paramref name="maxScroll" /> is zero) or the boundary guard in
     ///     <see cref="CanScroll" /> blocked the delta.
     /// </returns>
-    public bool Apply(
+    public bool Apply
+    (
         float delta,
         bool reverse,
         float maxScroll,

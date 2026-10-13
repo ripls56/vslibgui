@@ -4,52 +4,62 @@ namespace Gui.Widgets.Layout;
 
 public class Alignment
 {
-    public static readonly Alignment TopLeft = new(
+    public static readonly Alignment TopLeft = new
+    (
         -1,
         -1
     );
 
-    public static readonly Alignment TopCenter = new(
+    public static readonly Alignment TopCenter = new
+    (
         0,
         -1
     );
 
-    public static readonly Alignment TopRight = new(
+    public static readonly Alignment TopRight = new
+    (
         1,
         -1
     );
 
-    public static readonly Alignment CenterLeft = new(
+    public static readonly Alignment CenterLeft = new
+    (
         -1,
         0
     );
 
-    public static readonly Alignment Center = new(
+    public static readonly Alignment Center = new
+    (
         0,
         0
     );
 
-    public static readonly Alignment CenterRight = new(
+    public static readonly Alignment CenterRight = new
+    (
         1,
         0
     );
 
-    public static readonly Alignment BottomLeft = new(
+    public static readonly Alignment BottomLeft = new
+    (
         -1,
         1
     );
 
-    public static readonly Alignment BottomCenter = new(
+    public static readonly Alignment BottomCenter = new
+    (
         0,
         1
     );
 
-    public static readonly Alignment BottomRight = new(
+    public static readonly Alignment BottomRight = new
+    (
         1,
         1
     );
 
-    public Alignment(
+    public Alignment
+    (
         float x,
         float y
     )
@@ -61,7 +71,8 @@ public class Alignment
     public float X { get; }
     public float Y { get; }
 
-    public Vector2 CalculateOffset(
+    public Vector2 CalculateOffset
+    (
         Vector2 parentSize,
         Vector2 childSize
     )
@@ -69,7 +80,8 @@ public class Alignment
         var centerX = (parentSize.X - childSize.X) / 2f;
         var centerY = (parentSize.Y - childSize.Y) / 2f;
 
-        return new Vector2(
+        return new Vector2
+        (
             centerX + X * centerX,
             centerY + Y * centerY
         );
@@ -94,7 +106,8 @@ public enum CrossAxisAlignment
     Stretch,
 
     /// <summary>
-    ///     Aligns children along their text baseline. In a horizontal <see cref="Gui.Core.Layout.RenderFlex" />,
+    ///     Aligns children along their text baseline. In a horizontal
+    ///     <see cref="Gui.Core.Layout.RenderFlex" />,
     ///     children are positioned so their alphabetic baselines are co-linear.
     ///     Falls back to <see cref="Start" /> in a vertical flex.
     /// </summary>

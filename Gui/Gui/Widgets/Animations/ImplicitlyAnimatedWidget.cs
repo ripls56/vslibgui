@@ -18,7 +18,8 @@ public abstract class ImplicitlyAnimatedWidget : StatefulWidget
     /// <param name="curve">Easing curve (defaults to linear).</param>
     /// <param name="onEnd">Callback fired when animation completes.</param>
     /// <param name="key">Optional key for element identity.</param>
-    protected ImplicitlyAnimatedWidget(
+    protected ImplicitlyAnimatedWidget
+    (
         TimeSpan duration,
         Curve? curve = null,
         Action? onEnd = null,
@@ -55,7 +56,8 @@ public class TweenVisitor
 {
     private readonly IAnimation _animation;
 
-    internal TweenVisitor(
+    internal TweenVisitor
+    (
         IAnimation animation
     )
     {
@@ -80,7 +82,8 @@ public class TweenVisitor
     ///     Factory that creates a new <see cref="Tween{T}" /> with Begin=End=targetValue.
     /// </param>
     /// <returns>The current or newly created tween.</returns>
-    public Tween<T> Visit<T>(
+    public Tween<T> Visit<T>
+    (
         Tween<T>? current,
         T targetValue,
         Func<T, Tween<T>> constructor
@@ -91,7 +94,8 @@ public class TweenVisitor
             return constructor(targetValue);
         }
 
-        if (!Equals(
+        if (!Equals
+            (
                 current.End,
                 targetValue
             ))
@@ -136,11 +140,13 @@ public abstract class ImplicitlyAnimatedWidgetState<T> : State<T>
     public override void InitState()
     {
         base.InitState();
-        Controller = new AnimationController(
+        Controller = new AnimationController
+        (
             Widget.Duration,
             Element.Owner!.GetTickerProvider()
         );
-        _curvedAnimation = new CurvedAnimation(
+        _curvedAnimation = new CurvedAnimation
+        (
             Controller,
             Widget.Curve
         );
@@ -152,7 +158,8 @@ public abstract class ImplicitlyAnimatedWidgetState<T> : State<T>
     }
 
     /// <inheritdoc />
-    public override void UpdateWidget(
+    public override void UpdateWidget
+    (
         T oldWidget
     )
     {
@@ -165,7 +172,8 @@ public abstract class ImplicitlyAnimatedWidgetState<T> : State<T>
 
         if (Widget.Curve != oldWidget.Curve)
         {
-            _curvedAnimation = new CurvedAnimation(
+            _curvedAnimation = new CurvedAnimation
+            (
                 Controller,
                 Widget.Curve
             );
@@ -188,11 +196,13 @@ public abstract class ImplicitlyAnimatedWidgetState<T> : State<T>
     ///     the returned tween.
     /// </summary>
     /// <param name="visitor">The visitor used to create or update tweens.</param>
-    protected abstract void ForEachTween(
+    protected abstract void ForEachTween
+    (
         TweenVisitor visitor
     );
 
-    private void HandleStatusChanged(
+    private void HandleStatusChanged
+    (
         AnimationStatus status
     )
     {
@@ -202,7 +212,8 @@ public abstract class ImplicitlyAnimatedWidgetState<T> : State<T>
         }
     }
 
-    private void HandleValueChanged(
+    private void HandleValueChanged
+    (
         double _
     ) =>
         SetState(() => { });

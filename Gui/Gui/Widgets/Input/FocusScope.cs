@@ -3,8 +3,8 @@ using Gui.Widgets.Framework;
 namespace Gui.Widgets.Input;
 
 /// <summary>
-/// A widget that establishes a <see cref="FocusScopeNode"/> focus scope boundary.
-/// Tab traversal is contained within the scope that holds the currently focused node.
+///     A widget that establishes a <see cref="FocusScopeNode" /> focus scope boundary.
+///     Tab traversal is contained within the scope that holds the currently focused node.
 /// </summary>
 public class FocusScope : StatefulWidget
 {
@@ -12,7 +12,7 @@ public class FocusScope : StatefulWidget
     public required Widget Child { get; init; }
 
     /// <summary>
-    /// Optional externally-managed scope node. When null an internal node is created automatically.
+    ///     Optional externally-managed scope node. When null an internal node is created automatically.
     /// </summary>
     public FocusScopeNode? FocusNode { get; init; }
 

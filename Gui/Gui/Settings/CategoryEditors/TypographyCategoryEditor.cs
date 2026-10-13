@@ -36,7 +36,7 @@ public sealed class TypographyCategoryEditor : StatelessWidget
         var o = _draft.Typography;
         return new Column
         (
-            spacing: 24,
+            24,
             children:
             [
                 TextStyleSection
@@ -97,7 +97,7 @@ public sealed class TypographyCategoryEditor : StatelessWidget
     {
         return new Column
         (
-            spacing: 8,
+            8,
             children:
             [
                 new Text(name, _baseTheme.TextTheme.Title),

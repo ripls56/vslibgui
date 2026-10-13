@@ -13,7 +13,8 @@ namespace Gui.Widgets.Layout;
 public class Wrap : MultiChildWidget
 {
     /// <summary>Creates a new Wrap widget.</summary>
-    public Wrap(
+    public Wrap
+    (
         FlexDirection direction = FlexDirection.Horizontal,
         float spacing = 0,
         float runSpacing = 0,
@@ -65,7 +66,8 @@ public class Wrap : MultiChildWidget
     }
 
     /// <inheritdoc />
-    public override void UpdateRenderObject(
+    public override void UpdateRenderObject
+    (
         RenderObject renderObject
     )
     {

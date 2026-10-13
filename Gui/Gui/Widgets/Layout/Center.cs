@@ -6,7 +6,8 @@ namespace Gui.Widgets.Layout;
 
 public class Center : SingleChildWidget
 {
-    public Center(
+    public Center
+    (
         Widget? child = null,
         Framework.Key? key = null
     ) : base(child, key)
@@ -14,9 +15,13 @@ public class Center : SingleChildWidget
     }
 
     public override RenderObject CreateRenderObject() =>
-        new RenderPositionedBox { Alignment = Alignment.Center };
+        new RenderPositionedBox
+        {
+            Alignment = Alignment.Center
+        };
 
-    public override void UpdateRenderObject(
+    public override void UpdateRenderObject
+    (
         RenderObject renderObject
     )
     {

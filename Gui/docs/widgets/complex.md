@@ -56,10 +56,15 @@ new NineSliceItemSlot(
 ## ItemStackDisplay
 
 Renders a single `ItemStack` icon at a given size using the vanilla item-stack renderer.
+Hovering the icon shows the vanilla-style item tooltip; pass `showTooltip: false` to disable
+it (e.g. when the icon already sits inside a slot that owns a tooltip).
 
 ```csharp
-new ItemStackDisplay(stack, width: 40f, height: 40f, guiScale: 80)
+new ItemStackDisplay(stack, width: 40f, height: 40f, renderSize: 80)
+new ItemStackDisplay(stack, width: 40f, height: 40f, showTooltip: false)
 ```
+
+Use `RawItemStackDisplay` for the bare render-object widget with no tooltip wrapper.
 
 ## ItemStackSlideshow
 

@@ -7,7 +7,8 @@ namespace Gui.Widgets.Layout;
 
 public class Stack : MultiChildWidget
 {
-    public Stack(
+    public Stack
+    (
         IEnumerable<Widget> children,
         Framework.Key? key = null
     ) : base(children, key)
@@ -16,7 +17,8 @@ public class Stack : MultiChildWidget
 
     public override RenderObject CreateRenderObject() => new RenderStack();
 
-    public override void UpdateRenderObject(
+    public override void UpdateRenderObject
+    (
         RenderObject renderObject
     ) =>
         base.UpdateRenderObject(renderObject);

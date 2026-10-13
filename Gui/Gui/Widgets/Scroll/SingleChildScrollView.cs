@@ -12,7 +12,8 @@ namespace Gui.Widgets.Scroll;
 
 public class SingleChildScrollView : StatefulWidget
 {
-    public SingleChildScrollView(
+    public SingleChildScrollView
+    (
         Widget? child = null,
         ScrollController? controller = null,
         bool reverse = false
@@ -67,7 +68,8 @@ public class SingleChildScrollView : StatefulWidget
             SetState(() => { });
         }
 
-        public void OnMouseWheel(
+        public void OnMouseWheel
+        (
             PointerEvent e
         )
         {
@@ -80,7 +82,8 @@ public class SingleChildScrollView : StatefulWidget
             e.Handled = true;
         }
 
-        public override Widget Build(
+        public override Widget Build
+        (
             BuildContext context
         )
         {
@@ -88,14 +91,18 @@ public class SingleChildScrollView : StatefulWidget
                 ? Math.Max(0, Math.Max(0, _contentHeight - _viewportHeight) - Controller.Offset)
                 : Controller.Offset;
 
-            return new GestureDetector(
+            return new GestureDetector
+            (
                 onWheel: OnMouseWheel,
-                child: new Viewport(
-                    new Vector2(
+                child: new Viewport
+                (
+                    new Vector2
+                    (
                         0,
                         effectiveOffset
                     ),
-                    new ScrollableContentNotifier(
+                    new ScrollableContentNotifier
+                    (
                         (
                             vh,
                             ch
@@ -122,7 +129,8 @@ public class SingleChildScrollView : StatefulWidget
 
     private class ScrollableContentNotifier : SingleChildWidget
     {
-        public ScrollableContentNotifier(
+        public ScrollableContentNotifier
+        (
             Action<float, float> onLayout,
             Widget? child
         ) : base(child)
@@ -139,7 +147,8 @@ public class SingleChildScrollView : StatefulWidget
 
     private class ScrollableContentElement : SingleChildElement
     {
-        public ScrollableContentElement(
+        public ScrollableContentElement
+        (
             ScrollableContentNotifier widget
         ) : base(widget)
         {

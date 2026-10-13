@@ -5,7 +5,8 @@ namespace Gui.Widgets.Animations;
 
 public class AnimatedBuilder : StatefulWidget
 {
-    public AnimatedBuilder(
+    public AnimatedBuilder
+    (
         AnimationController animation,
         Func<BuildContext, Widget> builder
     )
@@ -27,12 +28,14 @@ public class AnimatedBuilder : StatefulWidget
             Widget.Animation.OnValueChanged += HandleTick;
         }
 
-        private void HandleTick(
+        private void HandleTick
+        (
             double animationValue
         ) =>
             SetState(() => { });
 
-        public override Widget Build(
+        public override Widget Build
+        (
             BuildContext context
         ) =>
             Widget.Builder(context);

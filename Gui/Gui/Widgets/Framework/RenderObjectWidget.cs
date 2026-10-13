@@ -2,7 +2,8 @@ namespace Gui.Widgets.Framework;
 
 public abstract class RenderObjectWidget : Widget
 {
-    protected RenderObjectWidget(
+    protected RenderObjectWidget
+    (
         Key? key = null
     ) : base(key)
     {

@@ -1,15 +1,21 @@
+using Gui.Core.Input;
 using Gui.Widgets.Animations;
 using Gui.Widgets.Events;
 using Gui.Widgets.Framework;
 using Gui.Widgets.Gestures;
 using Gui.Widgets.Layout;
 using Gui.Widgets.Overlay;
+using NUnit.Framework;
+using OpenTK.Mathematics;
 
 namespace Gui.Tests.Widgets;
 
 [TestFixture]
 public class TooltipTests
 {
+    [TearDown]
+    public void ResetGlobalPointer() => GlobalPointer.TestOverride = null;
+
     private class MockTickerProvider : ITickerProvider
     {
         public readonly List<Ticker> Tickers = [];
@@ -211,5 +217,77 @@ public class TooltipTests
 
         Assert.DoesNotThrow(() => root.Unmount(),
             "Unmounting while tooltip is visible must not throw");
+    }
+
+    [Test]
+    public void Tooltip_Closes_WhenGlobalCursorLeftTrigger_WithoutExitEvent()
+    {
+        var (root, owner, vsync) = Mount(
+            new Tooltip(
+                new SizedBox(100, 40),
+                new Gui.Widgets.Basic.Text("stuck"),
+                TimeSpan.FromMilliseconds(100),
+                TimeSpan.FromMilliseconds(50)));
+
+        var dispatcher = new EventDispatcher();
+        dispatcher.DispatchPointerMove(root, new PointerEvent(50, 20));
+        vsync.Advance(TimeSpan.FromMilliseconds(200));
+        owner.BuildDirtyElements();
+        Assert.That(OverlayEntryCount(root), Is.EqualTo(2), "Tooltip should be visible first");
+
+        // The pointer moved onto a window in front of this one. The engine gives that window
+        // the move event and stops, so no exit ever reaches this tree.
+        GlobalPointer.TestOverride = () => new Vector2(500, 500);
+        vsync.Advance(TimeSpan.FromMilliseconds(16));
+        vsync.Advance(TimeSpan.FromMilliseconds(100));
+        owner.BuildDirtyElements();
+
+        Assert.That(OverlayEntryCount(root), Is.EqualTo(1),
+            "The per-frame pointer guard must close a tooltip whose trigger lost the pointer");
+    }
+
+    [Test]
+    public void Tooltip_StaysVisible_WhileGlobalCursorOverTrigger()
+    {
+        var (root, owner, vsync) = Mount(
+            new Tooltip(
+                new SizedBox(100, 40),
+                new Gui.Widgets.Basic.Text("stay"),
+                TimeSpan.FromMilliseconds(100),
+                TimeSpan.FromMilliseconds(50)));
+
+        var dispatcher = new EventDispatcher();
+        dispatcher.DispatchPointerMove(root, new PointerEvent(50, 20));
+        vsync.Advance(TimeSpan.FromMilliseconds(200));
+        owner.BuildDirtyElements();
+
+        GlobalPointer.TestOverride = () => new Vector2(50, 20);
+        vsync.Advance(TimeSpan.FromMilliseconds(16));
+        vsync.Advance(TimeSpan.FromMilliseconds(100));
+        owner.BuildDirtyElements();
+
+        Assert.That(OverlayEntryCount(root), Is.EqualTo(2),
+            "The guard must not close a tooltip the pointer is still over");
+    }
+
+    [Test]
+    public void Tooltip_DoesNotOpen_WhenGlobalCursorLeftDuringWait()
+    {
+        var (root, owner, vsync) = Mount(
+            new Tooltip(
+                new SizedBox(100, 40),
+                new Gui.Widgets.Basic.Text("never"),
+                TimeSpan.FromMilliseconds(200)));
+
+        var dispatcher = new EventDispatcher();
+        dispatcher.DispatchPointerMove(root, new PointerEvent(50, 20));
+
+        // The wait elapses while another window owns the pointer.
+        GlobalPointer.TestOverride = () => new Vector2(500, 500);
+        vsync.Advance(TimeSpan.FromMilliseconds(400));
+        owner.BuildDirtyElements();
+
+        Assert.That(OverlayEntryCount(root), Is.EqualTo(1),
+            "The guard must cancel the pending wait instead of opening a tooltip nobody hovers");
     }
 }

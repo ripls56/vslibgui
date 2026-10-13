@@ -244,8 +244,8 @@ internal class FocusPage : StatefulWidget
 }
 
 /// <summary>
-/// A labelled <see cref="TextField"/> bound to a <see cref="FocusNode"/>. Shows a "focus" badge
-/// and a highlighted border when its node holds primary focus, so traversal is visible.
+///     A labelled <see cref="TextField" /> bound to a <see cref="FocusNode" />. Shows a "focus" badge
+///     and a highlighted border when its node holds primary focus, so traversal is visible.
 /// </summary>
 internal class FocusRow : StatefulWidget
 {
@@ -270,7 +270,7 @@ internal class FocusRow : StatefulWidget
 
 internal class FocusRowState : State<FocusRow>
 {
-    private readonly TextEditingController _controller = new("");
+    private readonly TextEditingController _controller = new();
     private Action? _listener;
 
     public override void InitState()
@@ -325,13 +325,13 @@ internal class FocusRowState : State<FocusRow>
                     new TextField
                     (
                         _controller,
-                        focusNode: Widget.Node,
-                        style: TextFieldStyle.Default(c, TextTheme.Default()) with
+                        Widget.Node,
+                        TextFieldStyle.Default(c, TextTheme.Default()) with
                         {
                             Height = 32,
                             FillColor = new Vector4(0f, 0f, 0f, 0.3f),
                             BorderThickness = focused ? 2f : 1f,
-                            BorderColor = focused ? c.Primary : c.Border,
+                            BorderColor = focused ? c.Primary : c.Border
                         }
                     )
                 ),

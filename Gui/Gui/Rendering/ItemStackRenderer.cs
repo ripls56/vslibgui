@@ -26,6 +26,15 @@ namespace Gui.Rendering;
 /// </summary>
 public class ItemStackRenderer : IPreSkiaRenderer, IDisposable
 {
+    /// <summary>
+    ///     Maps an item stack's continuously-varying visual state to a discrete bucket so that
+    ///     micro-changes share one cached render while distinct visual stages still get their own.
+    /// </summary>
+    /// <param name="world">World accessor, for values derived from game time (e.g. temperature decay).</param>
+    /// <param name="stack">The stack being cached.</param>
+    /// <returns>A bucket id folded into the cache key together with every other provider.</returns>
+    public delegate int VisualBucketProvider(IWorldAccessor world, ItemStack stack);
+
     private const int MaxCacheEntries = 8192;
 
     /// <summary>Per-bucket cap to stop spammy items from evicting unrelated cache entries via global LRU.</summary>
@@ -57,23 +66,16 @@ public class ItemStackRenderer : IPreSkiaRenderer, IDisposable
 
     private static readonly List<VisualBucketProvider> VisualBucketProviders = new();
 
-    static ItemStackRenderer()
-    {
-        IgnoreAttribute("topCrustType");
-        RegisterVisualBucket("transitionstate", static (_, stack) => ComputeTransitionBucket(stack));
-        RegisterVisualBucket("temperature", ComputeTemperatureBucket);
-    }
-
     private readonly Dictionary<ItemCacheKey, List<AttributedEntry>> _cache = new();
     private readonly ICoreClientAPI _capi;
     private readonly DummySlot _dummySlot = new();
     private readonly ClientMain _game;
-    private readonly Queue<(ItemCacheKey Key, AttributedEntry Entry)> _idleEvictionQueue = new();
-    private readonly Dictionary<ItemCacheKey, List<RenderRequest>> _pendingByKey = new();
-    private readonly List<RenderItemStack> _pendingListeners = [];
 
     private readonly Dictionary<RenderItemStack, int> _glowingSlots = new();
     private readonly List<RenderItemStack> _glowScratch = [];
+    private readonly Queue<(ItemCacheKey Key, AttributedEntry Entry)> _idleEvictionQueue = new();
+    private readonly Dictionary<ItemCacheKey, List<RenderRequest>> _pendingByKey = new();
+    private readonly List<RenderItemStack> _pendingListeners = [];
 
     private readonly List<(RenderRequest Req, List<RenderRequest> Bucket, int Index)>
         _pendingSnapshot = new();
@@ -85,7 +87,16 @@ public class ItemStackRenderer : IPreSkiaRenderer, IDisposable
     private int _pendingCount;
     private int _totalCacheCount;
 
-    public ItemStackRenderer(
+    static ItemStackRenderer()
+    {
+        IgnoreAttribute("topCrustType");
+        RegisterVisualBucket
+            ("transitionstate", static (_, stack) => ComputeTransitionBucket(stack));
+        RegisterVisualBucket("temperature", ComputeTemperatureBucket);
+    }
+
+    public ItemStackRenderer
+    (
         ICoreClientAPI capi
     )
     {
@@ -222,13 +233,16 @@ public class ItemStackRenderer : IPreSkiaRenderer, IDisposable
             }
 
             EvictBucketIfFull(list);
-            list.Add(new AttributedEntry
-            {
-                Snapshot = req.Snapshot,
-                Image = image,
-                LastUsedFrame = _frameCounter,
-                AttrHash = req.AttrHash
-            });
+            list.Add
+            (
+                new AttributedEntry
+                {
+                    Snapshot = req.Snapshot,
+                    Image = image,
+                    LastUsedFrame = _frameCounter,
+                    AttrHash = req.AttrHash
+                }
+            );
             _totalCacheCount++;
             rendered++;
         }
@@ -264,15 +278,6 @@ public class ItemStackRenderer : IPreSkiaRenderer, IDisposable
         IgnoredAttributesSet.CopyTo(arr);
         _ignoredAttributes = arr;
     }
-
-    /// <summary>
-    ///     Maps an item stack's continuously-varying visual state to a discrete bucket so that
-    ///     micro-changes share one cached render while distinct visual stages still get their own.
-    /// </summary>
-    /// <param name="world">World accessor, for values derived from game time (e.g. temperature decay).</param>
-    /// <param name="stack">The stack being cached.</param>
-    /// <returns>A bucket id folded into the cache key together with every other provider.</returns>
-    public delegate int VisualBucketProvider(IWorldAccessor world, ItemStack stack);
 
     /// <summary>
     ///     Registers a quantizer for a continuously-varying visual attribute. Stacks whose quantized
@@ -366,7 +371,12 @@ public class ItemStackRenderer : IPreSkiaRenderer, IDisposable
         return 1 + Math.Clamp((int)(normalized * (buckets - 1)), 0, buckets - 1);
     }
 
-    private static bool TryNormalize(ItemStack? stack, int renderSize, out int effectiveSize)
+    private static bool TryNormalize
+    (
+        ItemStack? stack,
+        int renderSize,
+        out int effectiveSize
+    )
     {
         if (stack?.Collectible == null)
         {
@@ -433,7 +443,7 @@ public class ItemStackRenderer : IPreSkiaRenderer, IDisposable
 
                         var innerAttrHash = ComputeAttrHash(innerStack);
 
-                        vh = itemClass ^ (itemId * 397) ^ (stackSize * 13) ^ innerAttrHash;
+                        vh = itemClass ^ itemId * 397 ^ stackSize * 13 ^ innerAttrHash;
                     }
 
                     break;
@@ -444,7 +454,7 @@ public class ItemStackRenderer : IPreSkiaRenderer, IDisposable
                     break;
             }
 
-            xor ^= (kh * 397) ^ vh;
+            xor ^= kh * 397 ^ vh;
         }
 
         return xor;
@@ -462,11 +472,18 @@ public class ItemStackRenderer : IPreSkiaRenderer, IDisposable
             }
         }
 
-        _pendingSnapshot.Sort(static (a, b) =>
-            b.Req.EnqueuedTickMs.CompareTo(a.Req.EnqueuedTickMs));
+        _pendingSnapshot.Sort
+        (static (a, b) =>
+            b.Req.EnqueuedTickMs.CompareTo(a.Req.EnqueuedTickMs)
+        );
     }
 
-    private void RemovePendingAt(ItemCacheKey key, List<RenderRequest> bucket, int index)
+    private void RemovePendingAt
+    (
+        ItemCacheKey key,
+        List<RenderRequest> bucket,
+        int index
+    )
     {
         if (index >= bucket.Count)
         {
@@ -621,7 +638,8 @@ public class ItemStackRenderer : IPreSkiaRenderer, IDisposable
     ///     Returns cached image for <paramref name="itemStack" />, or enqueues a render and returns
     ///     <c>null</c>.
     /// </summary>
-    public SKImage? GetOrQueue(
+    public SKImage? GetOrQueue
+    (
         ItemStack itemStack,
         int renderSize = 48
     )
@@ -650,14 +668,17 @@ public class ItemStackRenderer : IPreSkiaRenderer, IDisposable
             _pendingByKey[key] = bucket;
         }
 
-        bucket.Add(new RenderRequest
-        {
-            Snapshot = itemStack.Clone(),
-            RenderSize = effectiveSize,
-            PrimaryKey = key,
-            EnqueuedTickMs = Environment.TickCount,
-            AttrHash = ComputeAttrHash(itemStack)
-        });
+        bucket.Add
+        (
+            new RenderRequest
+            {
+                Snapshot = itemStack.Clone(),
+                RenderSize = effectiveSize,
+                PrimaryKey = key,
+                EnqueuedTickMs = Environment.TickCount,
+                AttrHash = ComputeAttrHash(itemStack)
+            }
+        );
         _pendingCount++;
         return null;
     }
@@ -667,7 +688,8 @@ public class ItemStackRenderer : IPreSkiaRenderer, IDisposable
     ///     Used while a new-bucket render is pending so the slot shows the previous stage instead of going
     ///     blank.
     /// </summary>
-    public SKImage? GetCachedAny(
+    public SKImage? GetCachedAny
+    (
         ItemStack itemStack,
         int renderSize = 48
     )
@@ -716,7 +738,8 @@ public class ItemStackRenderer : IPreSkiaRenderer, IDisposable
     }
 
     /// <summary>Removes all cached images for the given item's collectible type.</summary>
-    public void Invalidate(
+    public void Invalidate
+    (
         ItemStack? itemStack
     )
     {
@@ -740,12 +763,14 @@ public class ItemStackRenderer : IPreSkiaRenderer, IDisposable
         }
     }
 
-    internal void RegisterPending(
+    internal void RegisterPending
+    (
         RenderItemStack renderObject
     ) =>
         _pendingListeners.Add(renderObject);
 
-    private ItemCacheKey BuildKey(
+    private ItemCacheKey BuildKey
+    (
         ItemStack stack,
         int renderSize
     ) =>
@@ -763,7 +788,8 @@ public class ItemStackRenderer : IPreSkiaRenderer, IDisposable
         return hash;
     }
 
-    private AttributedEntry? FindEntry(
+    private AttributedEntry? FindEntry
+    (
         ItemCacheKey key,
         ItemStack stack
     )
@@ -790,7 +816,8 @@ public class ItemStackRenderer : IPreSkiaRenderer, IDisposable
         return null;
     }
 
-    private bool IsPending(
+    private bool IsPending
+    (
         ItemCacheKey key,
         ItemStack stack
     )
@@ -817,7 +844,8 @@ public class ItemStackRenderer : IPreSkiaRenderer, IDisposable
         return false;
     }
 
-    private SKImage? RenderToImage(
+    private SKImage? RenderToImage
+    (
         ItemStack itemStack,
         int size
     )
@@ -845,11 +873,13 @@ public class ItemStackRenderer : IPreSkiaRenderer, IDisposable
             _game.Platform.GlDisableCullFace();
             _game.Platform.GlToggleBlend(true);
             GL.BlendEquation(BlendEquationMode.FuncAdd);
-            GL.BlendFuncSeparate(
+            GL.BlendFuncSeparate
+            (
                 BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha,
                 BlendingFactorSrc.One, BlendingFactorDest.OneMinusSrcAlpha
             );
-            _game.Platform.ClearFrameBuffer(
+            _game.Platform.ClearFrameBuffer
+            (
                 _fbo,
                 [0, 0, 0, 0],
                 clearColorBuffers: true
@@ -860,7 +890,8 @@ public class ItemStackRenderer : IPreSkiaRenderer, IDisposable
 
             var halfSize = size / 2f;
             _dummySlot.Itemstack = itemStack;
-            _capi.Render.RenderItemstackToGui(
+            _capi.Render.RenderItemstackToGui
+            (
                 _dummySlot,
                 halfSize,
                 halfSize,
@@ -876,7 +907,8 @@ public class ItemStackRenderer : IPreSkiaRenderer, IDisposable
         }
         catch (Exception ex)
         {
-            _capi.Logger.Warning(
+            _capi.Logger.Warning
+            (
                 $"[GUI] Failed to render ItemStack: {ex.Message}"
             );
             return null;
@@ -900,14 +932,26 @@ public class ItemStackRenderer : IPreSkiaRenderer, IDisposable
 
         var textureId = GL.GenTexture();
         GL.BindTexture(TextureTarget.Texture2D, textureId);
-        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,
-            (int)TextureMinFilter.Linear);
-        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter,
-            (int)TextureMagFilter.Linear);
-        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS,
-            (int)TextureWrapMode.ClampToEdge);
-        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT,
-            (int)TextureWrapMode.ClampToEdge);
+        GL.TexParameter
+        (
+            TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,
+            (int)TextureMinFilter.Linear
+        );
+        GL.TexParameter
+        (
+            TextureTarget.Texture2D, TextureParameterName.TextureMagFilter,
+            (int)TextureMagFilter.Linear
+        );
+        GL.TexParameter
+        (
+            TextureTarget.Texture2D, TextureParameterName.TextureWrapS,
+            (int)TextureWrapMode.ClampToEdge
+        );
+        GL.TexParameter
+        (
+            TextureTarget.Texture2D, TextureParameterName.TextureWrapT,
+            (int)TextureWrapMode.ClampToEdge
+        );
         GL.CopyTexImage2D(TextureTarget.Texture2D, 0, InternalFormat.Rgba8, 0, 0, size, size, 0);
         GL.BindTexture(TextureTarget.Texture2D, 0);
 
@@ -920,7 +964,8 @@ public class ItemStackRenderer : IPreSkiaRenderer, IDisposable
         var backendTexture = new GRBackendTexture(size, size, false, glInfo);
 
         var capturedTextureId = textureId;
-        var image = SKImage.FromTexture(
+        var image = SKImage.FromTexture
+        (
             grContext,
             backendTexture,
             GRSurfaceOrigin.TopLeft,
@@ -932,7 +977,8 @@ public class ItemStackRenderer : IPreSkiaRenderer, IDisposable
                 GL.DeleteTexture(capturedTextureId);
                 backendTexture.Dispose();
             },
-            null);
+            null
+        );
 
         if (image == null)
         {
@@ -943,7 +989,8 @@ public class ItemStackRenderer : IPreSkiaRenderer, IDisposable
         return image;
     }
 
-    private void EnsureFbo(
+    private void EnsureFbo
+    (
         int size
     )
     {
@@ -1073,7 +1120,8 @@ public class ItemStackRenderer : IPreSkiaRenderer, IDisposable
         public int AttrHash;
     }
 
-    private readonly record struct ItemCacheKey(
+    private readonly record struct ItemCacheKey
+    (
         EnumItemClass Class,
         int Id,
         int RenderSize,

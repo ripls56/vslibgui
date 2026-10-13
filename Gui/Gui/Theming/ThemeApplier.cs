@@ -1,4 +1,3 @@
-using Gui;
 using Gui.Widgets.Framework;
 
 namespace Gui.Theming;
@@ -24,8 +23,12 @@ public static class ThemeApplier
         => BuildPersistedConfig(preset, new ThemeOverrides(), onboarded);
 
     /// <summary>Builds persisted config including overrides.</summary>
-    public static GuiConfig BuildPersistedConfig(
-        ThemePreset preset, ThemeOverrides overrides, bool onboarded)
+    public static GuiConfig BuildPersistedConfig
+    (
+        ThemePreset preset,
+        ThemeOverrides overrides,
+        bool onboarded
+    )
     {
         return new GuiConfig
         {

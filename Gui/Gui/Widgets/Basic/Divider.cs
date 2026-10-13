@@ -20,7 +20,8 @@ public class Divider : StatelessWidget
     /// <param name="endIndent">Trailing inset (right for horizontal, bottom for vertical).</param>
     /// <param name="color">Line color. Defaults to the theme border color.</param>
     /// <param name="axis">Orientation of the line. Defaults to horizontal.</param>
-    public Divider(
+    public Divider
+    (
         float thickness = 1f,
         float indent = 0f,
         float endIndent = 0f,
@@ -58,15 +59,29 @@ public class Divider : StatelessWidget
 
         if (Axis == Axis.Horizontal)
         {
-            return new Padding(
+            return new Padding
+            (
                 EdgeInsets.Only(Indent, right: EndIndent),
-                new Container(new BoxStyle { Height = Thickness, Color = lineColor })
+                new Container
+                (
+                    new BoxStyle
+                    {
+                        Height = Thickness, Color = lineColor
+                    }
+                )
             );
         }
 
-        return new Padding(
+        return new Padding
+        (
             EdgeInsets.Only(top: Indent, bottom: EndIndent),
-            new Container(new BoxStyle { Width = Thickness, Color = lineColor })
+            new Container
+            (
+                new BoxStyle
+                {
+                    Width = Thickness, Color = lineColor
+                }
+            )
         );
     }
 }

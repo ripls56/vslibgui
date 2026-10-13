@@ -223,8 +223,7 @@ internal class TypographyPage : StatelessWidget
                         vtml,
                         new TextStyle
                         {
-                            FontSize = 14,
-                            Color = colors.OnSurface
+                            FontSize = 14, Color = colors.OnSurface
                         }
                     ),
                     code: """
@@ -243,7 +242,10 @@ internal class TypographyPage : StatelessWidget
                         new Text
                         (
                             "Open Vanilla VTML",
-                            new TextStyle { Color = colors.OnPrimary, FontSize = 14 }
+                            new TextStyle
+                            {
+                                Color = colors.OnPrimary, FontSize = 14
+                            }
                         ),
                         onTap: _ => new VanillaVtmlDialog(vtml, Capi).TryOpen()
                     ),

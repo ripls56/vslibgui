@@ -29,7 +29,8 @@ public class RenderAnimatedSize : RenderProxyBox
     /// <param name="duration">How long the size transition takes.</param>
     /// <param name="curve">The easing curve applied to the animation.</param>
     /// <param name="vsync">Ticker provider for driving the animation.</param>
-    public RenderAnimatedSize(
+    public RenderAnimatedSize
+    (
         TimeSpan duration,
         Curve curve,
         ITickerProvider vsync
@@ -37,7 +38,8 @@ public class RenderAnimatedSize : RenderProxyBox
     {
         _initialDuration = duration;
         _initialCurve = curve;
-        _sizeTween = new SizeTween(
+        _sizeTween = new SizeTween
+        (
             Vector2.Zero,
             Vector2.Zero
         );
@@ -50,14 +52,16 @@ public class RenderAnimatedSize : RenderProxyBox
     /// </summary>
     /// <param name="duration">How long the size transition takes.</param>
     /// <param name="curve">The easing curve applied to the animation.</param>
-    public RenderAnimatedSize(
+    public RenderAnimatedSize
+    (
         TimeSpan duration,
         Curve curve
     )
     {
         _initialDuration = duration;
         _initialCurve = curve;
-        _sizeTween = new SizeTween(
+        _sizeTween = new SizeTween
+        (
             Vector2.Zero,
             Vector2.Zero
         );
@@ -84,15 +88,18 @@ public class RenderAnimatedSize : RenderProxyBox
     ///     two-argument constructor was used.
     /// </summary>
     /// <param name="vsync">Ticker provider for driving the animation.</param>
-    public void Initialize(
+    public void Initialize
+    (
         ITickerProvider vsync
     )
     {
-        _controller = new AnimationController(
+        _controller = new AnimationController
+        (
             _initialDuration,
             vsync
         );
-        _curvedAnimation = new CurvedAnimation(
+        _curvedAnimation = new CurvedAnimation
+        (
             _controller,
             _initialCurve
         );
@@ -141,15 +148,18 @@ public class RenderAnimatedSize : RenderProxyBox
     }
 
     /// <inheritdoc />
-    public override void Paint(
+    public override void Paint
+    (
         PaintingContext context
     )
     {
         if (context.Canvas != null)
         {
             context.Canvas.Save();
-            context.Canvas.ClipRect(
-                new SKRect(
+            context.Canvas.ClipRect
+            (
+                new SKRect
+                (
                     0,
                     0,
                     Size.X,

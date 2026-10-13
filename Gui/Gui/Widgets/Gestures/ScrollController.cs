@@ -19,7 +19,8 @@ public class ScrollController : IDisposable
 
     private float _viewportSize;
 
-    public ScrollController(
+    public ScrollController
+    (
         ScrollPhysics? physics = null
     )
     {
@@ -77,7 +78,8 @@ public class ScrollController : IDisposable
     /// <summary>
     ///     Maximum scrollable offset: <c>ContentSize - ViewportSize</c>, clamped to 0.
     /// </summary>
-    public float MaxScrollExtent => Math.Max(
+    public float MaxScrollExtent => Math.Max
+    (
         0,
         _contentSize - _viewportSize
     );
@@ -100,7 +102,8 @@ public class ScrollController : IDisposable
 
     public event Action? OnChanged;
 
-    public void Attach(
+    public void Attach
+    (
         ITickerProvider provider
     )
     {
@@ -108,7 +111,8 @@ public class ScrollController : IDisposable
         _ticker = provider.CreateTicker(OnTick);
     }
 
-    private void OnTick(
+    private void OnTick
+    (
         TimeSpan elapsed
     )
     {
@@ -124,7 +128,8 @@ public class ScrollController : IDisposable
         // Boundary handling
         if (newOffset < MinScroll || newOffset > MaxScroll)
         {
-            newOffset = Math.Clamp(
+            newOffset = Math.Clamp
+            (
                 newOffset,
                 MinScroll,
                 MaxScroll
@@ -140,7 +145,8 @@ public class ScrollController : IDisposable
         Offset = newOffset;
     }
 
-    public void StartSimulation(
+    public void StartSimulation
+    (
         float velocity,
         float minScroll,
         float maxScroll
@@ -153,7 +159,8 @@ public class ScrollController : IDisposable
         // VelocityTracker measures dy as last.Y - first.Y (downward drag = positive velocity).
         // The scroll offset increases as content moves up (scrolling down), so we negate to
         // convert the pointer-drag velocity into the simulation's initial scroll velocity.
-        _simulation = _physics.CreateFlingSimulation(
+        _simulation = _physics.CreateFlingSimulation
+        (
             Offset,
             -velocity
         );
@@ -168,7 +175,8 @@ public class ScrollController : IDisposable
         _ticker?.Stop();
     }
 
-    public void JumpTo(
+    public void JumpTo
+    (
         float value
     )
     {
@@ -181,7 +189,8 @@ public class ScrollController : IDisposable
     ///     <paramref name="duration" /> using the given easing <paramref name="curve" />.
     ///     Cancels any in-flight fling or previous animation.
     /// </summary>
-    public void AnimateTo(
+    public void AnimateTo
+    (
         float offset,
         TimeSpan duration,
         Curve? curve = null,
@@ -192,7 +201,8 @@ public class ScrollController : IDisposable
         Stop();
         MinScroll = minScroll;
         MaxScroll = maxScroll;
-        offset = Math.Clamp(
+        offset = Math.Clamp
+        (
             offset,
             MinScroll,
             MaxScroll
@@ -204,7 +214,8 @@ public class ScrollController : IDisposable
             return;
         }
 
-        _simulation = new ScrollToSimulation(
+        _simulation = new ScrollToSimulation
+        (
             Offset,
             offset,
             duration,
@@ -221,7 +232,8 @@ public class ScrollController : IDisposable
         private readonly float _end;
         private readonly float _start;
 
-        public ScrollToSimulation(
+        public ScrollToSimulation
+        (
             float start,
             float end,
             TimeSpan duration,
@@ -234,7 +246,8 @@ public class ScrollController : IDisposable
             _curve = curve;
         }
 
-        public override float X(
+        public override float X
+        (
             float time
         )
         {
@@ -243,7 +256,8 @@ public class ScrollController : IDisposable
                 return _end;
             }
 
-            var t = Math.Clamp(
+            var t = Math.Clamp
+            (
                 time / _durationSeconds,
                 0f,
                 1f
@@ -251,7 +265,8 @@ public class ScrollController : IDisposable
             return _start + (_end - _start) * (float)_curve.Transform(t);
         }
 
-        public override float Dx(
+        public override float Dx
+        (
             float time
         )
         {

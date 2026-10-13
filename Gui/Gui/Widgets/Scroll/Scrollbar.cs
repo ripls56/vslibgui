@@ -41,7 +41,8 @@ public enum ScrollbarPosition
 public class Scrollbar : StatefulWidget
 {
     /// <summary>Creates a new scrollbar wrapper widget.</summary>
-    public Scrollbar(
+    public Scrollbar
+    (
         ScrollController controller,
         Widget child,
         ScrollbarPosition position = ScrollbarPosition.Right,
@@ -106,9 +107,9 @@ internal class ScrollbarState : State<Scrollbar>
 
     private float _dragStartOffset;
     private float _dragStartY;
+    private CurvedAnimation _fadeAnimation = null!;
 
     private AnimationController _fadeController = null!;
-    private CurvedAnimation _fadeAnimation = null!;
     private TimeSpan _idleElapsed;
     private Ticker _idleTicker = null!;
     private bool _isDragging;
@@ -150,12 +151,14 @@ internal class ScrollbarState : State<Scrollbar>
         _fadeController.Reverse();
     }
 
-    public override void UpdateWidget(
+    public override void UpdateWidget
+    (
         Scrollbar oldWidget
     )
     {
         base.UpdateWidget(oldWidget);
-        if (!ReferenceEquals(
+        if (!ReferenceEquals
+            (
                 oldWidget.Controller,
                 Widget.Controller
             ))
@@ -175,24 +178,28 @@ internal class ScrollbarState : State<Scrollbar>
         SetState(() => { });
     }
 
-    public override Widget Build(
+    public override Widget Build
+    (
         BuildContext context
     )
     {
-        return new AnimatedBuilder(
-            animation: _fadeController,
-            builder: ctx =>
+        return new AnimatedBuilder
+        (
+            _fadeController,
+            ctx =>
             {
                 var theme = Theme.Of(context);
                 var colors = theme.ColorScheme;
 
-                var trackColor = Widget.TrackColor ?? new Vector4(
+                var trackColor = Widget.TrackColor ?? new Vector4
+                (
                     colors.OnSurface.X,
                     colors.OnSurface.Y,
                     colors.OnSurface.Z,
                     0.1f
                 );
-                var thumbColor = Widget.ThumbColor ?? new Vector4(
+                var thumbColor = Widget.ThumbColor ?? new Vector4
+                (
                     colors.OnSurface.X,
                     colors.OnSurface.Y,
                     colors.OnSurface.Z,
@@ -203,7 +210,8 @@ internal class ScrollbarState : State<Scrollbar>
                 var trackWidth = Widget.Width * visibility;
                 var isRight = Widget.Position == ScrollbarPosition.Right;
 
-                var scrollbarTrack = new ScrollbarTrackWidget(
+                var scrollbarTrack = new ScrollbarTrackWidget
+                (
                     Widget.Controller.Offset,
                     Widget.Controller.ContentSize,
                     Widget.Controller.ViewportSize,
@@ -211,7 +219,8 @@ internal class ScrollbarState : State<Scrollbar>
                     thumbColor: thumbColor,
                     thumbRadius: Widget.ThumbRadius,
                     reverse: Widget.Reverse,
-                    onLayout: (
+                    onLayout:
+                    (
                         height,
                         ro
                     ) =>
@@ -219,7 +228,8 @@ internal class ScrollbarState : State<Scrollbar>
                         _trackHeight = height;
                         _trackRenderObject = ro;
                     },
-                    child: new GestureDetector(
+                    child: new GestureDetector
+                    (
                         onPress: _OnPress,
                         onRelease: _OnRelease,
                         onMove: _OnMove
@@ -230,29 +240,35 @@ internal class ScrollbarState : State<Scrollbar>
                     ? EdgeInsets.Only(right: trackWidth)
                     : EdgeInsets.Only(trackWidth);
 
-                return new Stack(new Widget[]
-                {
-                    new Positioned(
-                        0,
-                        0,
-                        0,
-                        0,
-                        child: new Padding(contentPadding, Widget.Child)
-                    ),
-                    new Positioned(
-                        top: 0,
-                        bottom: 0,
-                        left: isRight ? null : 0,
-                        right: isRight ? 0 : null,
-                        width: trackWidth,
-                        child: scrollbarTrack
-                    )
-                });
+                return new Stack
+                (
+                    new Widget[]
+                    {
+                        new Positioned
+                        (
+                            0,
+                            0,
+                            0,
+                            0,
+                            child: new Padding(contentPadding, Widget.Child)
+                        ),
+                        new Positioned
+                        (
+                            top: 0,
+                            bottom: 0,
+                            left: isRight ? null : 0,
+                            right: isRight ? 0 : null,
+                            width: trackWidth,
+                            child: scrollbarTrack
+                        )
+                    }
+                );
             }
         );
     }
 
-    private float _ToLocalY(
+    private float _ToLocalY
+    (
         PointerEvent e
     )
     {
@@ -261,8 +277,10 @@ internal class ScrollbarState : State<Scrollbar>
             return e.Y;
         }
 
-        return _trackRenderObject.GlobalToLocal(
-                new Vector2(
+        return _trackRenderObject.GlobalToLocal
+            (
+                new Vector2
+                (
                     e.X,
                     e.Y
                 )
@@ -270,7 +288,8 @@ internal class ScrollbarState : State<Scrollbar>
             .Y;
     }
 
-    private void _OnPress(
+    private void _OnPress
+    (
         PointerEvent e
     )
     {
@@ -300,7 +319,8 @@ internal class ScrollbarState : State<Scrollbar>
         // Click outside thumb → jump to that position
         if (localY < thumbY || localY > thumbY + thumbHeight)
         {
-            var clickRatio = Math.Clamp(
+            var clickRatio = Math.Clamp
+            (
                 (localY - thumbHeight / 2) / maxTravel,
                 0,
                 1
@@ -308,8 +328,10 @@ internal class ScrollbarState : State<Scrollbar>
             var newOffset = Widget.Reverse
                 ? (1 - clickRatio) * maxOffset
                 : clickRatio * maxOffset;
-            ctrl.JumpTo(
-                Math.Clamp(
+            ctrl.JumpTo
+            (
+                Math.Clamp
+                (
                     newOffset,
                     0,
                     maxOffset
@@ -322,12 +344,14 @@ internal class ScrollbarState : State<Scrollbar>
         _dragStartOffset = ctrl.Offset;
     }
 
-    private void _OnRelease(
+    private void _OnRelease
+    (
         PointerEvent e
     ) =>
         _isDragging = false;
 
-    private void _OnMove(
+    private void _OnMove
+    (
         PointerEvent e
     )
     {
@@ -358,7 +382,8 @@ internal class ScrollbarState : State<Scrollbar>
             scrollDelta = -scrollDelta;
         }
 
-        var newOffset = Math.Clamp(
+        var newOffset = Math.Clamp
+        (
             _dragStartOffset + scrollDelta,
             0,
             maxOffset
@@ -374,7 +399,8 @@ internal class ScrollbarState : State<Scrollbar>
             return 20;
         }
 
-        return Math.Max(
+        return Math.Max
+        (
             20,
             ctrl.ViewportSize / ctrl.ContentSize * _trackHeight
         );
@@ -395,7 +421,8 @@ internal class ScrollbarState : State<Scrollbar>
 internal class ScrollbarTrackWidget : SingleChildWidget
 {
     /// <summary>Creates a new scrollbar track render widget.</summary>
-    public ScrollbarTrackWidget(
+    public ScrollbarTrackWidget
+    (
         float scrollOffset,
         float contentSize,
         float viewportSize,
@@ -457,7 +484,8 @@ internal class ScrollbarTrackWidget : SingleChildWidget
     }
 
     /// <inheritdoc />
-    public override void UpdateRenderObject(
+    public override void UpdateRenderObject
+    (
         RenderObject renderObject
     )
     {

@@ -8,7 +8,8 @@ namespace Gui.Widgets.Layout;
 public class Column : Flex
 {
     /// <summary>Creates a vertical flex layout.</summary>
-    public Column(
+    public Column
+    (
         float spacing = 0,
         MainAxisAlignment mainAxisAlignment = MainAxisAlignment.Start,
         CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.Start,
@@ -16,7 +17,8 @@ public class Column : Flex
         IEnumerable<Widget>? children = null,
         Framework.Key? key = null
     )
-        : base(
+        : base
+        (
             FlexDirection.Vertical,
             spacing,
             mainAxisAlignment,

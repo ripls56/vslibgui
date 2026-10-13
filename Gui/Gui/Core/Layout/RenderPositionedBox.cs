@@ -34,8 +34,10 @@ public class RenderPositionedBox : RenderBox
             height = childSize.Y;
         }
 
-        Size = Constraints.Constrain(
-            new Vector2(
+        Size = Constraints.Constrain
+        (
+            new Vector2
+            (
                 width,
                 height
             )
@@ -44,7 +46,8 @@ public class RenderPositionedBox : RenderBox
         if (Children.Count > 0)
         {
             var child = Children[0];
-            var offset = Alignment.CalculateOffset(
+            var offset = Alignment.CalculateOffset
+            (
                 Size,
                 child.Size
             );

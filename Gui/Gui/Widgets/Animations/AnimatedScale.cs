@@ -17,7 +17,8 @@ public class AnimatedScale : ImplicitlyAnimatedWidget
     ///     Creates an animated scale widget that transitions between scale
     ///     values over the given <paramref name="duration" />.
     /// </summary>
-    public AnimatedScale(
+    public AnimatedScale
+    (
         float scale,
         TimeSpan duration,
         Curve? curve = null,
@@ -26,7 +27,8 @@ public class AnimatedScale : ImplicitlyAnimatedWidget
         Widget? child = null,
         Framework.Key? key = null
     )
-        : base(
+        : base
+        (
             duration,
             curve,
             onEnd,
@@ -60,14 +62,17 @@ internal class AnimatedScaleState
     private FloatTween? _scaleTween;
 
     /// <inheritdoc />
-    protected override void ForEachTween(
+    protected override void ForEachTween
+    (
         TweenVisitor visitor
     )
     {
-        _scaleTween = (FloatTween)visitor.Visit(
+        _scaleTween = (FloatTween)visitor.Visit
+        (
             _scaleTween,
             Widget.Scale,
-            v => new FloatTween(
+            v => new FloatTween
+            (
                 v,
                 v
             )
@@ -75,14 +80,17 @@ internal class AnimatedScaleState
     }
 
     /// <inheritdoc />
-    public override Widget Build(
+    public override Widget Build
+    (
         BuildContext context
     )
     {
         var scale = _scaleTween!.Evaluate(Animation);
-        return new Transform(
+        return new Transform
+        (
             Widget.Child,
-            SKMatrix.CreateScale(
+            SKMatrix.CreateScale
+            (
                 scale,
                 scale
             ),

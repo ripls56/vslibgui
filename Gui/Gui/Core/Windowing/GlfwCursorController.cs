@@ -14,11 +14,15 @@ internal sealed class GlfwCursorController : IDisposable
     private CursorShape _currentShape = CursorShape.Arrow;
     private unsafe Cursor* _customCursor;
 
+    /// <summary>Releases the native cursor resource.</summary>
+    public void Dispose() => Reset();
+
     /// <summary>
     ///     Sets the OS cursor to the given <paramref name="shape" />.
     ///     No-ops when the shape is already active to avoid redundant GLFW calls.
     /// </summary>
-    public unsafe void SetShape(
+    public unsafe void SetShape
+    (
         CursorShape shape
     )
     {
@@ -72,7 +76,4 @@ internal sealed class GlfwCursorController : IDisposable
 
         _currentShape = CursorShape.Arrow;
     }
-
-    /// <summary>Releases the native cursor resource.</summary>
-    public void Dispose() => Reset();
 }

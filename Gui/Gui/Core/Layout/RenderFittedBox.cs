@@ -20,7 +20,8 @@ public class RenderFittedBox : RenderProxyBox
     public BoxFit Fit
     {
         get => _fit;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref _fit,
             value,
             relayout: true
@@ -30,7 +31,8 @@ public class RenderFittedBox : RenderProxyBox
     public Alignment Alignment
     {
         get => _alignment;
-        set => SetProperty(
+        set => SetProperty
+        (
             ref _alignment,
             value,
             relayout: true
@@ -48,18 +50,22 @@ public class RenderFittedBox : RenderProxyBox
             Size = Constraints.Constrain(child.Size);
 
             // Calculate transform
-            CalculateTransform(
+            CalculateTransform
+            (
                 child.Size,
                 Size,
                 out _scale,
                 out _offset
             );
-            _transform = SKMatrix.CreateScale(
+            _transform = SKMatrix.CreateScale
+                (
                     _scale.X,
                     _scale.Y
                 )
-                .PostConcat(
-                    SKMatrix.CreateTranslation(
+                .PostConcat
+                (
+                    SKMatrix.CreateTranslation
+                    (
                         _offset.X,
                         _offset.Y
                     )
@@ -78,7 +84,8 @@ public class RenderFittedBox : RenderProxyBox
         }
     }
 
-    private void CalculateTransform(
+    private void CalculateTransform
+    (
         Vector2 contentSize,
         Vector2 containerSize,
         out Vector2 scale,
@@ -104,13 +111,15 @@ public class RenderFittedBox : RenderProxyBox
                 scaleY = containerSize.Y / contentSize.Y;
                 break;
             case BoxFit.Contain:
-                scaleX = scaleY = Math.Min(
+                scaleX = scaleY = Math.Min
+                (
                     containerSize.X / contentSize.X,
                     containerSize.Y / contentSize.Y
                 );
                 break;
             case BoxFit.Cover:
-                scaleX = scaleY = Math.Max(
+                scaleX = scaleY = Math.Max
+                (
                     containerSize.X / contentSize.X,
                     containerSize.Y / contentSize.Y
                 );
@@ -125,9 +134,11 @@ public class RenderFittedBox : RenderProxyBox
                 scaleX = scaleY = 1.0f;
                 break;
             case BoxFit.ScaleDown:
-                scaleX = scaleY = Math.Min(
+                scaleX = scaleY = Math.Min
+                (
                     1.0f,
-                    Math.Min(
+                    Math.Min
+                    (
                         containerSize.X / contentSize.X,
                         containerSize.Y / contentSize.Y
                     )
@@ -135,21 +146,42 @@ public class RenderFittedBox : RenderProxyBox
                 break;
         }
 
-        var renderedSize = new Vector2(
+        var renderedSize = new Vector2
+        (
             contentSize.X * scaleX,
             contentSize.Y * scaleY
         );
-        offset = _alignment.CalculateOffset(
+        offset = _alignment.CalculateOffset
+        (
             containerSize,
             renderedSize
         );
-        scale = new Vector2(
+        scale = new Vector2
+        (
             scaleX,
             scaleY
         );
     }
 
-    public override void Paint(
+    /// <summary>
+    ///     Maps the subtree's paint bounds through the fit transform so an enclosing
+    ///     <see cref="Gui.Core.Painting.RenderRepaintBoundary" /> records enough area.
+    /// </summary>
+    internal override SKRect ComputePaintBounds()
+    {
+        var bounds = new SKRect
+        (
+            0,
+            0,
+            Size.X,
+            Size.Y
+        );
+        UnionChildPaintBounds(ref bounds);
+        return _transform.MapRect(bounds);
+    }
+
+    public override void Paint
+    (
         PaintingContext context
     )
     {
@@ -169,7 +201,8 @@ public class RenderFittedBox : RenderProxyBox
         context.Canvas.Restore();
     }
 
-    public override Vector2 GlobalToChild(
+    public override Vector2 GlobalToChild
+    (
         RenderObject child,
         Vector2 position
     )
@@ -180,7 +213,8 @@ public class RenderFittedBox : RenderProxyBox
         // 2. Divide by scale
         var x = (position.X - _offset.X) / _scale.X;
         var y = (position.Y - _offset.Y) / _scale.Y;
-        return new Vector2(
+        return new Vector2
+        (
             x,
             y
         );

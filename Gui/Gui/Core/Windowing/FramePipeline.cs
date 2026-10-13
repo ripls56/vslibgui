@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using Gui.Core.Framework;
+using Gui.Core.Painting;
 using Gui.Debugging;
 using Gui.Rendering;
 using Gui.Widgets.Framework;
@@ -111,15 +112,19 @@ internal sealed class FrameArgs
 /// </summary>
 internal sealed class FramePipeline : IDisposable
 {
+    private readonly PaintLayerRegistry _layerRegistry = new();
     private readonly Action<RenderObject> _paintReporter;
+    private readonly Stopwatch _sw = new();
     private PaintingContext? _paintingContext;
-    private SKPicture? _rootPaintCache;
+    private PaintLayer? _rootLayer;
+    private SKRect _rootLayerBounds;
 
     /// <summary>
     ///     Creates a new pipeline. <paramref name="onPaint" /> is invoked once per
     ///     render-object paint call so the caller can track repaint counts.
     /// </summary>
-    internal FramePipeline(
+    internal FramePipeline
+    (
         Action<RenderObject> onPaint
     )
     {
@@ -137,15 +142,20 @@ internal sealed class FramePipeline : IDisposable
     {
         _paintingContext?.Dispose();
         _paintingContext = null;
-        _rootPaintCache?.Dispose();
-        _rootPaintCache = null;
+        _layerRegistry.Clear();
+        _rootLayer?.Dispose();
+        _rootLayer = null;
+
+        // Safe now: the recording that referenced retired layers is gone.
+        _layerRegistry.DisposeRetiredLayers();
     }
 
     /// <summary>
     ///     Executes one full build → layout → paint cycle using the data in
     ///     <paramref name="args" />. Must be called from the render thread.
     /// </summary>
-    internal void Run(
+    internal void Run
+    (
         FrameArgs args
     )
     {
@@ -158,7 +168,7 @@ internal sealed class FramePipeline : IDisposable
         SetupPaintContext(args.Canvas, args.LocalElapsedMs);
         var context = _paintingContext!;
 
-        var sw = new Stopwatch();
+        var sw = _sw;
 
         sw.Restart();
         args.BuildOwner.BuildDirtyElements();
@@ -176,6 +186,10 @@ internal sealed class FramePipeline : IDisposable
 
         try
         {
+            // Lets MarkNeedsPaint stop at the first enclosing repaint boundary and
+            // register that layer here, instead of dirtying the root layer.
+            rootRo.LayerRegistry = _layerRegistry;
+
             if (args.ShouldCommitLayout)
             {
                 args.OnCommitLayout();
@@ -205,7 +219,8 @@ internal sealed class FramePipeline : IDisposable
         }
     }
 
-    private void SetupPaintContext(
+    private void SetupPaintContext
+    (
         SKCanvas canvas,
         double localElapsedMs
     )
@@ -220,7 +235,8 @@ internal sealed class FramePipeline : IDisposable
         }
     }
 
-    private static void ConfigureViolationReporter(
+    private static void ConfigureViolationReporter
+    (
         FrameArgs args
     )
     {
@@ -229,7 +245,8 @@ internal sealed class FramePipeline : IDisposable
             : null;
     }
 
-    private (Vector2 windowPos, Vector2 windowSize) PerformLayout(
+    private (Vector2 windowPos, Vector2 windowSize) PerformLayout
+    (
         FrameArgs args,
         RenderObject rootRo,
         Stopwatch sw
@@ -244,7 +261,8 @@ internal sealed class FramePipeline : IDisposable
         {
             var maxW = Math.Min(args.ScreenW, args.WindowConfig.MaxSize.X);
             var maxH = Math.Min(args.ScreenH, args.WindowConfig.MaxSize.Y);
-            constraints = LayoutConstraints.Loose(
+            constraints = LayoutConstraints.Loose
+            (
                 Math.Max(maxW, args.WindowConfig.MinSize.X),
                 Math.Max(maxH, args.WindowConfig.MinSize.Y)
             );
@@ -271,7 +289,8 @@ internal sealed class FramePipeline : IDisposable
         return (windowPos, windowSize);
     }
 
-    private void PaintFrame(
+    private void PaintFrame
+    (
         FrameArgs args,
         RenderObject rootRo,
         PaintingContext context,
@@ -294,7 +313,8 @@ internal sealed class FramePipeline : IDisposable
 
         var paintBounds = args.WindowConfig.Clip
             ? new SKRect(0, 0, windowSize.X, windowSize.Y)
-            : new SKRect(
+            : new SKRect
+            (
                 -windowPos.X,
                 -windowPos.Y,
                 args.ScreenW - windowPos.X,
@@ -306,14 +326,19 @@ internal sealed class FramePipeline : IDisposable
             canvas.ClipRect(paintBounds);
         }
 
-        var needsRepaint = rootRo.NeedsPaint || rootRo.ChildNeedsPaint || _rootPaintCache == null;
-        GuiProfiler.Current?.RecordFrame(needsRepaint);
+        var needsRootRecord = rootRo.NeedsPaint || rootRo.ChildNeedsPaint ||
+                              _rootLayer == null || _rootLayerBounds != paintBounds;
+        GuiProfiler.Current?.RecordFrame(needsRootRecord || _layerRegistry.HasDirtyLayers);
 
-        if (needsRepaint)
+        if (needsRootRecord)
         {
-            _rootPaintCache?.Dispose();
-            using var recorder = new SKPictureRecorder();
-            var recCanvas = recorder.BeginRecording(paintBounds);
+            // A full root record repaints every reachable dirty boundary inline, so
+            // any layer registered before this point is already up to date.
+            _layerRegistry.Clear();
+            _rootLayer ??= new PaintLayer();
+            _rootLayerBounds = paintBounds;
+
+            var recCanvas = _rootLayer.BeginRecording(paintBounds);
             context.PushCanvas(recCanvas);
 
             sw.Restart();
@@ -322,18 +347,37 @@ internal sealed class FramePipeline : IDisposable
             args.PerformanceMetrics.RecordPaintTime((float)sw.Elapsed.TotalMilliseconds);
 
             context.PopCanvas();
-            _rootPaintCache = recorder.EndRecording();
-            canvas.DrawPicture(_rootPaintCache);
+            _rootLayer.EndRecording();
+
+            // The previous root recording — the only thing that could still reference a
+            // retired boundary layer — is gone now.
+            _layerRegistry.DisposeRetiredLayers();
+        }
+        else if (_layerRegistry.HasDirtyLayers)
+        {
+            // Only isolated subtrees changed: re-record just those layers. The root
+            // recording references them as live drawables, so it stays valid.
+            sw.Restart();
+            _layerRegistry.RepaintDirtyLayers(context);
+            sw.Stop();
+            args.PerformanceMetrics.RecordPaintTime((float)sw.Elapsed.TotalMilliseconds);
         }
         else
         {
-            canvas.DrawPicture(_rootPaintCache);
             args.PerformanceMetrics.RecordPaintTime(0);
         }
 
+        canvas.DrawDrawable
+        (
+            _rootLayer!.Host,
+            0,
+            0
+        );
+
         if (args.DebugSettings.IsAnyEnabled)
         {
-            DebugPainter.PaintDebugInfo(
+            DebugPainter.PaintDebugInfo
+            (
                 rootRo,
                 context,
                 args.DebugSettings,
@@ -350,11 +394,13 @@ internal sealed class FramePipeline : IDisposable
         }
     }
 
-    private static Vector2 ClampSize(
+    private static Vector2 ClampSize
+    (
         Vector2 size,
         WindowConfig config
     ) =>
-        new(
+        new
+        (
             Math.Clamp(size.X, config.MinSize.X, config.MaxSize.X),
             Math.Clamp(size.Y, config.MinSize.Y, config.MaxSize.Y)
         );

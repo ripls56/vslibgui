@@ -23,7 +23,8 @@ public class SlotGrid : StatelessWidget
     /// <summary>
     ///     Creates a new <see cref="SlotGrid" />.
     /// </summary>
-    public SlotGrid(
+    public SlotGrid
+    (
         IReadOnlyList<ItemSlot?> slots,
         SlotController? controller = null,
         int columns = 10,
@@ -63,18 +64,23 @@ public class SlotGrid : StatelessWidget
     /// <summary>Nine-slice insets for <see cref="SlotBackground" />.</summary>
     public EdgeInsets? SlotBackgroundSlice { get; }
 
-    public override Widget Build(
+    public override Widget Build
+    (
         BuildContext context
     )
     {
         var rows = new List<Widget>();
-        var rowCount = (int)Math.Ceiling(
+        var rowCount = (int)Math.Ceiling
+        (
             Slots.Count / (double)Columns
         );
 
 
         var theme = Theme.Of(context);
-        var slotStyle = theme.ItemSlotStyle with { Size = SlotSize };
+        var slotStyle = theme.ItemSlotStyle with
+        {
+            Size = SlotSize
+        };
         for (var r = 0; r < rowCount; r++)
         {
             var rowChildren = new List<Widget>();
@@ -84,32 +90,46 @@ public class SlotGrid : StatelessWidget
                 if (index < Slots.Count)
                 {
                     Widget slot = SlotBackground != null
-                        ? new NineSliceItemSlot(
+                        ? new NineSliceItemSlot
+                        (
                             SlotBackground,
                             SlotBackgroundSlice ?? EdgeInsets.All(16),
                             SlotSize,
                             Slots[index],
                             Controller
                         )
-                        : new FlatItemSlot(
+                        : new FlatItemSlot
+                        (
                             Slots[index],
                             Controller,
                             slotStyle
                         );
-                    rowChildren.Add(slot);
+                    rowChildren.Add
+                    (
+                        // Hover, selection and stack changes hit one slot at a time, so
+                        // each slot owns its layer instead of dirtying the whole grid.
+                        new RepaintBoundary(slot)
+                    );
                 }
                 else
                 {
-                    rowChildren.Add(
-                        new Container(
-                            new BoxStyle { Width = SlotSize, Height = SlotSize }
+                    rowChildren.Add
+                    (
+                        new Container
+                        (
+                            new BoxStyle
+                            {
+                                Width = SlotSize, Height = SlotSize
+                            }
                         )
                     );
                 }
             }
 
-            rows.Add(
-                new Row(
+            rows.Add
+            (
+                new Row
+                (
                     mainAxisSize: MainAxisSize.Min,
                     spacing: Spacing,
                     children: rowChildren
@@ -117,7 +137,8 @@ public class SlotGrid : StatelessWidget
             );
         }
 
-        return new Column(
+        return new Column
+        (
             mainAxisSize: MainAxisSize.Min,
             spacing: Spacing,
             children: rows

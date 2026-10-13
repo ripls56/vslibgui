@@ -61,6 +61,7 @@ public abstract class GuiBase : GuiDialog, ITickerProvider
 
     private int _elementCount;
     private WindowInteractionStateMachine _interactionSm = null!;
+    private readonly PointerWatchdog _pointerWatchdog = new();
 
     /// <summary>Last known mouse position in window-local space (for OnMouseWheel).</summary>
     private Vector2? _lastMouseLocal;
@@ -513,7 +514,21 @@ public abstract class GuiBase : GuiDialog, ITickerProvider
         _lastMouseLocal = local;
         MouseOverCursor = null;
 
-        var e = _inputRouter.PointerMove(RootElement, local.X, local.Y);
+        var blocked = IsBlockedByFrontDialog(args.X, args.Y);
+        _pointerWatchdog.MarkSynced(screen, WindowPos);
+
+        var widgetHandled = false;
+        if (blocked)
+        {
+            // A window in front owns this cursor position. Clear latched hover instead of
+            // updating it: the pointer is over the other window, so whatever was hovered here
+            // (item slot highlight, tooltip trigger) must receive its exit now.
+            CancelHoverIfLatched();
+        }
+        else
+        {
+            widgetHandled = _inputRouter.PointerMove(RootElement, local.X, local.Y).Handled;
+        }
 
         if (!IsInsideWindow(local) && !_interactionSm.IsInteracting)
         {
@@ -527,12 +542,11 @@ public abstract class GuiBase : GuiDialog, ITickerProvider
             return;
         }
 
-        var blocked = IsBlockedByFrontDialog(args.X, args.Y);
         if (blocked)
         {
             args.Handled = false;
         }
-        else if (e.Handled)
+        else if (widgetHandled)
         {
             args.Handled = true;
         }
@@ -548,6 +562,66 @@ public abstract class GuiBase : GuiDialog, ITickerProvider
         {
             _cursorController.SetShape(cursor.Value);
         }
+    }
+
+    /// <summary>
+    ///     Fires pointer-exit on the latched hover hierarchy so hover-driven visuals (item-slot
+    ///     highlight, tooltip, vanilla tooltip suppression) do not stay on. Skipped while a
+    ///     widget holds pointer capture: a drag keeps owning the pointer outside its bounds.
+    /// </summary>
+    private void CancelHoverIfLatched()
+    {
+        if (_inputRouter.IsPointerCaptured || !_inputRouter.HasHoverState)
+        {
+            return;
+        }
+
+        _inputRouter.PointerLeave(RootElement!);
+        MouseOverCursor = null;
+    }
+
+    /// <summary>
+    ///     Re-checks hover against the global cursor once per frame.
+    ///     <para>
+    ///         The engine hands a mouse move to one dialog only: it walks <c>LoadedGuis</c> and
+    ///         stops at the first dialog that marks the event handled. A window in front of this
+    ///         one therefore starves it, and hover latched here — an item slot under a dialog,
+    ///         a tooltip drawn over another window — never receives the exit that clears it.
+    ///         This compares the global cursor with the position hover was last synced for and
+    ///         cancels hover when the pointer left the window or moved onto a window in front.
+    ///     </para>
+    ///     <para>
+    ///         Cancel-only by design: a window that did not receive the move event must not
+    ///         claim hover from the window that did.
+    ///     </para>
+    /// </summary>
+    private void UpdatePointerWatchdog()
+    {
+        if (RootElement?.RenderObject == null || _interactionSm.IsInteracting)
+        {
+            return;
+        }
+
+        var cursor = ToLogicalScreen(capi.Input.MouseX, capi.Input.MouseY);
+        if (!_pointerWatchdog.NeedsResync(cursor, WindowPos))
+        {
+            return;
+        }
+
+        _pointerWatchdog.MarkSynced(cursor, WindowPos);
+
+        if (_inputRouter.IsPointerCaptured || !_inputRouter.HasHoverState)
+        {
+            return;
+        }
+
+        var blocked = IsBlockedByFrontDialog(capi.Input.MouseX, capi.Input.MouseY);
+        if (!PointerWatchdog.ShouldCancelHover(cursor, WindowPos, WindowSize, blocked))
+        {
+            return;
+        }
+
+        CancelHoverIfLatched();
     }
 
     public override void OnMouseDown
@@ -828,6 +902,9 @@ public abstract class GuiBase : GuiDialog, ITickerProvider
 
         RenderObject.AdvanceFrame();
 
+        // Runs before the tickers so a hover cancel starts its fade-out in this same frame.
+        UpdatePointerWatchdog();
+
         _tickerScheduler.Update(TimeSpan.FromSeconds(deltaTime));
 
         if (ModSystem.SkiaRenderer?.Canvas != null)
@@ -888,7 +965,7 @@ public abstract class GuiBase : GuiDialog, ITickerProvider
                     ScreenH = screenH,
                     PaintResizePendingOverlay = PaintResizePendingOverlay,
                     IsResizePending = _interactionSm.IsResizing && WindowSize != _layoutSize,
-                    SyncHitBounds = SyncHitBounds,
+                    SyncHitBounds = SyncHitBounds
                 }
             );
         }
@@ -1068,6 +1145,10 @@ public abstract class GuiBase : GuiDialog, ITickerProvider
 
     public override void OnGuiClosed()
     {
+        // The engine warps the cursor to screen centre on close, so no further move event
+        // reaches the tree. Fire exit synthetically, otherwise hover state stays latched
+        // (vanilla tooltip suppression, CurrentHoveredSlot, highlights, tooltips).
+        _inputRouter.CancelHover();
         _cursorController.Reset();
         MouseOverCursor = null;
         ModSystem.UnregisterWindow(this);

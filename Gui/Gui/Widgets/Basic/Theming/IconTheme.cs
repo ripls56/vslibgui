@@ -22,8 +22,6 @@ public class IconTheme : InheritedWidget
         return widget?.Data ?? new IconThemeData();
     }
 
-    public override bool UpdateShouldNotify(InheritedWidget oldWidget)
-    {
-        return Data != ((IconTheme)oldWidget).Data;
-    }
+    public override bool UpdateShouldNotify
+        (InheritedWidget oldWidget) => Data != ((IconTheme)oldWidget).Data;
 }

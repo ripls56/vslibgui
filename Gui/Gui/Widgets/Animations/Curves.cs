@@ -6,7 +6,8 @@ namespace Gui.Widgets.Animations;
 public abstract class Curve
 {
     /// <summary>Maps animation time <paramref name="t" /> in [0,1] to an eased value.</summary>
-    public abstract double Transform(
+    public abstract double Transform
+    (
         double t
     );
 }
@@ -23,7 +24,12 @@ public class Interval : Curve
 {
     private readonly Curve _inner;
 
-    public Interval(double begin, double end, Curve? inner = null)
+    public Interval
+    (
+        double begin,
+        double end,
+        Curve? inner = null
+    )
     {
         Begin = begin;
         End = end;
@@ -408,7 +414,8 @@ public class CurvedAnimation : IAnimation
     private readonly AnimationController _parent;
 
     /// <summary>Creates a curved animation wrapping <paramref name="parent" />.</summary>
-    public CurvedAnimation(
+    public CurvedAnimation
+    (
         AnimationController parent,
         Curve curve
     )

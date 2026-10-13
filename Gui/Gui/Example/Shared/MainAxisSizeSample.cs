@@ -35,16 +35,26 @@ internal class MainAxisSizeSample : StatelessWidget
     {
         var colors = Theme.Of(context).ColorScheme;
 
-        return new Column(
+        return new Column
+        (
             crossAxisAlignment: CrossAxisAlignment.Stretch,
             spacing: 4,
             children:
             [
-                new Text(Label, new TextStyle { FontSize = 11, Color = colors.OnSurface }),
-                new Expanded(
-                    new Align(
+                new Text
+                (
+                    Label, new TextStyle
+                    {
+                        FontSize = 11, Color = colors.OnSurface
+                    }
+                ),
+                new Expanded
+                (
+                    new Align
+                    (
                         Alignment.TopLeft,
-                        new Container(
+                        new Container
+                        (
                             new BoxStyle
                             {
                                 Color = new Vector4(0f, 0f, 0f, 0.18f),
@@ -53,25 +63,32 @@ internal class MainAxisSizeSample : StatelessWidget
                                 BorderColor = colors.Primary,
                                 Padding = EdgeInsets.All(4)
                             },
-                            new Column(
+                            new Column
+                            (
                                 mainAxisSize: Size,
                                 spacing: 4,
                                 children:
                                 [
-                                    new Container(new BoxStyle
-                                    {
-                                        Color = colors.Primary,
-                                        Width = 60,
-                                        Height = 16,
-                                        CornerRadius = Vector4.One * 3
-                                    }),
-                                    new Container(new BoxStyle
-                                    {
-                                        Color = colors.Primary,
-                                        Width = 60,
-                                        Height = 16,
-                                        CornerRadius = Vector4.One * 3
-                                    })
+                                    new Container
+                                    (
+                                        new BoxStyle
+                                        {
+                                            Color = colors.Primary,
+                                            Width = 60,
+                                            Height = 16,
+                                            CornerRadius = Vector4.One * 3
+                                        }
+                                    ),
+                                    new Container
+                                    (
+                                        new BoxStyle
+                                        {
+                                            Color = colors.Primary,
+                                            Width = 60,
+                                            Height = 16,
+                                            CornerRadius = Vector4.One * 3
+                                        }
+                                    )
                                 ]
                             )
                         )

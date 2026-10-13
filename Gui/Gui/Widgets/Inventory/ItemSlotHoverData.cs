@@ -12,7 +12,8 @@ namespace Gui.Widgets.Inventory;
 public class ItemSlotHoverData : InheritedWidget
 {
     /// <summary>Creates a hover data provider wrapping <paramref name="child" />.</summary>
-    public ItemSlotHoverData(
+    public ItemSlotHoverData
+    (
         CurvedAnimation hoverAnimation,
         Widget child,
         bool isHighlighted = false,

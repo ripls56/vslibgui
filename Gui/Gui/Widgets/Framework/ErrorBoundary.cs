@@ -28,42 +28,48 @@ public class ErrorBoundary : StatefulWidget
 /// </summary>
 internal class ErrorBoundaryState : State<ErrorBoundary>
 {
-    private bool _hasError;
     private Exception? _error;
+    private bool _hasError;
 
     /// <summary>
     ///     Called by <see cref="BuildOwner" /> when a descendant element throws during rebuild.
     ///     Triggers a <see cref="State.SetState" /> transition to the error display.
     /// </summary>
-    internal void MarkError(
+    internal void MarkError
+    (
         Exception ex
     ) =>
-        SetState(() =>
-        {
-            _hasError = true;
-            _error = ex;
-        });
+        SetState
+        (() =>
+            {
+                _hasError = true;
+                _error = ex;
+            }
+        );
 
     /// <summary>
     ///     Resets the error state so the boundary can attempt to render its child again.
     ///     Call this after the underlying cause has been resolved.
     /// </summary>
     internal void ClearError() =>
-        SetState(() =>
-        {
-            _hasError = false;
-            _error = null;
-        });
+        SetState
+        (() =>
+            {
+                _hasError = false;
+                _error = null;
+            }
+        );
 
     /// <inheritdoc />
-    public override Widget Build(
+    public override Widget Build
+    (
         BuildContext context
     )
     {
         if (_hasError && _error != null)
         {
             return Widget.FallbackBuilder?.Invoke(_error)
-                ?? ErrorWidget.Builder(_error);
+                   ?? ErrorWidget.Builder(_error);
         }
 
         return Widget.Child;
