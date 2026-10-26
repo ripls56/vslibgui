@@ -3,6 +3,7 @@ using Gui.Rendering.Text;
 using Gui.Widgets.Basic;
 using Gui.Widgets.Input;
 using Gui.Widgets.Inventory;
+using Gui.Widgets.Painting;
 using OpenTK.Mathematics;
 
 namespace Gui.Widgets.Framework;
@@ -770,6 +771,164 @@ public readonly struct TextFieldStyle
     public static TextFieldStyle Default(ColorScheme colors, TextTheme text) => new(colors, text);
 }
 
+/// <summary>Horizontal placement of the title inside a <see cref="WindowTitleBar" />.</summary>
+public enum TitleBarAlignment
+{
+    /// <summary>Title hugs the left edge of the free space (default).</summary>
+    Left,
+
+    /// <summary>Title is centred in the free space between the side groups.</summary>
+    Center,
+
+    /// <summary>Title hugs the right edge of the free space.</summary>
+    Right
+}
+
+/// <summary>Which side of a <see cref="WindowTitleBar" /> holds the button group.</summary>
+public enum TitleBarButtonPlacement
+{
+    /// <summary>Buttons sit on the left, before the title (macOS-like).</summary>
+    Start,
+
+    /// <summary>Buttons sit on the right, after the title (default, Windows-like).</summary>
+    End
+}
+
+/// <summary>
+///     Style tokens for <see cref="WindowTitleBar" /> and <see cref="WindowFrame" />: bar
+///     geometry, colors, text styles, button glyphs and the layout of the button group.
+///     Explicit color / size parameters on the widgets override the matching field.
+/// </summary>
+public readonly struct WindowTitleBarStyle
+{
+    /// <summary>Bar height in pixels.</summary>
+    public float Height { get; init; }
+
+    /// <summary>
+    ///     Inner padding of the bar, applied inside <see cref="Height" />. The default insets
+    ///     only the left (8) and right (2) edges.
+    /// </summary>
+    public EdgeInsets Padding { get; init; }
+
+    /// <summary>
+    ///     Width and height of each title-bar button. <c>0</c> derives the size as
+    ///     <c>Height - 4</c>.
+    /// </summary>
+    public float ButtonSize { get; init; }
+
+    /// <summary>Horizontal gap between adjacent buttons in pixels.</summary>
+    public float ButtonSpacing { get; init; }
+
+    /// <summary>Corner radius of each title-bar button.</summary>
+    public float ButtonCornerRadius { get; init; }
+
+    /// <summary>
+    ///     Per-corner radii of the bar as <c>(topLeft, topRight, bottomRight, bottomLeft)</c>.
+    /// </summary>
+    public Vector4 CornerRadius { get; init; }
+
+    /// <summary>Border stroke width of the bar. <c>0</c> draws no border.</summary>
+    public float BorderThickness { get; init; }
+
+    /// <summary>Bar border color, painted when <see cref="BorderThickness" /> &gt; 0.</summary>
+    public Vector4 BorderColor { get; init; }
+
+    /// <summary>Horizontal placement of the title in the free space.</summary>
+    public TitleBarAlignment TitleAlignment { get; init; }
+
+    /// <summary>Side of the bar that holds the minimize / close buttons.</summary>
+    public TitleBarButtonPlacement ButtonPlacement { get; init; }
+
+    /// <summary>
+    ///     When <c>true</c>, the close button comes before the minimize button inside the
+    ///     group. Default order is minimize, then close.
+    /// </summary>
+    public bool ReverseButtonOrder { get; init; }
+
+    /// <summary>Fill color of the bar.</summary>
+    public Vector4 BackgroundColor { get; init; }
+
+    /// <summary>Optional gradient painted over <see cref="BackgroundColor" />.</summary>
+    public Gradient? BackgroundGradient { get; init; }
+
+    /// <summary>Idle fill of a button. Transparent by default.</summary>
+    public Vector4 ButtonColor { get; init; }
+
+    /// <summary>Fill of the minimize button while hovered.</summary>
+    public Vector4 ButtonHoverColor { get; init; }
+
+    /// <summary>Fill of a button while the pointer is pressed on it.</summary>
+    public Vector4 ButtonPressedColor { get; init; }
+
+    /// <summary>Fill of the close button while hovered.</summary>
+    public Vector4 CloseHoverColor { get; init; }
+
+    /// <summary>Text style of the title.</summary>
+    public TextStyle TitleTextStyle { get; init; }
+
+    /// <summary>
+    ///     Text style of the button glyphs. The close glyph is drawn 2 px larger than
+    ///     <see cref="TextStyle.FontSize" />, matching the legacy look.
+    /// </summary>
+    public TextStyle ButtonTextStyle { get; init; }
+
+    /// <summary>Glyph of the minimize button while the window is expanded.</summary>
+    public string MinimizeGlyph { get; init; }
+
+    /// <summary>Glyph of the minimize button while the window is collapsed.</summary>
+    public string RestoreGlyph { get; init; }
+
+    /// <summary>Glyph of the close button.</summary>
+    public string CloseGlyph { get; init; }
+
+    /// <summary>
+    ///     Creates a default style derived from the given <paramref name="colors" />
+    ///     and <paramref name="text" />.
+    /// </summary>
+    public static WindowTitleBarStyle Default(ColorScheme colors, TextTheme text)
+    {
+        var hover = new Vector4
+        (
+            colors.Surface.X + 0.12f,
+            colors.Surface.Y + 0.12f,
+            colors.Surface.Z + 0.12f,
+            1f
+        );
+
+        return new WindowTitleBarStyle
+        {
+            Height = 28f,
+            Padding = EdgeInsets.Only(left: 8, right: 2),
+            ButtonSize = 0f,
+            ButtonSpacing = 0f,
+            ButtonCornerRadius = 3f,
+            CornerRadius = Vector4.Zero,
+            BorderThickness = 0f,
+            BorderColor = colors.Border,
+            TitleAlignment = TitleBarAlignment.Left,
+            ButtonPlacement = TitleBarButtonPlacement.End,
+            ReverseButtonOrder = false,
+            BackgroundColor = colors.Surface,
+            BackgroundGradient = null,
+            ButtonColor = Vector4.Zero,
+            ButtonHoverColor = hover,
+            ButtonPressedColor = hover,
+            CloseHoverColor = colors.Error,
+            TitleTextStyle = new TextStyle
+            {
+                FontSize = 14f, Color = colors.OnSurface, FontFamily = text.Body.FontFamily
+            },
+            ButtonTextStyle = new TextStyle
+            {
+                FontSize = 14f, Color = colors.OnSurface, FontFamily = text.Body.FontFamily
+            },
+            MinimizeGlyph = "\u2013",
+            RestoreGlyph = "+",
+            CloseGlyph = "\u00d7"
+        };
+    }
+}
+
 /// <summary>
 ///     Immutable bundle of visual design tokens (colors and typography) that
 ///     can be provided to a widget subtree via <see cref="Theme" />.
@@ -814,6 +973,7 @@ public class ThemeData
                          ?? TextFieldStyle.Default(ColorScheme, TextTheme);
         IconButtonStyle = iconButtonStyle
                           ?? IconButtonStyle.Default(ColorScheme);
+        WindowTitleBarStyle = WindowTitleBarStyle.Default(ColorScheme, TextTheme);
     }
 
     /// <summary>
@@ -855,6 +1015,9 @@ public class ThemeData
 
     /// <summary>Style tokens for <see cref="TextField" />.</summary>
     public TextFieldStyle TextFieldStyle { get; init; }
+
+    /// <summary>Style tokens for <see cref="WindowTitleBar" /> / <see cref="WindowFrame" />.</summary>
+    public WindowTitleBarStyle WindowTitleBarStyle { get; init; }
 
     /// <summary>Outline color applied to focused interactive widgets (buttons, toggles).</summary>
     public Vector4 FocusOutlineColor { get; init; } = new

@@ -56,3 +56,45 @@ var header = theme.TextTheme.Headline;
 header.Color = theme.ColorScheme.Primary;
 new Text("Inventory", header);
 ```
+
+## Component style tokens
+
+`ThemeData` also carries one style struct per customizable widget. Each is a
+`readonly struct` of `{ get; init; }` tokens with a `Default(...)` factory, so you copy the
+default and override only what you need:
+
+| Property | Applies to |
+|----------|------------|
+| `ProgressBarStyle` | `ProgressBar` |
+| `ItemSlotStyle` | `FlatItemSlot`, `NineSliceItemSlot` |
+| `HotkeyBadgeStyle` | `HotkeyBadge` |
+| `DropdownStyle` | `Dropdown<T>` |
+| `CheckboxStyle` | `Checkbox` |
+| `RadioButtonStyle` | `RadioButton<T>` |
+| `SliderStyle` | `Slider` |
+| `ButtonStyle` | `Button` |
+| `IconButtonStyle` | `IconButton` |
+| `TextFieldStyle` | `TextField` |
+| `WindowTitleBarStyle` | `WindowTitleBar`, `WindowFrame` |
+
+Pass one to `ThemeData` to restyle a whole subtree:
+
+```csharp
+var colors = ColorScheme.Default();
+var bars = WindowTitleBarStyle.Default(colors, TextTheme.Default(colors)) with
+{
+    Height = 32,
+    ButtonPlacement = TitleBarButtonPlacement.Start,
+    TitleAlignment = TitleBarAlignment.Center,
+    TitleTextStyle = new TextStyle
+    {
+        FontFamily = "monospace", FontSize = 13, Color = colors.OnSurface
+    },
+};
+
+new Theme(new ThemeData { WindowTitleBarStyle = bars }, child: myContent);
+```
+
+A widget's own `style:` argument wins over the theme, and an explicit constructor argument
+(such as `backgroundColor:`) wins over both. See
+[WindowTitleBarStyle](./windowing.md#windowtitlebarstyle) for the full token table.

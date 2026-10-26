@@ -102,6 +102,13 @@ internal sealed class FrameArgs
 
     /// <summary>Syncs hit-bounds after layout changes window dimensions or position.</summary>
     internal required Action SyncHitBounds { get; init; }
+
+    /// <summary>
+    ///     Title-bar-only window size while the window is collapsed, or <c>null</c> when
+    ///     expanded. When set, layout uses tight constraints of this size and skips the
+    ///     shrink-wrap size recompute, so the window rectangle stays exactly the bar.
+    /// </summary>
+    internal Vector2? CollapsedSize { get; init; }
 }
 
 /// <summary>
@@ -255,6 +262,17 @@ internal sealed class FramePipeline : IDisposable
         var windowPos = args.WindowPos;
         var windowSize = args.WindowSize;
         args.PerformanceMetrics.IncrementLayout();
+
+        if (args.CollapsedSize is { } collapsed)
+        {
+            sw.Restart();
+            rootRo.Layout(LayoutConstraints.Tight(collapsed.X, collapsed.Y));
+            sw.Stop();
+            args.PerformanceMetrics.RecordLayoutTime((float)sw.Elapsed.TotalMilliseconds);
+
+            args.SyncHitBounds();
+            return (windowPos, collapsed);
+        }
 
         LayoutConstraints constraints;
         if (args.WindowConfig.IsShrinkWrap)

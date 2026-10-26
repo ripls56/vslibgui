@@ -16,6 +16,7 @@ using SkiaSharp;
 using Vintagestory.API.Client;
 using Vintagestory.API.Config;
 using Vintagestory.API.MathTools;
+using CursorShape = OpenTK.Windowing.GraphicsLibraryFramework.CursorShape;
 
 [assembly: InternalsVisibleTo("Gui.Tests")]
 
@@ -47,7 +48,7 @@ namespace Gui;
 /// </code>
 ///     </para>
 /// </summary>
-public abstract class GuiBase : GuiDialog, ITickerProvider
+public abstract class GuiBase : GuiDialog, ITickerProvider, IWindowHost
 {
     /// Dummy composer key so VS engine's GuiManager dispatches OnMouseWheel
     /// to us in the priority "point-inside-bounds" loop rather than the
@@ -58,6 +59,9 @@ public abstract class GuiBase : GuiDialog, ITickerProvider
     private readonly DialogInputRouter _inputRouter;
 
     private readonly TickerScheduler _tickerScheduler = new();
+
+    /// <summary>Title-bar collapse state; recreated on every <see cref="TryOpen" />.</summary>
+    private WindowCollapseState _collapse = new();
 
     private int _elementCount;
     private WindowInteractionStateMachine _interactionSm = null!;
@@ -87,6 +91,7 @@ public abstract class GuiBase : GuiDialog, ITickerProvider
         BuildOwner.SetTickerProvider(this);
         BuildOwner.SetClipboard(new GameClipboard(capi));
         BuildOwner.SetSoundPlayer(new SoundPlayer(capi));
+        BuildOwner.SetWindowHost(this);
         BuildOwner.FocusManager = FocusManager;
         BuildOwner.OnError =
             (
@@ -199,6 +204,9 @@ public abstract class GuiBase : GuiDialog, ITickerProvider
 
         _windowConfig = CreateWindowConfig();
         _interactionSm = new WindowInteractionStateMachine(_windowConfig);
+        _collapse = new WindowCollapseState();
+        // OnGuiClosed clears the host; a reopened dialog must register itself again.
+        BuildOwner.SetWindowHost(this);
         _positionInitialized = false;
 
         if (_windowConfig.Size.HasValue)
@@ -383,10 +391,63 @@ public abstract class GuiBase : GuiDialog, ITickerProvider
             Math.Clamp
             (
                 size.Y,
-                _windowConfig.MinSize.Y,
+                _collapse.EffectiveMinHeight(_windowConfig.MinSize.Y),
                 _windowConfig.MaxSize.Y
             )
         );
+    }
+
+    /// <inheritdoc />
+    public bool IsHostCollapsed => _collapse.IsCollapsed;
+
+    /// <inheritdoc />
+    public void SetHostCollapsed
+    (
+        object owner,
+        bool collapsed,
+        float collapsedHeight
+    )
+    {
+        var shrinkWrap = _windowConfig.IsShrinkWrap;
+        if (!_collapse.SetCollapsed(owner, collapsed, collapsedHeight, WindowSize))
+        {
+            return;
+        }
+
+        if (_collapse.TryGetCollapsedSize(out var collapsedSize))
+        {
+            WindowSize = collapsedSize;
+        }
+        else if (!shrinkWrap)
+        {
+            // Keep the width the user may have resized to while collapsed.
+            WindowSize = ClampSize(new Vector2(WindowSize.X, _collapse.ExpandedSize.Y));
+        }
+
+        _layoutSize = WindowSize;
+        RootElement?.RenderObject?.MarkNeedsLayout();
+        SyncHitBounds();
+    }
+
+    /// <summary>
+    ///     Cursor for a window-local hover point. Mirrors
+    ///     <see cref="WindowInteractionStateMachine.HoverCursorFor" />, but drops the vertical
+    ///     resize edges while collapsed so a title-bar-only window never shows a vertical arrow.
+    /// </summary>
+    private CursorShape? HoverCursorFor
+    (
+        Vector2 local
+    )
+    {
+        if (_interactionSm.IsInteracting)
+        {
+            return null;
+        }
+
+        var edge = _collapse.FilterEdges(_interactionSm.DetectResizeEdge(local, WindowSize));
+        return edge != ResizeEdge.None
+            ? WindowInteractionStateMachine.CursorForEdge(edge)
+            : CursorShape.Arrow;
     }
 
 
@@ -502,7 +563,9 @@ public abstract class GuiBase : GuiDialog, ITickerProvider
             WindowPos = newPos;
             if (_interactionSm.IsResizing)
             {
-                WindowSize = newSize;
+                // A collapsed window resizes horizontally only; its height stays the bar's.
+                WindowSize = _collapse.Apply(newSize);
+                _collapse.UpdateFrozenWidth(WindowSize.X);
             }
 
             SyncHitBounds();
@@ -533,7 +596,7 @@ public abstract class GuiBase : GuiDialog, ITickerProvider
         if (!IsInsideWindow(local) && !_interactionSm.IsInteracting)
         {
             args.Handled = false;
-            var hoverCursor = _interactionSm.HoverCursorFor(local, WindowSize);
+            var hoverCursor = HoverCursorFor(local);
             if (hoverCursor.HasValue)
             {
                 _cursorController.SetShape(hoverCursor.Value);
@@ -557,7 +620,7 @@ public abstract class GuiBase : GuiDialog, ITickerProvider
             MouseOverCursor = widgetCursor.Name;
         }
 
-        var cursor = _interactionSm.HoverCursorFor(local, WindowSize);
+        var cursor = HoverCursorFor(local);
         if (cursor.HasValue)
         {
             _cursorController.SetShape(cursor.Value);
@@ -647,7 +710,7 @@ public abstract class GuiBase : GuiDialog, ITickerProvider
         );
         var local = ToWindowLocal(screen);
 
-        var edge = _interactionSm.DetectResizeEdge(local, WindowSize);
+        var edge = _collapse.FilterEdges(_interactionSm.DetectResizeEdge(local, WindowSize));
         if (edge != ResizeEdge.None)
         {
             _interactionSm.BeginResize(edge, screen, WindowPos, WindowSize);
@@ -932,6 +995,10 @@ public abstract class GuiBase : GuiDialog, ITickerProvider
                     capi.Logger.Warning($"[GUI Layout] {ro.GetType().Name}: {msg}");
             }
 
+            var collapsedSize = _collapse.TryGetCollapsedSize(out var barSize)
+                ? barSize
+                : (Vector2?)null;
+
             _framePipeline.Run
             (
                 new FrameArgs
@@ -965,7 +1032,8 @@ public abstract class GuiBase : GuiDialog, ITickerProvider
                     ScreenH = screenH,
                     PaintResizePendingOverlay = PaintResizePendingOverlay,
                     IsResizePending = _interactionSm.IsResizing && WindowSize != _layoutSize,
-                    SyncHitBounds = SyncHitBounds
+                    SyncHitBounds = SyncHitBounds,
+                    CollapsedSize = collapsedSize
                 }
             );
         }
@@ -1153,6 +1221,7 @@ public abstract class GuiBase : GuiDialog, ITickerProvider
         MouseOverCursor = null;
         ModSystem.UnregisterWindow(this);
         RootElement?.Unmount();
+        BuildOwner.SetWindowHost(null);
         _tickerScheduler.Dispose();
         _framePipeline.Dispose();
         base.OnGuiClosed();

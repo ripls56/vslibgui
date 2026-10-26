@@ -22,6 +22,5 @@ hero:
 | [State Management](./state-management) | How to handle UI updates |
 | [Widget Registry](./widgets/base) | Complete catalogue of available widgets |
 | [Event Handling](./event-handling) | Input, focus, and gestures |
+| [Windowing System](./windowing) | Windows, drag and resize, title bars, window styles |
 | [Theming Guide](./theming) | Customising look and feel |
-| [Testing](./Testing) | Snapshot and logic testing |
-| [Compatibility](./Compatibility) | Working with other mods |

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Gui.Clipboard;
+using Gui.Core.Windowing;
 using Gui.Sound;
 using Gui.Widgets.Animations;
 using Gui.Widgets.Input;
@@ -24,6 +25,7 @@ public class BuildOwner
     private IClipboard? _clipboard;
     private ISoundPlayer? _soundPlayer;
     private ITickerProvider? _tickerProvider;
+    private IWindowHost? _windowHost;
     public FocusManager? FocusManager { get; set; }
 
     /// <summary><c>true</c> if at least one element is scheduled for rebuild.</summary>
@@ -95,6 +97,20 @@ public class BuildOwner
     ///     <c>GuiBase</c>). Silence is preferable to throwing from an input callback.
     /// </summary>
     public ISoundPlayer GetSoundPlayer() => _soundPlayer ?? NullSoundPlayer.Instance;
+
+    /// <summary>Registers the window that hosts this tree, or <c>null</c> to clear it.</summary>
+    public void SetWindowHost
+    (
+        IWindowHost? host
+    ) =>
+        _windowHost = host;
+
+    /// <summary>
+    ///     Returns the <see cref="IWindowHost" /> registered for this build owner, or <c>null</c>
+    ///     when the tree is not hosted by a window (headless tests). Callers must treat
+    ///     <c>null</c> as "no window to resize" and keep working.
+    /// </summary>
+    public IWindowHost? GetWindowHost() => _windowHost;
 
     internal void RegisterGlobalKey
     (

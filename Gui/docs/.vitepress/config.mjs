@@ -5,6 +5,7 @@ import vslibDark from './theme/vslib-dark.json'
 export default defineConfig({
   title: "vslibgui",
   description: "Flutter-inspired UI Framework for Vintage Story",
+  base: '/vslibgui/',
   srcDir: '.',
   outDir: '../.vitepress/dist',
   cacheDir: '../.vitepress/cache',

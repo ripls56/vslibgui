@@ -46,7 +46,23 @@ internal static class NativeLibraryLoader
         var rid = GetRid();
         var nativeDir = Path.Combine(modDir, "native", rid, "native");
 
-        RegisterResolver(typeof(Buffer).Assembly, nativeDir);
+        try
+        {
+            RegisterResolver(typeof(Buffer).Assembly, nativeDir);
+        }
+        catch (InvalidOperationException e)
+        {
+            // Only one resolver per assembly is allowed. Mods that hit the harfbuzz
+            // interposition crash before 4.0.0 shipped their own, usually with an aggressive
+            // ExecuteOrder so it ran first. Keep theirs instead of aborting client startup.
+            _logger?.Warning
+            (
+                "[GUI] Another mod already registered a native resolver for HarfBuzzSharp; "
+                + "keeping it. If it does not load the bundled library with RTLD_DEEPBIND, "
+                + "the system libharfbuzz can still interpose our symbols. {0}",
+                e.Message
+            );
+        }
     }
 
     private static void RegisterResolver

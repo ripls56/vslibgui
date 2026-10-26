@@ -68,6 +68,12 @@ public class SlotControllerGuardTests
         public void HandleClientPacket(IPlayer byPlayer, int packetId, byte[] data) =>
             throw new System.NotSupportedException();
 
+        public void SendInventoryRollback(
+            Vintagestory.API.Server.IServerPlayer player,
+            int slotId,
+            System.ReadOnlySpan<byte> data) =>
+            throw new System.NotSupportedException();
+
         public object DidOpen(IPlayer player) => throw new System.NotSupportedException();
 
         public object DidClose(IPlayer player) => throw new System.NotSupportedException();

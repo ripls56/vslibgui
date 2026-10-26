@@ -262,6 +262,10 @@ public sealed class PackageTask : FrostingTask<BuildContext>
                 $"../{BuildContext.ProjectName}/native",
                 $"../Releases/{context.Name}/native"
             );
+
+            // Native debug symbols add 62 MB that nothing loads at runtime. The csproj
+            // Exclude covers the publish output only; this folder is copied from source.
+            context.DeleteFiles($"../Releases/{context.Name}/native/**/*.pdb");
         }
 
         context.CopyFile(

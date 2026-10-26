@@ -109,8 +109,14 @@ var bodyStyle = theme.TextTheme.Body;
 ```
 
 `ThemeData` contains:
-- `ColorScheme` — 9 semantic colors: Primary, OnPrimary, Surface, OnSurface,
-  Background, OnBackground, Border, Error, OnError
-- `TextTheme` — 3 text styles: Headline, Body, Label
+- `ColorScheme` — 17 semantic colors: Primary, OnPrimary, Secondary, OnSecondary, Surface,
+  OnSurface, OnSurfaceVariant, Background, OnBackground, Border, Error, OnError, SurfaceLow,
+  SurfaceHigh, StateHover, StateSelected, OutlineVariant
+- `TextTheme` — 7 text roles: Display, Headline, Title, Subtitle, Body, Label, Caption
+- One style struct per customizable widget: `ButtonStyle`, `IconButtonStyle`,
+  `TextFieldStyle`, `DropdownStyle`, `CheckboxStyle`, `RadioButtonStyle`, `SliderStyle`,
+  `ProgressBarStyle`, `ItemSlotStyle`, `HotkeyBadgeStyle`, `WindowTitleBarStyle`. See
+  [Theming](../theming.md#component-style-tokens)
+- `FocusOutlineColor` and `FocusOutlineWidth`
 
 If no `Theme` ancestor exists, `Theme.Of()` returns `ThemeData.Default` (dark theme).
